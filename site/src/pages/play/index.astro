@@ -1,9 +1,8 @@
 ---
-// /play/ opens the screening room on the first deck.
+// /play/: the example decks as case studies.
 import Base from "../../layouts/Base.astro";
-import Room from "../../components/Room.astro";
-import { decks } from "../../data/decks";
+import Cases from "../../components/Cases.astro";
 ---
-<Base title="範例 — slidejam" description="用 slidejam 做的簡報，在放映室裡自己播放。左右換一份，看它用了哪些效果。" dark>
-  <Room current={decks[0].id} />
+<Base title="範例 — slidejam" description="用 slidejam 做的簡報：每一份都在自己播，按播放換你來翻。">
+  <Cases />
 </Base>

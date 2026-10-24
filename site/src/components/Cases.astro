@@ -1,0 +1,207 @@
+---
+// Example decks as case studies: one screen-high chapter each — the deck playing by itself on
+// the left, who it was for and what it does on the right. "Play" opens a theater where you
+// drive the deck. Each chapter has its own address (/play/<id>/); scrolling keeps it in sync.
+import { decks, deckStats } from "../data/decks";
+interface Props { current?: string }
+const { current } = Astro.props;
+const B = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const list = decks.map((d, i) => ({ ...d, ...deckStats(d.file), n: String(i + 1).padStart(2, "0") }));
+---
+<section class="cases-head wrap">
+  <p class="kicker"><span lang="zh">範例</span><span lang="en">Examples</span></p>
+  <h1><span lang="zh">用 slidejam 做的簡報</span><span lang="en">Decks made with slidejam</span></h1>
+  <p class="sub"><span lang="zh">每一份都在自己播。按「播放」，換你來翻。</span><span lang="en">Each one plays by itself. Press Play to drive it.</span></p>
+  <nav class="case-index">
+    {list.map((d, i) => (
+      <a href={`${B}play/${d.id}/`} data-id={d.id} style={`--i:${i}`}>
+        <span class="pi"><img src={`${B}posters/${d.id}.jpg`} alt="" /></span>
+        <span class="pt"><i>{d.n}</i><b><span lang="zh">{d.zh[0]}</span><span lang="en">{d.en[0]}</span></b><small>{d.slides} <span lang="zh">頁</span><span lang="en">slides</span> · {d.theme}</small></span>
+      </a>
+    ))}
+  </nav>
+</section>
+
+{list.map((d) => (
+  <section class="case" id={`case-${d.id}`} data-id={d.id} data-file={d.file} data-title-zh={d.zh[0]} data-title-en={d.en[0]}>
+    <div class="case-grid wrap-wide">
+      <div class="case-screen">
+        <div class="frame"><iframe data-src={`${B}${d.file}?embed&tour=5`} title={d.zh[0]} tabindex="-1" loading="lazy"></iframe><img class="poster" src={`${B}posters/${d.id}.jpg`} alt="" /></div>
+      </div>
+      <div class="case-text">
+        <span class="no">{d.n}</span>
+        <h2><span lang="zh">{d.zh[0]}</span><span lang="en">{d.en[0]}</span></h2>
+        <p class="lead"><span lang="zh">{d.zh[1]}</span><span lang="en">{d.en[1]}</span></p>
+        <dl>
+          <dt><span lang="zh">講給誰</span><span lang="en">For</span></dt><dd><span lang="zh">{d.who[0]}</span><span lang="en">{d.who[1]}</span></dd>
+          <dt><span lang="zh">想做到</span><span lang="en">Aim</span></dt><dd><span lang="zh">{d.goal[0]}</span><span lang="en">{d.goal[1]}</span></dd>
+          <dt><span lang="zh">用了</span><span lang="en">Uses</span></dt>
+          <dd class="chips">{d.fx.slice(0, 12).map((f) => <a href={`${B}play/effects/?slide=${f}`}>{f}</a>)}{d.fx.length > 12 && <span>+{d.fx.length - 12}</span>}</dd>
+        </dl>
+        <p class="facts">{d.slides} <span lang="zh">頁</span><span lang="en">slides</span> · <span lang="zh">主題</span><span lang="en">theme</span> {d.theme}</p>
+        <div class="actions">
+          <button class="play"><span lang="zh">播放</span><span lang="en">Play</span></button>
+          <button class="share" data-url={`${B}play/${d.id}/`}><span lang="zh">複製連結</span><span lang="en">Copy link</span></button>
+          <a class="plain" href={`https://github.com/cooldongdong/slidejam/blob/master/${d.file}`}><span lang="zh">原始碼</span><span lang="en">Source</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+))}
+
+<div class="theater" id="theater" hidden>
+  <div class="th-bar">
+    <b id="th-title"></b>
+    <span class="hint"><span lang="zh">點投影片後可用鍵盤 ← →；按 ? 看所有快捷鍵</span><span lang="en">Click the slide, then ← →; ? lists every key</span></span>
+    <span class="sp"></span>
+    <button id="th-full"><span lang="zh">全螢幕</span><span lang="en">Full screen</span></button>
+    <button id="th-close"><span lang="zh">關閉</span><span lang="en">Close</span></button>
+  </div>
+  <div class="th-stage"><iframe id="th-frame" title="deck" allow="fullscreen; clipboard-write"></iframe></div>
+</div>
+
+<script is:inline define:vars={{ base: B, first: current ?? null }}>
+const cases = [...document.querySelectorAll(".case")];
+const lang = () => (document.documentElement.dataset.lang === "en" ? "en" : "zh");
+
+// decks only play while their chapter is near the screen
+const play = new IntersectionObserver((es) => es.forEach((e) => {
+  const f = e.target.querySelector("iframe");
+  if (e.isIntersecting && !f.src) { f.src = f.dataset.src; f.onload = () => e.target.classList.add("live"); }
+  if (!e.isIntersecting && f.src) { f.removeAttribute("src"); e.target.classList.remove("live"); }
+}), { rootMargin: "0px" });
+cases.forEach((c) => play.observe(c));
+
+// the chapter in view: reveal it, and keep the address on it
+let shown = null;
+const seen = new IntersectionObserver((es) => es.forEach((e) => {
+  if (!e.isIntersecting) return;
+  e.target.classList.add("in");
+  const id = e.target.dataset.id;
+  if (id === shown) return;
+  shown = id;
+  document.querySelectorAll(".case-index a").forEach((a) => a.classList.toggle("on", a.dataset.id === id));
+  if (!theater.hidden) return;
+  history.replaceState(null, "", `${base}play/${id}/${location.search}`);
+}), { threshold: 0.55 });
+cases.forEach((c) => seen.observe(c));
+document.querySelectorAll(".case-index a").forEach((a) => a.addEventListener("click", (e) => {
+  e.preventDefault(); document.getElementById(`case-${a.dataset.id}`).scrollIntoView({ behavior: "smooth", block: "start" });
+}));
+
+// theater: the real deck, big, yours to drive
+const theater = document.getElementById("theater"), tframe = document.getElementById("th-frame");
+function open(c, slide) {
+  tframe.src = `${base}${c.dataset.file}${slide ? `?slide=${encodeURIComponent(slide)}` : ""}`;
+  document.getElementById("th-title").textContent = c.dataset[lang() === "en" ? "titleEn" : "titleZh"];
+  theater.hidden = false;
+  requestAnimationFrame(() => theater.classList.add("on"));
+  document.documentElement.style.overflow = "hidden";
+  tframe.onload = () => {
+    tframe.focus();
+    // Esc inside the deck closes the theater, unless the deck has something of its own open
+    // (overview, keys, themes, edit or annotate) — then Esc is the deck's to handle
+    const w = tframe.contentWindow;
+    w.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      const d = w.document, busy = d.querySelector("#overview.show, #keys.show, #themes.show, #wall")
+        || d.body.classList.contains("editing") || d.body.classList.contains("annotating");
+      if (!busy) close();
+    }, true);
+  };
+}
+function close() {
+  theater.classList.remove("on");
+  document.documentElement.style.overflow = "";
+  setTimeout(() => { theater.hidden = true; tframe.removeAttribute("src"); }, 300);
+}
+cases.forEach((c) => c.querySelector(".play").addEventListener("click", () => open(c)));
+cases.forEach((c) => c.querySelector(".frame").addEventListener("click", () => open(c)));
+document.getElementById("th-close").onclick = close;
+document.getElementById("th-full").onclick = () => { tframe.requestFullscreen?.(); tframe.focus(); };
+addEventListener("keydown", (e) => { if (e.key === "Escape" && !theater.hidden) close(); });
+theater.addEventListener("click", (e) => { if (e.target === theater || e.target.classList.contains("th-stage")) close(); });
+
+// copy a chapter's own address
+cases.forEach((c) => c.querySelector(".share").addEventListener("click", async (e) => {
+  const b = e.currentTarget;
+  try { await navigator.clipboard.writeText(new URL(b.dataset.url, location.href).href); b.classList.add("done"); setTimeout(() => b.classList.remove("done"), 1500); } catch {}
+}));
+
+// arriving at /play/<id>/: go straight to that chapter; ?slide=… opens it in the theater
+(() => {
+  if (!first) return;
+  const c = document.getElementById(`case-${first}`);
+  c.scrollIntoView({ block: "start" });
+  const q = new URLSearchParams(location.search);
+  if (q.has("slide")) open(c, q.get("slide"));
+})();
+</script>
+
+<style is:global>
+.wrap-wide{max-width:1400px;margin:0 auto;padding:0 32px}
+.cases-head{padding:90px 24px 70px}
+.cases-head h1{font-size:clamp(40px,6vw,76px);line-height:1.05;letter-spacing:-.03em;margin:0;color:#fff}
+.cases-head .sub{font-size:19px;color:#8a9ca3;margin:18px 0 34px}
+/* the three decks up front, as posters */
+.case-index{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.case-index a{display:block;color:#8a9ca3;text-decoration:none;animation:card-in .9s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(var(--i) * .1s + .15s)}
+@keyframes card-in{from{opacity:0;transform:translateY(30px)}}
+.case-index .pi{display:block;aspect-ratio:16/9;border-radius:10px;overflow:hidden;box-shadow:0 0 0 1px rgb(255 255 255/.08),0 30px 60px -30px rgb(0 0 0/.9);transition:transform .4s cubic-bezier(.16,1,.3,1),box-shadow .4s}
+.case-index .pi img{width:100%;height:100%;object-fit:cover;display:block}
+.case-index a:hover .pi{transform:translateY(-6px);box-shadow:0 0 0 1px rgb(127 209 226/.4),0 40px 70px -30px rgb(0 0 0/.95)}
+.case-index .pt{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;margin-top:14px;align-items:baseline}
+.case-index .pt i{font:12px var(--mono);font-style:normal;color:#4a5a60;grid-row:span 2}
+.case-index .pt b{color:#e8eef5;font-weight:600;font-size:16px}
+.case-index .pt small{font:12px var(--mono);color:#5b6a71}
+.case{min-height:100vh;display:flex;align-items:center;padding:60px 0;scroll-margin-top:0}
+.case-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,.75fr);gap:64px;align-items:center;width:100%}
+.case-screen{opacity:0;transform:translateY(40px) scale(.97);transition:opacity 1s cubic-bezier(.16,1,.3,1),transform 1.2s cubic-bezier(.16,1,.3,1)}
+.case.in .case-screen{opacity:1;transform:none}
+.frame{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;cursor:pointer;box-shadow:0 0 0 1px rgb(255 255 255/.14),0 60px 120px -40px rgb(0 0 0/.9);transition:box-shadow .4s,transform .4s}
+.frame:hover{transform:translateY(-4px);box-shadow:0 0 0 1px rgb(127 209 226/.35),0 70px 130px -40px rgb(0 0 0/.95)}
+.frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none}
+.frame .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .6s}
+.case.live .frame .poster{opacity:0}
+.case-text > *{opacity:0;transform:translateY(24px);transition:opacity .8s,transform .9s cubic-bezier(.16,1,.3,1)}
+.case.in .case-text > *{opacity:1;transform:none}
+.case.in .case-text > :nth-child(2){transition-delay:.08s}.case.in .case-text > :nth-child(3){transition-delay:.16s}
+.case.in .case-text > :nth-child(4){transition-delay:.24s}.case.in .case-text > :nth-child(5){transition-delay:.32s}.case.in .case-text > :nth-child(6){transition-delay:.4s}
+.case-text .no{display:block;font:300 64px/1 var(--mono);color:#2a3a42;letter-spacing:-.04em;margin-bottom:14px}
+.case-text h2{font-size:clamp(28px,3vw,40px);line-height:1.15;margin:0;color:#fff;letter-spacing:-.01em}
+.case-text .lead{color:#8a9ca3;font-size:16px;margin:10px 0 26px}
+.case-text dl{display:grid;grid-template-columns:64px 1fr;gap:14px 18px;margin:0 0 22px;font-size:15px}
+.case-text dt{color:#5b6a71;font-size:13px;padding-top:2px}
+.case-text dd{margin:0;color:#c7d6db;line-height:1.6}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips a,.chips span{font:12px var(--mono);color:#8a9ca3;border:1px solid #1d2a30;border-radius:999px;padding:2px 9px;text-decoration:none}
+.chips a:hover{color:#fff;border-color:#4fb3c9}
+.case-text .facts{font:13px var(--mono);color:#5b6a71;margin:0 0 26px}
+.actions{display:flex;align-items:center;gap:18px}
+.actions .play{font:600 15px var(--sans);letter-spacing:.04em;border:0;border-radius:999px;padding:12px 30px;background:#e8eef5;color:#060708;cursor:pointer;transition:transform .2s,background .2s}
+.actions .play:hover{background:#fff;transform:translateY(-1px)}
+.actions .share,.actions .plain{font:500 14px var(--sans);border:0;background:none;color:#8a9ca3;cursor:pointer;text-decoration:none;padding:4px 0;border-bottom:1px solid transparent}
+.actions .share:hover,.actions .plain:hover{color:#fff;border-bottom-color:#fff}
+.actions .share.done{color:#7ddc8a}
+/* theater */
+.theater{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;background:rgb(3 4 5/.94);backdrop-filter:blur(14px);opacity:0;transition:opacity .3s}
+.theater[hidden]{display:none}
+.theater.on{opacity:1}
+.th-bar{display:flex;align-items:center;gap:18px;padding:16px 28px;color:#c7d6db;font-size:14px}
+.th-bar b{color:#fff;font-size:16px}
+.th-bar .hint{color:#5b6a71;font-size:13px}
+.th-bar .sp{flex:1}
+.th-bar button{font:500 14px var(--sans);border:0;background:none;color:#8a9ca3;cursor:pointer;padding:4px 0;border-bottom:1px solid transparent}
+.th-bar button:hover{color:#fff;border-bottom-color:#fff}
+.th-stage{flex:1;display:grid;place-items:center;padding:0 28px 28px;min-height:0}
+.th-stage iframe{width:min(100%,calc((100vh - 110px) * 16 / 9));aspect-ratio:16/9;border:0;border-radius:10px;background:#000;box-shadow:0 60px 120px -40px rgb(0 0 0/.9);transform:scale(.96);transition:transform .4s cubic-bezier(.16,1,.3,1)}
+.theater.on .th-stage iframe{transform:none}
+@media (max-width:960px){
+  .case-grid{grid-template-columns:1fr;gap:32px}
+  .case-index{grid-template-columns:1fr}
+  .case{min-height:0;padding:50px 0}
+  .wrap-wide{padding:0 20px}
+  .th-bar .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){.case-screen,.case-text > *{transition:none;opacity:1;transform:none}}
+</style>

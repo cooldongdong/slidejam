@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 const B = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+import { decks as examples } from "../data/decks";
 ---
 <Base title={'slidejam — 會動的簡報，跟 AI 一起做'} description={'一個 HTML 檔，雙擊就開。從真網站拍下頁面動畫，44 種效果，跟 AI 一起即興做簡報。'}>
 <section class="hero"><div class="wrap">
@@ -73,16 +74,31 @@ cd slidejam && npm install</pre>
 </div></section>
 
 <section class="examples"><div class="wrap">
-  <h2><span lang="zh">打開來看</span><span lang="en">Open one</span></h2>
-  <div class="cards">
-    <a class="card" href={B + "effects/"}>
-      <div class="screen"><iframe src={B + "effects.html?embed&loop=60&slide=1"} title="effects" loading="lazy" tabindex="-1"></iframe></div>
-      <div class="t"><b><span lang="zh">效果圖鑑</span><span lang="en">Effects gallery</span></b><span class="d"><span lang="zh">44 種效果，每一頁都有示範和「跟 AI 這樣說」。它本身就是一份 slidejam 簡報。</span><span lang="en">44 effects, each with a demo and a line to ask an AI with. It is itself a slidejam deck.</span></span></div>
-    </a>
-    <a class="card" href={B + "play/"}>
-      <div class="screen"><iframe src={B + "examples/storymap/index.html?embed&loop=60&slide=1"} title="storymap" loading="lazy" tabindex="-1"></iframe></div>
-      <div class="t"><b><span lang="zh">範例：從車站出發</span><span lang="en">Example: a storymap talk</span></b><span class="d"><span lang="zh">樹林地圖故事的三頁簡報：真地圖插點飛行、嵌入真網站、從真網站拍下的頁面重組。</span><span lang="en">Three slides about a Shulin story map: a live map tour, an embedded site, and a morph captured from the real site.</span></span></div>
-    </a>
+  <h2><span lang="zh">看別人怎麼用</span><span lang="en">See it used</span></h2>
+  <p class="ex-sub"><span lang="zh">三份用 slidejam 做的簡報，每一份都能直接播放。</span><span lang="en">Three decks made with slidejam, each ready to play.</span></p>
+  <div class="ex-grid">
+    {examples.map((d) => (
+      <a class="ex" href={`${B}play/${d.id}/`}>
+        <span class="ex-img"><img src={`${B}posters/${d.id}.jpg`} alt="" loading="lazy" /><span class="ex-play"><span lang="zh">播放</span><span lang="en">Play</span></span></span>
+        <b><span lang="zh">{d.zh[0]}</span><span lang="en">{d.en[0]}</span></b>
+        <small><span lang="zh">{d.who[0]}</span><span lang="en">{d.who[1]}</span></small>
+      </a>
+    ))}
   </div>
+  <p style="text-align:center;margin-top:34px"><a class="btn" href={B + "play/"}><span lang="zh">看所有範例 →</span><span lang="en">All examples →</span></a></p>
 </div></section>
 </Base>
+
+<style is:global>
+.ex-sub{text-align:center;color:var(--ink-muted);margin:-18px 0 34px}
+.ex-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.ex{display:block;text-decoration:none;color:var(--ink)}
+.ex-img{position:relative;display:block;aspect-ratio:16/9;border-radius:12px;overflow:hidden;box-shadow:0 0 0 1px rgb(255 255 255/.1),0 30px 60px -30px rgb(0 0 0/.9);transition:transform .4s cubic-bezier(.16,1,.3,1)}
+.ex-img img{width:100%;height:100%;object-fit:cover;display:block}
+.ex-play{position:absolute;inset:0;display:grid;place-items:center;background:rgb(6 7 8/.55);color:#fff;font:600 15px var(--sans);letter-spacing:.06em;opacity:0;transition:opacity .3s}
+.ex:hover .ex-img{transform:translateY(-6px)}
+.ex:hover .ex-play{opacity:1}
+.ex b{display:block;margin-top:14px;font-size:17px}
+.ex small{color:var(--ink-muted);font-size:14px}
+@media (max-width:860px){.ex-grid{grid-template-columns:1fr}}
+</style>

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>slidejam：會動的簡報</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="deck/deck.css">
+<link rel="stylesheet" href="deck/themes/night.css">
+<style>
+.names{display:flex;flex-wrap:wrap;gap:12px;max-width:1300px}
+.terminal{font-size:28px;padding:34px 38px}
+.names > span{font:500 34px var(--mono);color:var(--accent-ink);border:1px solid var(--line-strong);border-radius:999px;padding:8px 20px}
+.big{font:700 150px/1 var(--mono);letter-spacing:-.04em;color:var(--ink)}
+.big b{color:var(--accent)}
+</style>
+</head>
+<body>
+<!-- An example deck: introducing slidejam in eight slides, with the night theme. -->
+<div id="stage">
+
+<section class="slide">
+  <p class="kicker" data-i="1">slidejam</p>
+  <h1 data-fx="letters">會動的簡報，</h1>
+  <h1 data-fx="letters" data-delay="0.7">跟 AI 一起 jam 出來</h1>
+<aside class="notes">今天介紹一個做簡報的方式：跟 AI 一起即興，做出會動的簡報。</aside></section>
+
+<section class="slide center">
+  <p class="big-q" data-i="1">做簡報，最花時間的是</p>
+  <p class="big-q" data-i="2"><span data-fx="rotate">排版｜找截圖｜對齊動畫｜改了又改</span></p>
+<aside class="notes">做簡報最花時間的，往往不是想內容，是跟工具搏鬥。</aside></section>
+
+<section class="slide">
+  <div class="grid2">
+    <div>
+      <p class="kicker" data-i="1">一個檔案</p>
+      <h2 data-i="2">雙擊就開</h2>
+      <ul class="steps">
+        <li data-i="3">不用安裝、不用伺服器</li>
+        <li data-i="4">整個資料夾壓縮就能寄</li>
+        <li data-i="5">隨身碟也能上台</li>
+      </ul>
+    </div>
+    <div class="terminal" data-fx="terminal" data-i="4">
+      <div class="cmd">node tools/new-deck.mjs ~/talks/my-talk</div>
+      <div>✓ new deck at ~/talks/my-talk</div>
+      <div>  index.html</div>
+      <div>  deck/</div>
+      <div>  media/</div>
+    </div>
+  </div>
+<aside class="notes">一份簡報就是一個資料夾，裡面的 index.html 雙擊就能打開。</aside></section>
+
+<section class="slide">
+  <div class="grid2" style="grid-template-columns:.7fr 1.3fr">
+    <div>
+      <p class="kicker" data-i="1">真網站</p>
+      <h2 data-i="2">點下去，<br>頁面就重組</h2>
+      <p data-i="3">給兩個網址，就拍下這一段。</p>
+    </div>
+    <div class="morph" data-fx="morph" data-src="../media/morph-project" data-i="4"></div>
+  </div>
+<aside class="notes">介紹網站的時候，最有說服力的是網站本身。這段動畫是從真的網站拍下來的。</aside></section>
+
+<section class="slide">
+  <div class="grid2" style="grid-template-columns:1.25fr .75fr">
+    <div class="spot" data-fx="spot" data-rects="9 18.4 24.5 8.1, 9 38.2 48.6 14.2" data-i="1"><img src="../media/p-cofacts.png" alt=""></div>
+    <div>
+      <p class="kicker" data-i="2">跟 AI 說</p>
+      <h2 data-i="3">說不清楚？<br>框起來</h2>
+      <p data-i="4">按 A 框一塊，寫一句話，<br>清單貼給 AI。</p>
+    </div>
+  </div>
+<aside class="notes">想要的效果說不清楚，就直接在投影片上框起來。AI 拿到的是精確的位置。</aside></section>
+
+<section class="slide center">
+  <p class="kicker" data-i="1">44 種效果</p>
+  <h2 data-i="2">叫名字就有</h2>
+  <div class="names" data-fx="swarm" style="justify-content:center">
+    <span>bento</span><span>morph</span><span>map</span><span>particles</span><span>flap</span><span>slot</span><span>spot</span><span>hotspots</span><span>tilt</span><span>explode</span><span>parallax</span><span>dive</span><span>wipe</span><span>compare</span><span>chat</span><span>terminal</span><span>story</span><span>tunnel</span><span>network</span><span>ring</span><span>letters</span><span>rotate</span><span>textmask</span><span>live</span>
+  </div>
+<aside class="notes">四十幾種效果，每一種都有名字。跟 AI 說「這頁用 bento」就好。</aside></section>
+
+<section class="slide">
+  <div class="grid2" style="grid-template-columns:.7fr 1.3fr">
+    <div>
+      <p class="kicker" data-i="1">主題</p>
+      <h2 data-i="2">一行換一套</h2>
+      <p data-i="3">按 T 預覽，喜歡就存。</p>
+    </div>
+    <div class="compare" data-fx="compare" data-i="4" style="aspect-ratio:16/9;border-radius:var(--radius);border:1px solid var(--line-strong)"><img src="../media/hero.png" alt=""><img src="../media/hero-dark.png" alt=""></div>
+  </div>
+<aside class="notes">配色和風格是一個設定檔。這份簡報用的是 night。</aside></section>
+
+<section class="slide center">
+  <h1 class="mono" data-fx="particles" style="font-size:150px;font-weight:600">/slidejam</h1>
+  <p data-i="2" style="margin-top:30px">在 Claude Code 打這一行就開始</p>
+<aside class="notes">在 Claude Code 打 /slidejam，就開始。謝謝。</aside></section>
+
+</div>
+<script src="deck/deck.js"></script>
+</body>
+</html>
