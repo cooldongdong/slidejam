@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>簡報標題</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="deck/deck.css">
+<style>
+/* 配色：改這幾個就換一套顏色。其他 token 見 deck/deck.css 開頭 */
+:root{
+  --accent:#0d5f74; --accent-ink:#094656; --accent-soft:#e0eef1;
+  --paper:#f6f7f8;
+}
+</style>
+</head>
+<body>
+<!--
+  每一頁是一個 <section class="slide">。
+  按 E 直接改字、⌘S 存回；按 A 標註想要的效果，複製給 AI。效果清單見 effects.html。
+-->
+<div id="stage">
+
+<section class="slide">
+  <p class="kicker" data-i="1">場合・日期</p>
+  <h1 data-i="2">簡報標題</h1>
+  <p class="lede" data-i="3" style="margin-top:28px">講者名字</p>
+<aside class="notes">開場第一句話。</aside></section>
+
+<section class="slide center">
+  <p class="big-q" data-i="1">用一個問題開場？</p>
+<aside class="notes">停一下，讓大家想。</aside></section>
+
+<section class="slide section">
+  <p class="num" data-i="1">01</p>
+  <h1 data-i="2">第一段</h1>
+  <p data-i="3">這一段要講什麼</p>
+<aside class="notes">段落開頭。</aside></section>
+
+<section class="slide">
+  <div class="grid2">
+    <div>
+      <p class="kicker" data-i="1">小標</p>
+      <h2 data-i="2">一頁一個重點</h2>
+      <ul class="steps">
+        <li data-i="3">動詞開頭的短句</li>
+        <li data-i="4">第二點</li>
+        <li data-i="5">第三點</li>
+      </ul>
+    </div>
+    <div class="browser" data-i="4"><span class="url">example.com</span><div class="screen" style="aspect-ratio:16/10;background:var(--surface-2)"></div></div>
+  </div>
+<aside class="notes">右邊換成截圖：&lt;img src="media/xxx.png"&gt;</aside></section>
+
+<section class="slide center">
+  <div class="stat" data-i="1"><div class="n" data-fx="count">1,234</div><div class="l">一個數字，一句說明</div></div>
+<aside class="notes">數字用 count 跳上去。</aside></section>
+
+<section class="slide center section">
+  <h1 data-i="1">謝謝</h1>
+  <p data-i="2" class="mono">example.com</p>
+<aside class="notes">結尾。</aside></section>
+
+</div>
+<script src="deck/deck.js"></script>
+<script src="deck/fx.js"></script>
+</body>
+</html>

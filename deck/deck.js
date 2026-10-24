@@ -63,7 +63,7 @@
     $$("[data-step-out]", s).forEach((e) => e.classList.remove("off"));
     s.classList.add("active");
     $$("video", s).forEach((v) => { v.currentTime = 0; v.play().catch(() => {}); });
-    if (!document.body.classList.contains("editing")) eachFx(s, (d, e) => d.enter?.(e, s));
+    if (!authoring()) eachFx(s, (d, e) => d.enter?.(e, s));
     stage.classList.toggle("on-dark", s.classList.contains("section") || s.classList.contains("video") || s.classList.contains("dark"));
     $("#bar").style.width = ((i + 1) / slides.length) * 100 + "%";
     $("#page").textContent = `${i + 1} / ${slides.length}`;
@@ -89,6 +89,13 @@
     show(Deck.cur + 1);
   }
   Object.assign(Deck, { show, next, prev: () => show(Deck.cur - 1) });
+
+  // in E or A mode effects stand still, so text and positions are where they rest
+  const authoring = () => document.body.classList.contains("editing") || document.body.classList.contains("annotating");
+  function freezeFx(on) {
+    const s = Deck.slides[Deck.cur];
+    eachFx(s, (d, e) => (on ? d.leave?.(e) : d.enter?.(e, s)));
+  }
 
   // ---------- notes ----------
   const notesOf = (s) => $("aside.notes", s);
@@ -194,10 +201,11 @@
   }
   function markDirty(e) { dirty.add(e); e.classList?.add("dirty"); }
   function setEditing(on) {
+    if (on === document.body.classList.contains("editing")) return;
+    const was = authoring();
     document.body.classList.toggle("editing", on);
     if (on) setAnnotating(false);
-    const s = Deck.slides[Deck.cur];
-    eachFx(s, (d, e) => (on ? d.leave?.(e) : d.enter?.(e, s)));
+    if (was !== authoring()) freezeFx(on);
     editables().forEach((e) => {
       if (on) {
         if (!orig.has(e)) orig.set(e, e.innerHTML);
@@ -216,7 +224,10 @@
   const idb = (mode, fn) => new Promise((res, rej) => {
     const r = indexedDB.open("web-deck", 1);
     r.onupgradeneeded = () => r.result.createObjectStore("h");
-    r.onsuccess = () => { const q = fn(r.result.transaction("h", mode).objectStore("h")); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); };
+    r.onsuccess = () => {
+      try { const q = fn(r.result.transaction("h", mode).objectStore("h")); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }
+      catch (err) { rej(err); }
+    };
     r.onerror = () => rej(r.error);
   });
   const fileName = () => decodeURIComponent(location.pathname.split("/").pop() || "index.html");
@@ -299,8 +310,11 @@
     return [`.slide:nth-of-type(${si + 1})`, ...parts].join(" > ");
   }
   function setAnnotating(on) {
+    if (on === document.body.classList.contains("annotating")) return;
+    const was = authoring();
     document.body.classList.toggle("annotating", on);
-    if (on && document.body.classList.contains("editing")) setEditing(false);
+    if (on) setEditing(false);
+    if (was !== authoring()) freezeFx(on);
     hoverEl?.classList.remove("anno-hover");
     renderPanel(); renderPins();
     if (on) toast("標註模式：點任何地方，寫下想要怎樣。右上角可以複製給 AI。A 或 Esc 離開");
