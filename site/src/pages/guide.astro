@@ -1,44 +1,45 @@
 ---
 import Base from "../layouts/Base.astro";
 const B = import.meta.env.BASE_URL.replace(/\/?$/, "/");
-// The six steps (plus step 0), shared by the scroll story and the inline chat on phones.
-// chat: [who, 中文, English]; tree: the folder after this step, "+" marks what just appeared.
+// The six steps (plus step 0). cli is the Claude Code transcript for that step:
+// ["you", zh, en] typed by you · ["ai", zh, en] Claude's reply · ["tool", zh, en, output] a tool call.
+// tree: the folder after this step; "+" just appeared, "*" just changed.
 const STEPS = [
-  { zh: "要做哪一份？", en: "Which deck?",
-    ai: ["問你要開新的，還是繼續某個資料夾。貼了標註清單，就直接從清單裡的路徑接著做。", "Asks: new deck or an existing folder? A pasted annotation list carries its own path."],
-    you: ["說「做簡報」，或「繼續做 ~/talks/xxx」。", "Say \"make me a deck\", or \"carry on with ~/talks/xxx\"."],
-    chat: [["me", "幫我做簡報", "Make me a deck"], ["ai", "（步驟 0）開一份新的，還是繼續某個資料夾的簡報？", "(step 0) A new one, or carry on with a folder?"], ["me", "新的，介紹 civictech.tw", "New — about civictech.tw"]],
+  { zh: "呼叫 /slidejam", en: "Call /slidejam",
+    ai: ["先問你要開新的，還是繼續某個資料夾。貼了標註清單，就直接從清單裡的路徑接著做。", "Asks: a new deck or an existing folder? A pasted annotation list carries its own path."],
+    you: ["在 Claude Code 輸入 /slidejam，或直接說「做簡報」。", "Type /slidejam in Claude Code, or just say \"make me a deck\"."],
+    cli: [["you", "/slidejam", "/slidejam"], ["ai", "（步驟 0）開一份新的，還是繼續某個資料夾的簡報？", "(step 0) A new deck, or carry on with a folder?"], ["you", "新的，介紹 civictech.tw 的建置成果", "New — what we built on civictech.tw"]],
     tree: [] },
   { zh: "開場五問", en: "Five questions",
     ai: ["一次問完：講什麼、講給誰、講多久、要秀哪些網站、你有幾小時。", "Asks all five at once: topic, audience, length, sites to show, hours you have."],
     you: ["回答。時間少，第一版就做精簡一點。", "Answer. Little time means a leaner first version."],
-    chat: [["ai", "（步驟 1／6）1. 最想讓台下記住哪一句？2. 聽眾是誰？3. 幾分鐘？4. 要秀哪些網站？5. 你有幾小時？", "(step 1/6) 1. The one line to remember? 2. Audience? 3. Minutes? 4. Which sites? 5. Hours you have?"], ["me", "活動參與者、20 分鐘，秀 civictech.tw，我有一個半小時", "Event attendees, 20 min, show civictech.tw, I have 90 minutes"]],
+    cli: [["ai", "（步驟 1／6）先問五件事：\n1. 最想讓台下記住哪一句？\n2. 聽眾是誰？ 3. 講幾分鐘？\n4. 要秀哪些網站？ 5. 你有幾小時？", "(step 1/6) Five questions first:\n1. The one line they should remember?\n2. Audience? 3. Minutes?\n4. Sites to show? 5. Hours you have?"], ["you", "活動參與者，20 分鐘，秀 civictech.tw，我有一個半小時", "Event attendees, 20 min, civictech.tw, I have 90 minutes"]],
     tree: [] },
   { zh: "大綱", en: "Outline", gate: true,
     ai: ["每頁一句話，標出用哪個效果、需要哪些截圖。", "One line per slide, with the effect by name and the screenshots it needs."],
     you: ["刪、改、換順序，滿意了說「可以動工」。", "Cut, reword, reorder; say go when it's right."],
-    chat: [["ai", "（步驟 2／6）1 開場 letters／2 痛點 bento／3 找得到：議題頁點進專案頁（morph）……要動工嗎？", "(step 2/6) 1 opening, letters / 2 pains, bento / 3 findable: topic → project (morph)… go?"], ["me", "第 5 頁拿掉，可以動工", "Drop slide 5 — go"]],
+    cli: [["ai", "（步驟 2／6）大綱，12 頁：\n 1  開場　　　　letters\n 2  四個痛點　　bento\n 3  找得到　　　morph（拍 civictech.tw）\n …\n可以動工嗎？", "(step 2/6) Outline, 12 slides:\n 1  opening     letters\n 2  four pains  bento\n 3  findable    morph (capture civictech.tw)\n …\nGo?"], ["you", "第 5 頁拿掉，可以動工", "Drop slide 5 — go"]],
     tree: [] },
   { zh: "建檔", en: "Set up",
     ai: ["開資料夾、截圖、拍頁面重組動畫。", "Makes the folder, takes screenshots, captures morphs."],
     you: ["等。網站要登入的話，AI 會請你幫忙。", "Wait. If a site needs a login, the AI asks."],
-    chat: [["ai", "（步驟 3／6）~/talks/civictech 開好了，拍了 6 張截圖、1 段 morph。", "(step 3/6) ~/talks/civictech is ready: 6 screenshots, 1 morph."]],
-    tree: ["+civictech/", "+  index.html", "+  deck/", "+  media/", "+    home.png …6 張", "+    morph-project/"] },
+    cli: [["tool", "Bash(node tools/new-deck.mjs ~/talks/civictech)", "Bash(node tools/new-deck.mjs ~/talks/civictech)", "✓ new deck at ~/talks/civictech"], ["tool", "Bash(node tools/capture-morph.mjs morph.config.mjs)", "Bash(node tools/capture-morph.mjs morph.config.mjs)", "✓ media/morph-project  (2 pairs, 3 rows)"], ["ai", "（步驟 3／6）資料夾開好了，拍了 6 張截圖、1 段 morph。", "(step 3/6) Folder ready: 6 screenshots and 1 morph."]],
+    tree: ["+civictech/", "+  index.html", "+  deck/", "+  media/", "+    home.png …", "+    morph-project/"] },
   { zh: "第一版", en: "First version",
     ai: ["做完全部頁面和講稿，自己截圖檢查，告訴你哪裡不確定。", "Writes every slide and the notes, checks its own screenshots, says what it's unsure of."],
     you: ["用 Chrome 打開，從頭播一次。", "Open it in Chrome and play it through."],
-    chat: [["ai", "（步驟 4／6）12 頁做好了。打開 index.html。不確定：第 7 頁的數字是去年的。字按 E 自己改；效果按 A 標起來貼給我。", "(step 4/6) 12 slides done. Open index.html. Unsure: slide 7's numbers are last year's. Fix words with E; mark effects with A and paste them."]],
-    tree: ["civictech/", "  index.html", "  deck/", "  media/", "    home.png …6 張", "    morph-project/", "+  .shots/sheet.png"] },
+    cli: [["tool", "Bash(node tools/shoot.mjs ~/talks/civictech/index.html --sheet)", "Bash(node tools/shoot.mjs ~/talks/civictech/index.html --sheet)", "✓ 12 slide(s) → .shots"], ["tool", "Read(.shots/sheet.png)", "Read(.shots/sheet.png)", "Read image"], ["ai", "（步驟 4／6）12 頁做好了，打開 ~/talks/civictech/index.html。\n不確定：第 7 頁的數字是去年的。\n字按 E 自己改；效果按 A 標起來貼給我。", "(step 4/6) 12 slides done — open ~/talks/civictech/index.html.\nUnsure: slide 7's numbers are last year's.\nFix words with E; mark effects with A and paste."]],
+    tree: ["civictech/", "  index.html", "  deck/", "  media/", "    home.png …", "    morph-project/", "+  .shots/sheet.png"] },
   { zh: "來回修", en: "Rounds of changes",
     ai: ["一則一則處理，只重拍改到的頁，逐項回報。", "Handles each item, re-shoots only what changed, reports item by item."],
     you: ["字按 E 自己改；效果、版面按 A 點或框，貼清單。", "Words: E. Effects and layout: A, then paste the list."],
-    chat: [["me", "1. 第 12 頁〈找得到〉框住：9.6 18.9 24 7.7　想要：聚光燈打在標題上", "1. slide 12 — box: 9.6 18.9 24 7.7 — want: spotlight on the title"], ["ai", "（步驟 5／6）第 12 頁加了 spot，框在標題。截圖如下。", "(step 5/6) Slide 12 has a spot on the title. Screenshot below."]],
-    tree: ["civictech/", "*  index.html", "  deck/", "  media/", "    home.png …6 張", "    morph-project/", "  .shots/sheet.png"] },
+    cli: [["you", "1. 第 12 頁〈找得到〉\n   框住：元素內 9.6 18.9 24 7.7\n   想要：聚光燈打在標題上", "1. slide 12 (findable)\n   box: 9.6 18.9 24 7.7\n   want: spotlight on the title"], ["tool", "Edit(index.html)", "Edit(index.html)", "Updated with 1 change"], ["ai", "（步驟 5／6）第 12 頁加了 spot，框在標題。截圖如下。", "(step 5/6) Slide 12 now has a spot on the title. Screenshot below."]],
+    tree: ["civictech/", "*  index.html", "  deck/", "  media/", "    home.png …", "    morph-project/", "  .shots/sheet.png"] },
   { zh: "上台前", en: "Before the talk",
     ai: ["陪你跑檢查清單：網路、字型、講者視窗、全螢幕、空白頁。", "Runs the checklist: network, fonts, presenter view, full screen, blank slides."],
     you: ["按 P 開講者視窗，排練一次。", "Press P for the presenter view and rehearse."],
-    chat: [["ai", "（步驟 6／6）第 4 頁的地圖要網路，場地沒 Wi-Fi 的話，先換成截圖？", "(step 6/6) Slide 4's map needs a network. Swap in a screenshot in case there's no Wi-Fi?"], ["me", "好，換", "Yes, swap it"]],
-    tree: ["civictech/", "  index.html", "  deck/", "  media/", "    home.png …6 張", "+    map.png", "    morph-project/", "  .shots/sheet.png"] },
+    cli: [["ai", "（步驟 6／6）第 4 頁的地圖要網路。場地沒 Wi-Fi 的話，先換成截圖？", "(step 6/6) Slide 4's map needs a network. Swap in a screenshot in case there's no Wi-Fi?"], ["you", "好，換", "Yes, swap it"], ["tool", "Bash(node tools/shoot.mjs index.html 4)", "Bash(node tools/shoot.mjs index.html 4)", "✓ media/map.png"]],
+    tree: ["civictech/", "  index.html", "  deck/", "  media/", "    home.png …", "+    map.png", "    morph-project/", "  .shots/sheet.png"] },
 ];
 ---
 <Base title={'使用流程 — slidejam'} description={'跟 AI 用 slidejam 做簡報的完整流程：從說一句「做簡報」，到上台。'}>
@@ -56,7 +57,8 @@ const STEPS = [
 cd slidejam
 npm install                      <span class="c"># 拍真網站動畫才需要</span>
 npx playwright install chromium-headless-shell
-ln -s "$PWD/skill" ~/.claude/skills/slidejam</pre>
+ln -s "$PWD/skill" ~/.claude/skills/slidejam
+<span class="c"># 之後在 Claude Code 輸入 /slidejam 就開始</span></pre>
     <div class="who" style="font-size:16px">
       <p style="margin:0 0 10px"><span lang="zh">沒有用 Claude Code 也可以：打開 <a href={B + "play/effects/"}>效果圖鑑</a> 挑效果，把按 A 標註出來的清單貼給任何一個 AI。</span><span lang="en">Not on Claude Code? Pick effects from the <a href={B + "play/effects/"}>gallery</a> and paste the lists you mark with A to any AI.</span></p>
       <p style="margin:0"><span lang="zh">需要 Chrome（改字存檔只有 Chrome 能用）和 Node.js 22 以上。</span><span lang="en">You need Chrome (saving edits is Chrome-only) and Node.js 22+.</span></p>
@@ -64,18 +66,21 @@ ln -s "$PWD/skill" ~/.claude/skills/slidejam</pre>
   </div>
 </div></section>
 
-<section class="block flowx" id="flow"><div class="wrap">
-  <h2><span lang="zh">六個步驟</span><span lang="en">Six steps</span></h2>
-  <p class="lead"><span lang="zh">往下捲，會重演一次真的對話：AI 每則訊息都標出「（步驟 2／6）」，資料夾也一步步長出來。第 2 步之後要你說「可以動工」，AI 才會開始建檔。</span><span lang="en">Scroll and a real conversation replays: every AI message names its step, and the folder grows as you go. Nothing is created until you say go after step 2.</span></p>
+<section class="flowx" id="flow">
+  <div class="wrap flowx-head">
+    <h2><span lang="zh">六個步驟</span><span lang="en">Six steps</span></h2>
+    <p class="lead"><span lang="zh">往下捲，看一場真實的對話重演：從輸入 /slidejam 開始，AI 每則訊息都標出走到第幾步，資料夾也一步步長出來。第 2 步之後要你說「可以動工」，AI 才會開始建檔。</span><span lang="en">Scroll to replay a real session, starting from /slidejam: every AI message names its step and the folder grows as you go. Nothing is created until you say go after step 2.</span></p>
+  </div>
   <div class="fx-story">
     <div class="fx-sticky">
       <div class="term">
-        <div class="term-bar"><i></i><i></i><i></i><span>Claude Code — ~/talks/civictech</span></div>
+        <div class="term-bar"><i></i><i></i><i></i><span>~/talks — claude</span></div>
         <div class="term-body">
-          <div class="term-chat" id="chat"></div>
-          <div class="term-tree"><b>~/talks/</b><div id="tree"></div></div>
+          <div class="term-log" id="log"></div>
+          <aside class="term-tree"><b>~/talks/</b><div id="tree"></div></aside>
         </div>
-        <div class="term-steps" id="dots">{STEPS.map((_, i) => <i data-k={i}>{i}</i>)}</div>
+        <div class="term-input"><span>&gt;</span><em id="typing"></em><i class="caret"></i></div>
+        <div class="term-steps" id="dots">{STEPS.map((_, i) => <button data-k={i}>{i}</button>)}</div>
       </div>
     </div>
     <ol class="fx-steps">
@@ -85,12 +90,12 @@ ln -s "$PWD/skill" ~/.claude/skills/slidejam</pre>
           <h3><span lang="zh">{st.zh}</span><span lang="en">{st.en}</span>{st.gate && <small><span lang="zh">要你說「可以動工」</span><span lang="en">needs your go</span></small>}</h3>
           <div class="who"><b>AI</b><p><span lang="zh">{st.ai[0]}</span><span lang="en">{st.ai[1]}</span></p></div>
           <div class="who"><b><span lang="zh">你</span><span lang="en">You</span></b><p><span lang="zh">{st.you[0]}</span><span lang="en">{st.you[1]}</span></p></div>
-          <div class="inline-chat">{st.chat.map(([who, zh, en]) => <p class={who}><span lang="zh">{zh}</span><span lang="en">{en}</span></p>)}</div>
+          <div class="inline-cli">{st.cli.map(([kind, zh, en, out]) => <p class={kind}><span lang="zh">{zh}</span><span lang="en">{en}</span>{out && <em>⎿ {out}</em>}</p>)}</div>
         </li>
       ))}
     </ol>
   </div>
-</div></section>
+</section>
 
 <section class="block" id="decks"><div class="wrap">
   <h2><span lang="zh">第二份簡報、隔天接著做</span><span lang="en">More decks, and picking up later</span></h2>
@@ -159,47 +164,58 @@ ln -s "$PWD/skill" ~/.claude/skills/slidejam</pre>
 </Base>
 
 <script is:inline define:vars={{ STEPS }}>
-// replay the active step in the window: messages arrive one by one (the AI "types" first),
-// and the folder shows what just appeared or changed
-const chat = document.getElementById("chat"), tree = document.getElementById("tree");
-const dots = [...document.querySelectorAll("#dots i")], steps = [...document.querySelectorAll(".fx-step")];
-const lang = () => (document.documentElement.dataset.lang === "en" ? 2 : 1);
+// One continuous session: when a step becomes active, everything before it is already in the
+// log and this step plays out — you type into the prompt, Claude thinks, tools run.
+const log = document.getElementById("log"), tree = document.getElementById("tree"), typing = document.getElementById("typing");
+const dots = [...document.querySelectorAll("#dots button")], steps = [...document.querySelectorAll(".fx-step")];
+const L = () => (document.documentElement.dataset.lang === "en" ? 2 : 1);
 let cur = -1, timers = [];
-function render(k, animate) {
-  timers.forEach(clearTimeout); timers = [];
+const line = (m, old) => {
+  const d = document.createElement("div");
+  d.className = m[0] + (old ? " old" : "");
+  if (m[0] === "tool") { const t = m[L()]; const k = t.indexOf("("); d.innerHTML = `<b></b><span></span><em></em>`; d.children[0].textContent = t.slice(0, k); d.children[1].textContent = t.slice(k); d.children[2].textContent = "⎿  " + m[3]; }
+  else d.textContent = m[L()];
+  log.appendChild(d);
+};
+function drawTree(k) {
   const st = STEPS[k];
-  chat.innerHTML = "";
-  let t = 0;
-  st.chat.forEach((m) => {
-    const say = () => { const p = document.createElement("p"); p.className = m[0]; p.textContent = m[lang()]; chat.appendChild(p); };
-    if (!animate) return say();
-    if (m[0] === "ai") {
-      timers.push(setTimeout(() => { const d = document.createElement("p"); d.className = "ai typing"; d.innerHTML = "<i></i><i></i><i></i>"; chat.appendChild(d); }, t));
-      t += 700;
-      timers.push(setTimeout(() => { chat.querySelector(".typing")?.remove(); say(); }, t));
-    } else timers.push(setTimeout(say, t));
-    t += 650;
-  });
-  tree.innerHTML = st.tree.length ? "" : `<span class="empty">${lang() === 2 ? "(empty)" : "（還是空的）"}</span>`;
-  st.tree.forEach((line) => {
-    const d = document.createElement("div");
-    const mark = line[0];
-    d.textContent = mark === "+" || mark === "*" ? line.slice(1) : line;
-    if (mark === "+") d.className = "new";
-    if (mark === "*") d.className = "mod";
-    tree.appendChild(d);
-  });
+  tree.innerHTML = st.tree.length ? "" : `<span class="empty">${L() === 2 ? "(empty)" : "（還是空的）"}</span>`;
+  st.tree.forEach((t) => { const d = document.createElement("div"); const m = t[0]; d.textContent = m === "+" || m === "*" ? t.slice(1) : t; if (m === "+") d.className = "new"; if (m === "*") d.className = "mod"; tree.appendChild(d); });
+}
+function play(k, animate) {
+  timers.forEach(clearTimeout); timers = [];
+  typing.textContent = "";
+  log.innerHTML = "";
+  for (let j = 0; j < k; j++) STEPS[j].cli.forEach((m) => line(m, true));
   dots.forEach((d, j) => { d.classList.toggle("on", j === k); d.classList.toggle("done", j < k); });
   steps.forEach((s, j) => s.classList.toggle("on", j === k));
+  drawTree(k);
+  if (!animate) return STEPS[k].cli.forEach((m) => line(m));
+  let t = 250;
+  const at = (ms, f) => timers.push(setTimeout(f, ms));
+  STEPS[k].cli.forEach((m) => {
+    if (m[0] === "you") {
+      const text = m[L()], per = Math.min(45, 900 / text.length);
+      [...text].forEach((_, i) => at(t + i * per, () => (typing.textContent = text.slice(0, i + 1))));
+      t += text.length * per + 250;
+      at(t, () => { typing.textContent = ""; line(m); });
+      t += 400;
+    } else {
+      at(t, () => { const d = document.createElement("div"); d.className = "think"; d.textContent = L() === 2 ? "Thinking…" : "思考中…"; log.appendChild(d); });
+      t += 700;
+      at(t, () => { log.querySelector(".think")?.remove(); line(m); });
+      t += m[0] === "tool" ? 500 : 650;
+    }
+  });
 }
 const io = new IntersectionObserver((es) => es.forEach((e) => {
   if (!e.isIntersecting) return;
   const k = +e.target.dataset.k;
-  if (k !== cur) { cur = k; render(k, true); }
+  if (k !== cur) { cur = k; play(k, true); }
 }), { rootMargin: "-45% 0px -45% 0px" });
 steps.forEach((s) => io.observe(s));
-render(0, false); cur = 0;
-new MutationObserver(() => render(cur, false)).observe(document.documentElement, { attributes: true, attributeFilter: ["data-lang"] });
+play(0, false); cur = 0;
+new MutationObserver(() => play(cur, false)).observe(document.documentElement, { attributes: true, attributeFilter: ["data-lang"] });
 dots.forEach((d) => d.addEventListener("click", () => steps[+d.dataset.k].scrollIntoView({ behavior: "smooth", block: "center" })));
 </script>
 
@@ -232,54 +248,70 @@ code{font-family:var(--mono);font-size:.92em;background:var(--surface-2);padding
     .cases,.keys,.tools,.twocol{grid-template-columns:1fr}
 }
 
-/* ---- six steps as a scroll story: a sticky Claude Code window replays each step ---- */
-.fx-story{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:start}
-.fx-sticky{position:sticky;top:96px}
-.term{background:#0f1719;color:#d6e2e5;border-radius:16px;overflow:hidden;box-shadow:0 40px 80px -40px rgb(15 26 29/.6)}
-.term-bar{display:flex;align-items:center;gap:7px;padding:12px 16px;background:#172126;font:13px var(--mono);color:#8a9ca3}
+/* ---- six steps: a dark, full-width scroll story around a large Claude Code window ---- */
+.flowx{background:#0a0f11;color:#e8eef5;padding:84px 0 40px;border-top:1px solid var(--line)}
+.flowx-head h2{font-size:clamp(28px,3.6vw,44px);margin:0 0 12px;color:#fff}
+.flowx-head .lead{color:#a9bac0;font-size:18px;max-width:780px;margin:0 0 36px}
+.fx-story{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:48px;align-items:start;max-width:1440px;margin:0 auto;padding:0 32px}
+.fx-sticky{position:sticky;top:84px}
+.term{display:flex;flex-direction:column;height:min(78vh,760px);background:#11181b;border:1px solid #22313a;border-radius:16px;overflow:hidden;box-shadow:0 60px 120px -40px rgb(0 0 0/.8),0 0 0 1px rgb(127 209 226/.05);font:15px/1.65 var(--mono)}
+.term-bar{display:flex;align-items:center;gap:7px;padding:11px 16px;background:#172126;color:#7d9096;font-size:13px;flex:none}
 .term-bar i{width:11px;height:11px;border-radius:50%;background:#e06c5f}.term-bar i:nth-child(2){background:#e3b341}.term-bar i:nth-child(3){background:#5fb15f}
-.term-bar span{margin-left:10px}
-.term-body{display:grid;grid-template-columns:1fr 190px;min-height:400px}
-.term-chat{padding:18px;display:flex;flex-direction:column;gap:10px;justify-content:flex-end}
-.term-chat p{margin:0;max-width:92%;padding:10px 14px;border-radius:14px;font-size:14.5px;line-height:1.55;animation:msg .45s cubic-bezier(.16,1,.3,1)}
-.term-chat .me{align-self:flex-end;background:#0d5f74;color:#fff;border-radius:14px 14px 4px 14px}
-.term-chat .ai{align-self:flex-start;background:#1f2b31;color:#e8eef5;border-radius:14px 14px 14px 4px}
-.term-chat .typing{display:flex;gap:5px;padding:13px 14px}
-.term-chat .typing i{width:7px;height:7px;border-radius:50%;background:#8a9ca3;animation:dot 1s infinite}
-.term-chat .typing i:nth-child(2){animation-delay:.15s}.term-chat .typing i:nth-child(3){animation-delay:.3s}
-@keyframes msg{from{opacity:0;transform:translateY(10px)}}
-@keyframes dot{30%{transform:translateY(-4px);opacity:1}0%,60%,100%{opacity:.4}}
-.term-tree{border-left:1px solid #22313a;padding:18px 16px;font:13px/1.9 var(--mono);color:#8a9ca3;white-space:pre}
-.term-tree b{color:#d6e2e5;font-weight:600}
+.term-bar span{margin:0 auto;padding-right:40px}
+.term-body{flex:1;display:grid;grid-template-columns:1fr 230px;min-height:0}
+.term-log{overflow:hidden;padding:20px 22px;display:flex;flex-direction:column;gap:14px;justify-content:flex-end}
+.term-log > div{white-space:pre-wrap;animation:msg .4s cubic-bezier(.16,1,.3,1)}
+.term-log .you{color:#e8eef5;background:#1b262b;border-left:3px solid #7d9096;padding:6px 12px;border-radius:4px}
+.term-log .you::before{content:"> ";color:#7d9096}
+.term-log .ai{color:#e8eef5;padding-left:20px;position:relative}
+.term-log .ai::before{content:"⏺";position:absolute;left:0;color:#e8eef5}
+.term-log .tool{color:#e8eef5;padding-left:20px;position:relative}
+.term-log .tool::before{content:"⏺";position:absolute;left:0;color:#7ddc8a}
+.term-log .tool b{font-weight:600}
+.term-log .tool em{display:block;font-style:normal;color:#7d9096}
+.term-log .think{color:#d97757;padding-left:20px;position:relative}
+.term-log .think::before{content:"✻";position:absolute;left:0;animation:spin 1.2s linear infinite;display:inline-block}
+.term-log .old{opacity:.45}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes msg{from{opacity:0;transform:translateY(8px)}}
+.term-tree{border-left:1px solid #22313a;padding:20px 16px;font-size:13.5px;line-height:1.9;color:#7d9096;white-space:pre;overflow:hidden}
+.term-tree b{color:#e8eef5;font-weight:600}
 .term-tree .new{color:#7ddc8a;animation:msg .5s cubic-bezier(.16,1,.3,1) both}
-.term-tree .new::after{content:"  新";font-size:11px;color:#7ddc8a}
+.term-tree .new::after{content:"  新";font-size:11px}
 .term-tree .mod{color:#f4b860}
 .term-tree .mod::after{content:"  改";font-size:11px}
 html[data-lang="en"] .term-tree .new::after{content:"  new"}
 html[data-lang="en"] .term-tree .mod::after{content:"  edited"}
-.term-tree .empty{color:#5b6a71;font-style:italic}
-.term-steps{display:flex;gap:8px;padding:12px 16px;border-top:1px solid #22313a}
-.term-steps i{flex:1;height:26px;border-radius:7px;background:#1f2b31;color:#5b6a71;font:600 12px/26px var(--mono);text-align:center;font-style:normal;transition:background .3s,color .3s}
-.term-steps i.done{background:#16333a;color:#7fd1e2}
-.term-steps i.on{background:#0d5f74;color:#fff}
+.term-tree .empty{color:#4a5a60;font-style:italic}
+.term-input{flex:none;display:flex;align-items:center;gap:10px;margin:0 16px 12px;padding:10px 14px;border:1px solid #33444c;border-radius:8px;color:#e8eef5;min-height:44px}
+.term-input span{color:#7d9096}
+.term-input em{font-style:normal;white-space:pre}
+.term-input .caret{width:8px;height:18px;background:#e8eef5;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.term-steps{flex:none;display:flex;gap:6px;padding:0 16px 14px}
+.term-steps button{flex:1;height:26px;border:0;border-radius:6px;background:#1b262b;color:#4a5a60;font:600 12px var(--mono);cursor:pointer;transition:background .3s,color .3s}
+.term-steps button.done{background:#16333a;color:#7fd1e2}
+.term-steps button.on{background:#0d5f74;color:#fff}
 .fx-steps{list-style:none;margin:0;padding:0}
-.fx-step{min-height:62vh;padding:24px 0 24px 28px;border-left:2px solid var(--line);opacity:.35;transition:opacity .4s,border-color .4s;display:flex;flex-direction:column;justify-content:center}
-.fx-step.on{opacity:1;border-color:var(--accent)}
-.fx-step .no{font:600 14px var(--mono);color:var(--accent)}
-.fx-step h3{font-size:clamp(24px,2.6vw,32px);margin:6px 0 16px}
-.fx-step h3 small{font:500 14px var(--mono);color:var(--warm);margin-left:12px}
-.fx-step .who{margin-bottom:12px}
-.fx-step .who b{display:block;font:600 12px var(--mono);letter-spacing:.08em;color:var(--ink-muted);margin-bottom:2px}
-.fx-step .who p{margin:0;font-size:17px;color:var(--ink-2)}
-.inline-chat{display:none}
-@media (max-width:860px){
-  .fx-story{grid-template-columns:1fr}
+.fx-step{min-height:72vh;padding:24px 0 24px 28px;border-left:2px solid #22313a;opacity:.3;transition:opacity .4s,border-color .4s;display:flex;flex-direction:column;justify-content:center}
+.fx-step.on{opacity:1;border-color:#7fd1e2}
+.fx-step .no{font:600 14px var(--mono);color:#7fd1e2}
+.fx-step h3{font-size:clamp(26px,2.8vw,36px);margin:6px 0 18px;color:#fff}
+.fx-step h3 small{font:500 14px var(--mono);color:#f4b860;margin-left:12px}
+.fx-step .who{margin-bottom:14px}
+.fx-step .who b{display:block;font:600 12px var(--mono);letter-spacing:.08em;color:#7d9096;margin-bottom:3px}
+.fx-step .who p{margin:0;font-size:17px;color:#c7d6db}
+.inline-cli{display:none}
+@media (max-width:960px){
+  .fx-story{grid-template-columns:1fr;padding:0 20px}
   .fx-sticky{display:none}
   .fx-step{min-height:0;opacity:1;padding:18px 0 18px 18px}
-  .inline-chat{display:grid;gap:8px;margin-top:6px}
-  .inline-chat p{margin:0;padding:9px 13px;border-radius:13px;font-size:14px;max-width:92%}
-  .inline-chat .me{justify-self:end;background:var(--accent);color:#fff}
-  .inline-chat .ai{background:var(--surface-2)}
+  .inline-cli{display:grid;gap:8px;margin-top:6px;font:13px/1.6 var(--mono);background:#11181b;border:1px solid #22313a;border-radius:10px;padding:12px}
+  .inline-cli p{margin:0;white-space:pre-wrap;color:#e8eef5}
+  .inline-cli .you::before{content:"> ";color:#7d9096}
+  .inline-cli .ai::before,.inline-cli .tool::before{content:"⏺ "}
+  .inline-cli .tool::before{color:#7ddc8a}
+  .inline-cli em{display:block;font-style:normal;color:#7d9096}
 }
-@media (prefers-reduced-motion:reduce){.term-chat p,.term-tree .new{animation:none}}
+@media (prefers-reduced-motion:reduce){.term-log > div,.term-tree .new{animation:none}}
 </style>
