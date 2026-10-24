@@ -13,12 +13,12 @@ export const decks = [
     goal: ["三分鐘講清楚它能做什麼：一個檔案、真網站拍進來、跟 AI 一起改。", "Show in three minutes what it does: one file, real sites captured, revised with an AI."],
   },
   {
-    id: "storymap",
-    file: "examples/storymap/index.html",
-    zh: ["從車站出發", "樹林社大的地圖故事，用 warm 主題。"],
-    en: ["From the station", "A Shulin story map, in the warm theme."],
-    who: ["社大學員與在地居民", "Community college members and neighbours"],
-    goal: ["把散落的舊文章變成走得到的路線：真地圖飛過七個地點，再把網站本身放進投影片。", "Turn scattered old articles into a walkable route: a real map flies through seven places, and the site itself plays in the slides."],
+    id: "taipei",
+    file: "examples/taipei/index.html",
+    zh: ["台北一日遊", "七個地方、真地圖、照片，用 warm 主題。"],
+    en: ["A day in Taipei", "Seven stops on a real map, with photos, in the warm theme."],
+    who: ["第一次來台北的朋友", "Friends visiting Taipei for the first time"],
+    goal: ["把一天的行程講成一條路線：地圖飛過七站，每一站一張照片、一種效果。", "Tell a day's plan as a route: the map flies through seven stops, each with a photo and an effect of its own."],
   },
   {
     id: "effects",

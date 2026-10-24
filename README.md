@@ -105,7 +105,7 @@ deck/        the engine: deck.css, deck.js (core and modes), fx/ (one file per e
 template/    the starting index.html
 tools/       new-deck, capture-morph, shoot
 effects.html gallery of every effect
-examples/    an example deck (storymap) and the gallery's media
+examples/    example decks (intro, taipei) and the gallery's media
 skill/       a Claude Code skill for building decks with an AI
 ```
 

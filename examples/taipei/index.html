@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>台北一日遊</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&family=Noto+Serif+TC:wght@600;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="deck/deck.css">
+<link rel="stylesheet" href="deck/themes/warm.css">
+<style>
+.card{position:absolute;z-index:500;background:rgb(250 246 240/.94);border-radius:20px;padding:40px 48px;max-width:720px;box-shadow:0 30px 60px -20px rgb(40 20 10/.35)}
+.card.bl{left:96px;bottom:96px}
+.card.tr{right:96px;top:96px}
+.card h1{font-size:110px}
+.card h2{font-size:72px;margin:6px 0 14px}
+.card p{font-size:30px;line-height:1.6;margin:0;color:var(--ink-2)}
+.time{font:600 36px var(--mono);color:var(--accent);margin:0}
+.slide.full > .zoom{position:absolute;inset:0;border:0;border-radius:0}
+.shot{aspect-ratio:3/2;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line-strong)}
+.shot > img{display:block;width:100%;height:100%;object-fit:cover}
+.credits{position:absolute;left:0;right:0;bottom:44px;text-align:center;font-size:18px;line-height:1.7;color:var(--ink-muted)}
+</style>
+</head>
+<body>
+<!-- An example deck: a day in Taipei, with a real map and photos, in the warm theme. -->
+<div id="stage">
+
+<section class="slide full">
+  <div class="map" data-fx="map" data-center="25.058 121.535" data-zoom="13.75" data-delay="0.6" data-stagger="0.2"
+    data-pins="25.0478 121.5170 台北車站; 25.0346 121.5218 中正紀念堂; 25.0372 121.4999 龍山寺; 25.0420 121.5081 西門町; 25.0340 121.5645 台北101; 25.0272 121.5767 象山; 25.0880 121.5241 士林夜市"
+    data-tour="25.0478 121.5170 16; 25.0346 121.5218 16; 25.0372 121.4999 16.5; 25.0420 121.5081 16.5; 25.0340 121.5645 16; 25.0272 121.5767 16; 25.0880 121.5241 16; 25.058 121.535 13.75"></div>
+  <div class="card tr">
+    <p class="kicker" data-i="1">從早到晚，七個地方</p>
+    <h1 data-i="2">台北一日遊</h1>
+  </div>
+<aside class="notes">一天能在台北走多少地方？這是我排的七站。
+（按 → 地圖會一站一站飛過去，最後回到全景）</aside></section>
+
+<section class="slide full">
+  <div class="zoom" data-fx="zoom" data-at="40% 60%" data-scale="1.15" data-ms="9000" data-delay="0"><img src="media/station.jpg" alt="台北車站大廳"></div>
+  <div class="card bl">
+    <p class="time" data-fx="flap">09:00</p>
+    <h2 data-i="1">台北車站</h2>
+    <p data-i="2">從這裡出發。台鐵、高鐵、捷運都在這一站。</p>
+  </div>
+<aside class="notes">早上九點，從台北車站出發。大廳很大，先在這裡集合。</aside></section>
+
+<section class="slide">
+  <div class="grid2" style="grid-template-columns:.75fr 1.25fr">
+    <div>
+      <p class="time" data-fx="flap">10:00</p>
+      <h2 data-i="1">中正紀念堂</h2>
+      <p data-i="2">白色的大廳、藍色的屋頂，<br>前面是一整片廣場。</p>
+    </div>
+    <div class="zoom shot" data-fx="zoom" data-at="50% 30%" data-scale="1.3" data-ms="8000" data-i="1"><img src="media/cks.jpg" alt="中正紀念堂"></div>
+  </div>
+<aside class="notes">搭一站捷運到中正紀念堂。廣場很開闊，適合拍照。</aside></section>
+
+<section class="slide">
+  <div class="grid2" style="grid-template-columns:1.3fr .7fr">
+    <div class="hotspots shot" data-fx="hotspots" data-i="1" style="aspect-ratio:auto">
+      <img src="media/longshan.jpg" alt="龍山寺">
+      <p data-at="20 13">屋脊上的龍，是用碎瓷片一片片貼出來的剪黏</p>
+      <p data-at="50 38">正殿供奉觀世音菩薩</p>
+      <p data-at="52 72">香客很多，記得放輕腳步</p>
+    </div>
+    <div>
+      <p class="time" data-fx="flap">11:30</p>
+      <h2 data-i="2">龍山寺</h2>
+      <p data-i="3">1738 年建廟，<br>到現在香火沒斷過。</p>
+    </div>
+  </div>
+<aside class="notes">中午前到萬華的龍山寺。（每按一次 →，打開一個小圓點的說明）</aside></section>
+
+<section class="slide center">
+  <p class="time" data-fx="flap">13:00</p>
+  <h1 data-fx="textmask" data-img="media/ximending.jpg" style="font-size:300px;line-height:1.1">西門町</h1>
+  <p class="lede" data-i="1">吃午餐、逛街、看電影，一次解決</p>
+<aside class="notes">走路就到西門町。中午吃飽，下午逛一圈。</aside></section>
+
+<section class="slide">
+  <div class="grid2" style="grid-template-columns:.7fr 1.3fr">
+    <div>
+      <p class="time" data-fx="flap">15:30</p>
+      <h2 data-i="1">台北101</h2>
+      <p data-i="2">508 公尺，曾經是世界第一高。<br>白天看它，晚上也看它。</p>
+    </div>
+    <div class="compare shot" data-fx="compare" data-i="1"><img src="media/101-day.jpg" alt="白天的台北101"><img src="media/101-night.jpg" alt="晚上的台北101"></div>
+  </div>
+<aside class="notes">下午搭捷運到信義區。101 白天和晚上是兩種樣子，等一下爬上象山還會再看到它。</aside></section>
+
+<section class="slide full">
+  <div class="zoom" data-fx="zoom" data-at="86% 45%" data-scale="1.2" data-ms="10000" data-delay="0"><img src="media/elephant.jpg" alt="從象山看台北夕陽"></div>
+  <div class="card bl">
+    <p class="time" data-fx="flap">17:00</p>
+    <h2 data-i="1">象山</h2>
+    <p data-i="2">爬二十分鐘的階梯，<br>換一整片夕陽。</p>
+  </div>
+<aside class="notes">傍晚爬象山。階梯有點陡，但上去之後，整個台北盆地和 101 都在眼前。</aside></section>
+
+<section class="slide">
+  <div class="grid2" style="grid-template-columns:1.15fr .85fr">
+    <div class="shot" data-i="1"><img src="media/shilin.jpg" alt="士林夜市"></div>
+    <div>
+      <p class="time" data-fx="flap">19:30</p>
+      <h2 data-i="2" style="margin-bottom:24px">士林夜市</h2>
+      <div class="chat" data-fx="chat" data-delay="1.2">
+        <p>晚上吃什麼？</p>
+        <p class="me">士林夜市！</p>
+        <p>雞排要排多久 😂</p>
+        <p class="me">邊排邊逛，順便撈金魚</p>
+      </div>
+    </div>
+  </div>
+<aside class="notes">最後一站，士林夜市。吃的、玩的都有，一天就在這裡收尾。</aside></section>
+
+<section class="slide center">
+  <p class="kicker" data-i="1">一天，七個地方</p>
+  <h1 data-fx="letters">下次來台北，</h1>
+  <h1 data-fx="letters" data-delay="0.7">照這張走就好</h1>
+  <p class="credits">照片來自 Wikimedia Commons。CC0：Shupin Zeng、Alfred Twu、Marina Perez、Thomas Tucker、Steven Hung。<br>CC BY-SA：AngMoKio（中正紀念堂）、Bernard Gagnon（龍山寺）、Exec8（士林夜市）。地圖 © OpenStreetMap。完整出處見 media/CREDITS.md</p>
+<aside class="notes">謝謝大家。路線就是這張，下次來可以照著走。</aside></section>
+
+</div>
+<script src="deck/deck.js"></script>
+</body>
+</html>

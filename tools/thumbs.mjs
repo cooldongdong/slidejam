@@ -28,7 +28,7 @@ for (const id of ids) {
 }
 
 // posters for the play page: each example deck's opening slide
-const decks = { intro: "examples/intro/index.html", effects: "effects.html", storymap: "examples/storymap/index.html" };
+const decks = { intro: "examples/intro/index.html", effects: "effects.html", taipei: "examples/taipei/index.html" };
 const posters = resolve("site/public/posters");
 mkdirSync(posters, { recursive: true });
 for (const [id, file] of Object.entries(decks)) {
