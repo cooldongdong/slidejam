@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>使用流程 — slidejam</title>
+<meta name="description" content="跟 AI 用 slidejam 做簡報的完整流程：從說一句「做簡報」，到上台。">
+<meta property="og:title" content="slidejam 使用流程：跟 AI 從零做到上台">
+<meta property="og:description" content="六個步驟，每一步 AI 做什麼、你做什麼；第二份簡報、隔天接著做都說清楚。">
+<meta property="og:image" content="https://cooldongdong.github.io/slidejam/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site/site.css">
+<style>
+.page-hero{padding:64px 0 24px}
+.page-hero h1{font-size:clamp(34px,5vw,58px);line-height:1.15;margin:0;letter-spacing:-.02em}
+.page-hero p{font-size:19px;color:var(--ink-2);max-width:760px;margin:18px 0 0}
+.block{padding:56px 0;border-top:1px solid var(--line)}
+.block h2{font-size:clamp(26px,3.2vw,36px);margin:0 0 10px}
+.block > .wrap > p.lead{font-size:18px;color:var(--ink-2);margin:0 0 28px;max-width:760px}
+/* the six steps */
+.flow{display:grid;gap:18px;counter-reset:f}
+.fstep{display:grid;grid-template-columns:64px 1fr 1fr 1.1fr;grid-template-areas:"n h h h" "n a b c";gap:14px 22px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px 24px;counter-increment:f}
+.fstep::before{grid-area:n;content:counter(f);display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--accent);color:#fff;font:600 20px var(--mono)}
+.fstep h3{grid-area:h;margin:0;font-size:22px}
+.fstep > .who:nth-of-type(1){grid-area:a}.fstep > .who:nth-of-type(2){grid-area:b}.fstep > .chat{grid-area:c}
+.fstep h3 small{font:500 14px var(--mono);color:var(--warm);margin-left:10px}
+.who{font-size:15px;color:var(--ink-2)}
+.who b{display:block;font:600 13px var(--mono);letter-spacing:.06em;color:var(--ink-muted);margin-bottom:6px}
+.who ul{margin:0;padding-left:18px}
+.who li{margin-bottom:4px}
+.chat{display:grid;gap:8px;align-content:start}
+.chat p{margin:0;padding:10px 14px;border-radius:14px;font-size:14.5px;line-height:1.55}
+.chat .me{background:var(--accent);color:#fff;justify-self:end;border-radius:14px 14px 4px 14px;max-width:92%}
+.chat .ai{background:var(--surface-2);color:var(--ink);border-radius:14px 14px 14px 4px;max-width:96%}
+.fstep.zero{counter-increment:none}
+.fstep.zero::before{content:"0";background:var(--ink-muted)}
+.twocol > *,.case,.tools > *{min-width:0}
+.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.case{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px}
+.case h3{margin:0 0 10px;font-size:19px}
+.case p{margin:0 0 12px;color:var(--ink-2);font-size:15.5px}
+.keys{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 28px}
+.keys div{display:grid;grid-template-columns:70px 1fr;gap:12px;align-items:baseline;font-size:16px;color:var(--ink-2)}
+.keys kbd{font:600 15px var(--mono);background:var(--surface);border:1px solid var(--line-strong);border-bottom-width:3px;border-radius:8px;padding:3px 0;text-align:center;color:var(--ink)}
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:32px}
+.tools .screen{margin-top:10px}
+.tools h3{margin:0;font-size:19px}
+.tools p{margin:6px 0 0;color:var(--ink-2);font-size:15.5px}
+.tree{background:#0f1719;color:#d6e2e5;border-radius:14px;padding:18px 22px;font:15px/1.7 var(--mono);white-space:pre;overflow-x:auto}
+.tree .c{color:#7d9096}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+ol.plain{margin:0;padding-left:22px;color:var(--ink-2);font-size:16px}
+ol.plain li{margin-bottom:8px}
+code{font-family:var(--mono);font-size:.92em;background:var(--surface-2);padding:1px 6px;border-radius:5px}
+@media (max-width:860px){
+  .fstep{grid-template-columns:1fr;grid-template-areas:"n" "h" "a" "b" "c";gap:12px}
+  .cases,.keys,.tools,.twocol{grid-template-columns:1fr}
+}
+</style>
+<script>
+function pickLang(l) {
+  document.documentElement.dataset.lang = l;
+  document.documentElement.lang = l === "zh" ? "zh-Hant-TW" : "en";
+  try { localStorage.setItem("slidejam-lang", l); } catch {}
+}
+(() => { let saved = null; try { saved = localStorage.getItem("slidejam-lang"); } catch {} pickLang(saved || (navigator.language.startsWith("zh") ? "zh" : "en")); })();
+</script>
+</head>
+<body>
+<header id="top"><div class="wrap nav">
+  <a class="logo" href="./">slide<span>jam</span></a>
+  <nav>
+    <a href="#setup"><span lang="zh">準備</span><span lang="en">Setup</span></a>
+    <a href="#flow"><span lang="zh">六個步驟</span><span lang="en">Six steps</span></a>
+    <a href="#decks"><span lang="zh">第二份簡報</span><span lang="en">More decks</span></a>
+    <a href="#tools"><span lang="zh">按鍵</span><span lang="en">Keys</span></a>
+    <a href="#effects"><span lang="zh">效果在哪</span><span lang="en">Effects</span></a>
+    <a href="https://github.com/cooldongdong/slidejam">GitHub</a>
+  </nav>
+  <div class="lang"><button data-l="zh">中文</button><button data-l="en">EN</button></div>
+</div></header>
+
+<main>
+<section class="page-hero"><div class="wrap">
+  <p class="kicker"><span lang="zh">使用流程</span><span lang="en">Workflow</span></p>
+  <h1><span lang="zh">從一句「做簡報」，到上台</span><span lang="en">From "make me a deck" to the stage</span></h1>
+  <p><span lang="zh">slidejam 附了一個 Claude Code skill。你說「做簡報」，它會帶你走六個步驟，每一步都會說現在在第幾步、輪到誰做什麼。這頁把整個流程攤開。</span><span lang="en">slidejam ships a Claude Code skill. Say "make me a deck" and it walks you through six steps, always telling you which step you are on and whose turn it is. This page lays the whole flow out.</span></p>
+</div></section>
+
+<section class="block" id="setup"><div class="wrap">
+  <h2><span lang="zh">準備（只要做一次）</span><span lang="en">Setup (once)</span></h2>
+  <p class="lead"><span lang="zh">拿到 slidejam，再把 skill 連到 Claude Code。之後在任何資料夾開 Claude Code 都能用。</span><span lang="en">Get slidejam and link the skill into Claude Code. It then works from any folder.</span></p>
+  <div class="twocol">
+    <pre>git clone https://github.com/cooldongdong/slidejam
+cd slidejam
+npm install                      <span class="c"># 拍真網站動畫才需要</span>
+npx playwright install chromium-headless-shell
+ln -s "$PWD/skill" ~/.claude/skills/slidejam</pre>
+    <div class="who" style="font-size:16px">
+      <p style="margin:0 0 10px"><span lang="zh">沒有用 Claude Code 也可以：打開 <a href="effects.html">效果圖鑑</a> 挑效果，把按 A 標註出來的清單貼給任何一個 AI。</span><span lang="en">Not on Claude Code? Pick effects from the <a href="effects.html">gallery</a> and paste the lists you mark with A to any AI.</span></p>
+      <p style="margin:0"><span lang="zh">需要 Chrome（改字存檔只有 Chrome 能用）和 Node.js 22 以上。</span><span lang="en">You need Chrome (saving edits is Chrome-only) and Node.js 22+.</span></p>
+    </div>
+  </div>
+</div></section>
+
+<section class="block" id="flow"><div class="wrap">
+  <h2><span lang="zh">六個步驟</span><span lang="en">Six steps</span></h2>
+  <p class="lead"><span lang="zh">AI 會在每則訊息開頭標出「（步驟 2／6：大綱）」，你隨時知道走到哪了。第 2 步之後要你說「可以動工」，AI 才會開始建檔。</span><span lang="en">Every message from the AI starts with "(step 2/6: outline)", so you always know where you are. Nothing is created until you say go after step 2.</span></p>
+  <div class="flow">
+
+    <div class="fstep zero">
+      <h3><span lang="zh">要做哪一份？</span><span lang="en">Which deck?</span></h3>
+      <div class="who"><b>AI</b><span lang="zh">問你要開新的，還是繼續某個資料夾。你貼了標註清單，它就直接從清單裡的檔案路徑接著做。</span><span lang="en">Asks: a new deck, or carry on with a folder? If you paste an annotation list, it picks up from the file path in it.</span></div>
+      <div class="who"><b><span lang="zh">你</span><span lang="en">You</span></b><span lang="zh">說「做簡報」，或「繼續做 ~/talks/xxx」。</span><span lang="en">Say "make me a deck", or "carry on with ~/talks/xxx".</span></div>
+      <div class="chat"><p class="me"><span lang="zh">幫我做簡報</span><span lang="en">Make me a deck</span></p><p class="ai"><span lang="zh">開一份新的，還是繼續做某個資料夾的簡報？</span><span lang="en">A new one, or carry on with an existing folder?</span></p></div>
+    </div>
+
+    <div class="fstep">
+      <h3><span lang="zh">開場五問</span><span lang="en">Five questions</span></h3>
+      <div class="who"><b>AI</b><span lang="zh">一次問完五件事：講什麼、講給誰、講多久、要秀哪些網站、你有幾小時。</span><span lang="en">Asks five things at once: topic, audience, length, which sites to show, and how many hours you have.</span></div>
+      <div class="who"><b><span lang="zh">你</span><span lang="en">You</span></b><span lang="zh">回答。時間少的話，第一版就做精簡一點。</span><span lang="en">Answer. Little time means a leaner first version.</span></div>
+      <div class="chat"><p class="ai"><span lang="zh">（步驟 1／6）1. 主題和最想讓台下記住的一句話？2. 聽眾是誰？3. 幾分鐘？4. 要秀哪些網站？5. 你有幾小時？</span><span lang="en">(step 1/6) 1. Topic, and the one line they should remember? 2. Audience? 3. Minutes? 4. Which sites? 5. Hours you have?</span></p></div>
+    </div>
+
+    <div class="fstep">
+      <h3><span lang="zh">大綱</span><span lang="en">Outline</span><small><span lang="zh">要你說「可以動工」</span><span lang="en">needs your go</span></small></h3>
+      <div class="who"><b>AI</b><span lang="zh">每頁一句話，標出用哪個效果、需要哪些截圖。</span><span lang="en">One line per slide, with the effect by name and the screenshots it needs.</span></div>
+      <div class="who"><b><span lang="zh">你</span><span lang="en">You</span></b><span lang="zh">刪、改、換順序。滿意了說「可以動工」。</span><span lang="en">Cut, reword, reorder. Say "go" when it's right.</span></div>
+      <div class="chat"><p class="ai"><span lang="zh">（步驟 2／6）3. 找得到：議題頁點進專案頁（morph，要拍 civictech.tw）…</span><span lang="en">(step 2/6) 3. Findable: topic page → project page (morph, capture civictech.tw)…</span></p><p class="me"><span lang="zh">第 5 頁拿掉，可以動工</span><span lang="en">Drop slide 5, go</span></p></div>
+    </div>
+
+    <div class="fstep">
+      <h3><span lang="zh">建檔</span><span lang="en">Set up</span></h3>
+      <div class="who"><b>AI</b><span lang="zh">開資料夾（預設 <code>~/talks/名字</code>），截圖、拍頁面重組動畫。</span><span lang="en">Makes the folder (default <code>~/talks/name</code>), takes screenshots, captures morphs.</span></div>
+      <div class="who"><b><span lang="zh">你</span><span lang="en">You</span></b><span lang="zh">等。網站需要登入的話，AI 會請你幫忙。</span><span lang="en">Wait. If a site needs a login, the AI asks for help.</span></div>
+      <div class="chat"><p class="ai"><span lang="zh">（步驟 3／6）資料夾開好了，拍了 6 張截圖和 1 段 morph。</span><span lang="en">(step 3/6) Folder ready: 6 screenshots and 1 morph captured.</span></p></div>
+    </div>
+
+    <div class="fstep">
+      <h3><span lang="zh">第一版</span><span lang="en">First version</span></h3>
+      <div class="who"><b>AI</b>
+        <ul><li><span lang="zh">做完全部頁面和講稿</span><span lang="en">Writes every slide and the notes</span></li>
+        <li><span lang="zh">自己截圖檢查一輪</span><span lang="en">Screenshots and checks its own work</span></li>
+        <li><span lang="zh">給你檔案路徑、每頁摘要、它不確定的地方</span><span lang="en">Gives you the path, a line per slide, and what it's unsure of</span></li></ul></div>
+      <div class="who"><b><span lang="zh">你</span><span lang="en">You</span></b><span lang="zh">用 Chrome 打開，從頭播一次。</span><span lang="en">Open it in Chrome and play it through.</span></div>
+      <div class="chat"><p class="ai"><span lang="zh">（步驟 4／6）打開 ~/talks/civic/index.html。不確定：第 7 頁的數字是去年的。字自己按 E 改；效果按 A 標起來貼給我。</span><span lang="en">(step 4/6) Open ~/talks/civic/index.html. Unsure: slide 7's numbers are last year's. Fix wording with E; mark effects with A and paste them to me.</span></p></div>
+    </div>
+
+    <div class="fstep">
+      <h3><span lang="zh">來回修</span><span lang="en">Rounds of changes</span></h3>
+      <div class="who"><b>AI</b><span lang="zh">一則一則處理，只重拍改到的頁，逐項回報。</span><span lang="en">Handles each item, re-shoots only what changed, reports item by item.</span></div>
+      <div class="who"><b><span lang="zh">你</span><span lang="en">You</span></b>
+        <ul><li><span lang="zh">文字：按 E 自己改，⌘S 存</span><span lang="en">Wording: press E, fix it, ⌘S</span></li>
+        <li><span lang="zh">效果、版面：按 A 點或框，複製清單貼給 AI</span><span lang="en">Effects, layout: press A, click or box, paste the list</span></li></ul></div>
+      <div class="chat"><p class="me">1. 第 12 頁〈找得到〉<br>框住：9.6 18.9 24 7.7<br><span lang="zh">想要：聚光燈打在標題上</span><span lang="en">want: spotlight on the title</span></p><p class="ai"><span lang="zh">（步驟 5／6）第 12 頁加了 spot，框在標題。截圖如下。</span><span lang="en">(step 5/6) Slide 12 has a spot on the title now. Screenshot below.</span></p></div>
+    </div>
+
+    <div class="fstep">
+      <h3><span lang="zh">上台前</span><span lang="en">Before the talk</span></h3>
+      <div class="who"><b>AI</b><span lang="zh">陪你跑檢查清單：網路、字型、講者視窗、全螢幕、有沒有空白頁。</span><span lang="en">Runs the checklist with you: network, fonts, presenter view, full screen, blank slides.</span></div>
+      <div class="who"><b><span lang="zh">你</span><span lang="en">You</span></b><span lang="zh">按 P 開講者視窗，排練一次。</span><span lang="en">Press P for the presenter view and rehearse.</span></div>
+      <div class="chat"><p class="ai"><span lang="zh">（步驟 6／6）第 4 頁的地圖要網路，場地沒 Wi-Fi 的話我先換成截圖？</span><span lang="en">(step 6/6) Slide 4's map needs a network. Swap in a screenshot in case there's no Wi-Fi?</span></p></div>
+    </div>
+
+  </div>
+</div></section>
+
+<section class="block" id="decks"><div class="wrap">
+  <h2><span lang="zh">第二份簡報、隔天接著做</span><span lang="en">More decks, and picking up later</span></h2>
+  <p class="lead"><span lang="zh">每份簡報都是一個獨立的資料夾，裡面有自己的一份引擎。做第二份不會影響第一份。</span><span lang="en">Every deck is its own folder with its own copy of the engine. A second deck never touches the first.</span></p>
+  <div class="cases">
+    <div class="case"><h3><span lang="zh">開第二份</span><span lang="en">A second deck</span></h3>
+      <p><span lang="zh">再說一次「做簡報」，選「開新的」，給它另一個名字。</span><span lang="en">Say "make me a deck" again, choose new, give it another name.</span></p>
+      <pre>~/talks/civictech/
+~/talks/misheng/   <span class="c"># 互不影響</span></pre></div>
+    <div class="case"><h3><span lang="zh">隔天、開新對話接著做</span><span lang="en">Tomorrow, in a new chat</span></h3>
+      <p><span lang="zh">說「繼續做 ~/talks/misheng」，或直接貼標註清單。清單第一行就有檔案路徑，AI 會自己找到是哪一份，直接從第 5 步接著改。</span><span lang="en">Say "carry on with ~/talks/misheng", or just paste an annotation list. Its first lines carry the path, so the AI goes straight to step 5.</span></p></div>
+    <div class="case"><h3><span lang="zh">slidejam 出了新效果</span><span lang="en">slidejam gains effects</span></h3>
+      <p><span lang="zh">在 slidejam 資料夾 <code>git pull</code>，再更新那份簡報的引擎。投影片和素材都不會動。</span><span lang="en"><code>git pull</code> slidejam, then refresh that deck's engine. Slides and media stay as they are.</span></p>
+      <pre>node tools/new-deck.mjs ~/talks/misheng --update</pre></div>
+  </div>
+</div></section>
+
+<section class="block" id="tools"><div class="wrap">
+  <h2><span lang="zh">在簡報裡的按鍵</span><span lang="en">Keys inside a deck</span></h2>
+  <p class="lead"><span lang="zh">忘了的話，按 ? 或點左下角的小問號。</span><span lang="en">Forgot? Press ? or the small button bottom-left.</span></p>
+  <div class="keys">
+    <div><kbd>→</kbd><span lang="zh">下一步、下一頁</span><span lang="en">next step / slide</span></div>
+    <div><kbd>←</kbd><span lang="zh">上一頁</span><span lang="en">previous slide</span></div>
+    <div><kbd>G</kbd><span lang="zh">總覽，點縮圖跳頁</span><span lang="en">overview, click to jump</span></div>
+    <div><kbd>W</kbd><span lang="zh">一次看全部，每頁同時播放</span><span lang="en">wall: every slide playing at once</span></div>
+    <div><kbd>P</kbd><span lang="zh">講者視窗：講稿、下一頁、計時，只在你的螢幕</span><span lang="en">presenter view: notes, next slide, clock — your screen only</span></div>
+    <div><kbd>N</kbd><span lang="zh">在同一個視窗看講稿</span><span lang="en">notes in the same window</span></div>
+    <div><kbd>E</kbd><span lang="zh">直接改字，⌘S 存回檔案</span><span lang="en">edit text in place, ⌘S saves the file</span></div>
+    <div><kbd>A</kbd><span lang="zh">標註給 AI：點一下或拖拉框選</span><span lang="en">annotate for the AI: click or drag a box</span></div>
+    <div><kbd>R</kbd><span lang="zh">重播這一頁</span><span lang="en">replay this slide</span></div>
+    <div><kbd>F</kbd><span lang="zh">全螢幕</span><span lang="en">full screen</span></div>
+  </div>
+  <div class="tools">
+    <div><h3><span lang="zh">A：說不清楚的，框起來</span><span lang="en">A: box what's hard to describe</span></h3><p><span lang="zh">清單有頁碼、元素和精確位置，AI 不用猜。</span><span lang="en">The list has the slide, the element and exact coordinates.</span></p>
+      <div class="screen"><iframe src="demos/annotate.html?embed&loop=10" title="annotate" loading="lazy" tabindex="-1"></iframe></div></div>
+    <div><h3><span lang="zh">E：字自己改最快</span><span lang="en">E: fixing words yourself is fastest</span></h3><p><span lang="zh">⌘S 只換掉改過的那一行，其他一個字都不動。</span><span lang="en">⌘S replaces only the line you changed.</span></p>
+      <div class="screen"><iframe src="demos/edit.html?embed&loop=8" title="edit" loading="lazy" tabindex="-1"></iframe></div></div>
+  </div>
+</div></section>
+
+<section class="block" id="effects"><div class="wrap">
+  <h2><span lang="zh">效果放在哪？怎麼加新的？</span><span lang="en">Where effects live, and adding one</span></h2>
+  <div class="twocol" style="margin-top:22px">
+    <div>
+      <p class="lead" style="margin-bottom:16px"><span lang="zh">一個效果一個檔案，JS 和樣式都在裡面。簡報打開時，引擎只載入這份簡報用到的效果。</span><span lang="en">One file per effect, script and styles together. A deck loads only the effects it uses.</span></p>
+      <div class="tree">deck/
+  deck.js      <span class="c"># 翻頁、總覽、E、A、P、W</span>
+  deck.css
+  fx/
+    _lib.js    <span class="c"># 效果共用的小工具</span>
+    bento.js   <span class="c"># 一個效果一個檔</span>
+    morph.js
+    map.js
+    …</div>
+    </div>
+    <div>
+      <p class="lead" style="margin-bottom:16px"><span lang="zh">圖鑑裡沒有想要的？跟 AI 描述，或按 A 標出來。它會：</span><span lang="en">Not in the gallery? Describe it or mark it with A. The AI will:</span></p>
+      <ol class="plain">
+        <li><span lang="zh">在 <code>deck/fx/</code> 加一個新檔案</span><span lang="en">add a file in <code>deck/fx/</code></span></li>
+        <li><span lang="zh">在效果圖鑑加一頁示範，寫好「跟 AI 這樣說」</span><span lang="en">add a gallery slide with a demo and a line to ask with</span></li>
+        <li><span lang="zh">用 <code>--update</code> 把它帶進你的簡報</span><span lang="en">bring it into your deck with <code>--update</code></span></li>
+      </ol>
+      <p style="color:var(--ink-muted);font-size:15px;margin-top:16px"><span lang="zh">下次就能直接叫名字。<a href="effects.html?wall">看目前所有效果 →</a></span><span lang="en">Next time, just call it by name. <a href="effects.html?wall">See every effect →</a></span></p>
+    </div>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <a class="logo" href="./" style="font-size:18px">slide<span>jam</span></a>
+  <span class="sp"></span>
+  <a href="./"><span lang="zh">首頁</span><span lang="en">Home</span></a>
+  <a href="effects.html"><span lang="zh">效果圖鑑</span><span lang="en">Effects</span></a>
+  <a href="https://github.com/cooldongdong/slidejam/blob/master/docs/%E4%BD%BF%E7%94%A8%E8%AA%AA%E6%98%8E.md"><span lang="zh">使用說明</span><span lang="en">User guide (zh)</span></a>
+  <a href="https://github.com/cooldongdong/slidejam">GitHub</a>
+</div></footer>
+
+<script>
+document.querySelectorAll(".lang button").forEach((b) => b.addEventListener("click", () => pickLang(b.dataset.l)));
+addEventListener("scroll", () => document.getElementById("top").classList.toggle("scrolled", scrollY > 8), { passive: true });
+</script>
+</body>
+</html>
