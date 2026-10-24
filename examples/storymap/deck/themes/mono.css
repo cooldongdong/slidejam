@@ -1,0 +1,15 @@
+/* slidejam 主題：mono（黑白極簡）。只有黑白灰、直角、沒有陰影，適合正式場合、印成講義。 */
+:root{
+  --paper:#ffffff; --surface:#ffffff; --surface-2:#f0f0f0;
+  --ink:#000; --ink-2:#222; --ink-muted:#666;
+  --line:#e2e2e2; --line-strong:#111;
+  --accent:#000; --accent-ink:#000; --accent-soft:#f0f0f0; --on-accent:#fff;
+  --warn:#d4380d; --warn-soft:#ffe58f;
+  --section-bg:#000; --section-ink:#fff; --section-muted:#bbb; --section-num:#fff;
+  --dark:#000; --dark-line:#222; --on-dark:#fff; --on-dark-muted:#999;
+  --c1:#000; --c2:#d4380d; --c3:#555; --c4:#888; --c5:#333; --c6:#aaa; --c7:#666; --c8:#bbb;
+  --device:#000; --device-metal:#bbb; --chat-bg:#f4f4f4;
+  --radius:2px; --radius-lg:4px;
+  --shadow:none;
+  --chrome:#000;
+}

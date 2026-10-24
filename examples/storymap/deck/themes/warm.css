@@ -1,0 +1,18 @@
+/* slidejam 主題：warm（暖紙張）。米白紙張、赭紅強調、襯線標題，適合人文、地方、故事。 */
+:root{
+  --paper:#faf6f0; --surface:#fffdf9; --surface-2:#f1e9de;
+  --ink:#2a1f17; --ink-2:#4a3b30; --ink-muted:#7a6a5c;
+  --line:#eadfd1; --line-strong:#d9c9b6;
+  --accent:#9a4a1f; --accent-ink:#5e2c12; --accent-soft:#f6e7dc; --on-accent:#fff;
+  --warn:#3f6b4a; --warn-soft:#f3d9c4;
+  --section-bg:#5e2c12; --section-ink:#fffaf3; --section-muted:#f0d9c6; --section-num:#e9b48f;
+  --dark:#2a1f17; --dark-line:#3d2f24; --on-dark:#fbf3ea; --on-dark-muted:#c9b6a3;
+  --code:#ecdcc9; --code-key:#f0b27a; --code-str:#c7d98f; --code-num:#e8a1b8; --code-prompt:#c7d98f;
+  --c1:#9a4a1f; --c2:#3f6b4a; --c3:#7a4f8a; --c4:#b07d2b; --c5:#2f5f7a; --c6:#a33b3b; --c7:#5d6b2f; --c8:#6a4a3a;
+  --device:#2a211b; --device-metal:#cdbfae; --chat-bg:#f3ece2;
+  --head:'Noto Serif TC','Songti TC','Source Han Serif TC',serif;
+  --head-weight:900;
+  --radius:10px; --radius-lg:16px;
+  --shadow-rgb:60 35 15;
+  --chrome:#1b140f;
+}

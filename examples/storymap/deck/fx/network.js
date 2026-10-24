@@ -6,12 +6,12 @@
 .network{position:relative;overflow:hidden}
 .nw-lines{position:absolute;inset:0;width:100%;height:100%}
 .nw-group{display:contents}
-.nw-group > b{position:absolute;left:0;top:0;white-space:nowrap;font-size:22px;font-weight:650;color:rgb(15 26 29/var(--lab,0));transform-origin:50% calc(100% + 22px)}
-.nw-group > b::after{content:"";position:absolute;left:50%;top:calc(100% + 8px);width:28px;height:28px;margin-left:-14px;border-radius:50%;background:#fff;border:3px solid var(--c);box-sizing:border-box}
+.nw-group > b{position:absolute;left:0;top:0;white-space:nowrap;font-size:22px;font-weight:650;color:color-mix(in srgb,var(--ink) calc(var(--lab,0) * 100%),transparent);transform-origin:50% calc(100% + 22px)}
+.nw-group > b::after{content:"";position:absolute;left:50%;top:calc(100% + 8px);width:28px;height:28px;margin-left:-14px;border-radius:50%;background:var(--surface);border:3px solid var(--c);box-sizing:border-box}
 .nw-dot{position:absolute;left:-5px;top:-5px;width:10px;height:10px;border-radius:50%;background:var(--c);font-size:0;overflow:hidden}
 `);
 
-  const PALETTE = ["#0d5f74", "#b45309", "#7c3aed", "#15803d", "#be185d", "#1d4ed8", "#a16207", "#0f766e"];
+  const PALETTE = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => `var(--c${n})`); // theme colours --c1…--c8
   register("network", {
     build(e) {
       if (e._nw) return e._nw;

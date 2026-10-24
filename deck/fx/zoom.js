@@ -2,7 +2,7 @@
 (() => {
   const { register, num, ms, delay, stop, anim } = Deck.lib;
   Deck.lib.css(`
-.pan,.zoom{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--line-strong);background:var(--surface)}
+.pan,.zoom{position:relative;overflow:hidden;border-radius:var(--radius);border:1px solid var(--line-strong);background:var(--surface)}
 .zoom > img{display:block;width:100%;height:100%;object-fit:cover}
 `);
 

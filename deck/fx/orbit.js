@@ -5,7 +5,7 @@
   Deck.lib.css(`
 .orbit{position:relative;width:100%;height:620px}
 .orbit > svg{position:absolute;inset:0;width:100%;height:100%}
-.orbit-node{position:absolute;transform:translate(-50%,-50%);background:var(--surface);border:2px solid var(--line-strong);border-radius:14px;padding:14px 22px;font-size:28px;font-weight:600;text-align:center;white-space:nowrap;transition:border-color .3s,background .3s,transform .3s}
+.orbit-node{position:absolute;transform:translate(-50%,-50%);background:var(--surface);border:2px solid var(--line-strong);border-radius:var(--radius);padding:14px 22px;font-size:28px;font-weight:600;text-align:center;white-space:nowrap;transition:border-color .3s,background .3s,transform .3s}
 .orbit-node small{display:block;font-size:18px;font-weight:400;color:var(--ink-muted);margin-top:4px}
 .orbit-node.lit{border-color:var(--accent);background:var(--accent-soft);transform:translate(-50%,-50%) scale(1.08)}
 .orbit > .center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}

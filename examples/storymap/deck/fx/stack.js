@@ -5,7 +5,7 @@
   Deck.lib.css(`
 .stack{position:relative}
 .stack > *{position:absolute;left:0;right:0;top:0;transform-origin:50% 0}
-.stack .card{padding:16px 18px;border-radius:14px;box-shadow:0 10px 30px rgb(15 26 29/.12)}
+.stack .card{padding:16px 18px;border-radius:var(--radius);box-shadow:0 10px 30px rgb(var(--shadow-rgb)/.12)}
 .stack .card b{display:block;font-size:19px;color:var(--ink)}
 .stack .card p{font-size:14px;line-height:1.5;margin-top:6px}
 .stack .card .tag{font-size:12px;margin-bottom:8px}

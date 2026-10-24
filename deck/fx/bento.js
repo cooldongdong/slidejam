@@ -8,18 +8,18 @@
   Deck.lib.css(`
 .bento{display:grid;grid-template-columns:repeat(var(--cols,4),1fr);grid-auto-rows:1fr;gap:18px;transform-origin:50% 50%}
 .bento > .w2{grid-column:span 2}.bento > .h2{grid-row:span 2}
-.tile{position:relative;border-radius:22px;overflow:hidden;border:1px solid var(--line);background:var(--surface);box-shadow:0 20px 60px rgb(15 26 29/.07)}
-.tile.dark{background:#0f1a1d;border-color:#1c2a2e;color:#f2f5f5}
+.tile{position:relative;border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--line);background:var(--surface);box-shadow:0 20px 60px rgb(var(--shadow-rgb)/.07)}
+.tile.dark{background:var(--dark);border-color:var(--dark-line);color:var(--on-dark)}
 .tile .head{position:absolute;left:24px;top:20px;right:24px;z-index:3}
 .tile .head b{display:block;font-size:26px;font-weight:650;color:var(--ink)}
 .tile .head span{display:block;font-size:16px;color:var(--ink-muted);margin-top:6px}
-.tile .head.pill b,.tile .head.pill span{display:inline-block;background:rgb(255 255 255/.9);padding:3px 10px;border-radius:9px}
-.tile.dark .head b{color:#f2f5f5}.tile.dark .head span{color:#9fb0b4}
+.tile .head.pill b,.tile .head.pill span{display:inline-block;background:color-mix(in srgb,var(--surface) 90%,transparent);padding:3px 10px;border-radius:9px}
+.tile.dark .head b{color:var(--on-dark)}.tile.dark .head span{color:var(--on-dark-muted)}
 .tile .vis{position:absolute;left:24px;right:24px;top:96px;bottom:0;overflow:hidden;border-radius:12px 12px 0 0;box-shadow:0 0 0 1px var(--line);border:0}
 .tile .vis.pan > img{width:100%}
 .tile > .fill{position:absolute;inset:0}
 .tile .big{position:absolute;left:24px;bottom:20px;font:600 120px/.95 var(--mono);letter-spacing:-.04em}
-.tile .big + small,.tile .big small{display:block;font-size:18px;color:#9fb0b4;letter-spacing:0;font-family:var(--sans);margin-top:8px}
+.tile .big + small,.tile .big small{display:block;font-size:18px;color:var(--on-dark-muted);letter-spacing:0;font-family:var(--sans);margin-top:8px}
 .tile .phone{position:absolute;left:50%;top:92px;width:190px;margin-left:-95px;padding:7px;border-radius:32px}
 .tile .phone::before{top:14px;width:50px;height:14px;margin-left:-25px}
 .tile .phone > .pan{border:0;border-radius:26px;height:100%}
@@ -32,8 +32,8 @@
 .tile .cap{position:absolute;left:0;right:0;bottom:0;padding:44px 24px 18px;background:linear-gradient(to top,var(--surface) 55%,transparent);z-index:2}
 .tile .cap b{display:block;font-size:30px;color:var(--ink)}
 .tile .cap .tag{display:inline-block;font:17px var(--mono);color:var(--warn);border:1.5px solid var(--warn);border-radius:999px;padding:2px 12px;margin-bottom:8px;background:var(--surface)}
-.tile.dark .cap{background:linear-gradient(to top,#0f1719 55%,transparent)}
-.tile.dark .cap b{color:#fff}
+.tile.dark .cap{background:linear-gradient(to top,var(--dark) 55%,transparent)}
+.tile.dark .cap b{color:var(--on-dark)}
 .tile .wish{position:absolute;left:24px;right:24px;bottom:22px;border:1.5px solid var(--accent);border-radius:10px;padding:10px 14px;font-size:18px;color:var(--ink);background:var(--surface);min-height:46px}
 `);
 

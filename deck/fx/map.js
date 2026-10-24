@@ -8,12 +8,12 @@
 (() => {
   const { register, num, ms, delay, timers, stop } = Deck.lib;
   Deck.lib.css(`
-.map{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line-strong);background:var(--surface-2)}
+.map{position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line-strong);background:var(--surface-2)}
 .slide.full > .map{position:absolute;inset:0;border:0;border-radius:0}
 .map .leaflet-control-attribution{font-size:11px}
 .pin{position:relative}
 .pin i{position:absolute;left:-11px;top:-30px;width:22px;height:22px;border-radius:50% 50% 50% 0;background:var(--accent);transform:rotate(-45deg);box-shadow:0 4px 10px rgb(0 0 0/.3);animation:pin-drop .6s var(--ease) both}
-.pin i::after{content:"";position:absolute;left:7px;top:7px;width:8px;height:8px;border-radius:50%;background:#fff}
+.pin i::after{content:"";position:absolute;left:7px;top:7px;width:8px;height:8px;border-radius:50%;background:var(--on-accent)}
 .pin span{position:absolute;left:16px;top:-34px;white-space:nowrap;font:600 20px var(--sans);color:var(--ink);background:var(--surface);padding:3px 10px;border-radius:8px;box-shadow:0 4px 12px rgb(0 0 0/.15);animation:pin-label .5s .3s var(--ease) both}
 @keyframes pin-drop{from{transform:translateY(-60px) rotate(-45deg);opacity:0}to{transform:rotate(-45deg);opacity:1}}
 @keyframes pin-label{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}

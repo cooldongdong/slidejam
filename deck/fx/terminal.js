@@ -3,14 +3,14 @@
 (() => {
   const { register, delay, clamp, stop, loopRaf, kids, keep, restore } = Deck.lib;
   Deck.lib.css(`
-.terminal{background:#0f1719;color:#cfdde1;font:22px/1.55 var(--mono);border-radius:14px;padding:26px 30px;overflow:hidden;box-shadow:0 30px 60px -30px rgb(0 0 0/.5)}
+.terminal{background:var(--dark);color:var(--code);font:22px/1.55 var(--mono);border-radius:var(--radius);padding:26px 30px;overflow:hidden;box-shadow:0 30px 60px -30px rgb(0 0 0/.5)}
 .terminal > *{white-space:pre}
-.terminal .cmd{color:#fff;min-height:1.55em;white-space:pre-wrap;word-break:break-all}
-.terminal .cmd::before{content:"$ ";color:#6fd1b0}
+.terminal .cmd{color:var(--on-dark);min-height:1.55em;white-space:pre-wrap;word-break:break-all}
+.terminal .cmd::before{content:"$ ";color:var(--code-prompt)}
 .terminal > :not(.cmd){opacity:0}
 .terminal > .on{opacity:1}
 body.editing .terminal > *,body.annotating .terminal > *{opacity:1}
-.terminal .k{color:#8fc8ff}.terminal .s{color:#f2c27b}.terminal .n{color:#b9a3ff}
+.terminal .k{color:var(--code-key)}.terminal .s{color:var(--code-str)}.terminal .n{color:var(--code-num)}
 `);
 
   register("terminal", {

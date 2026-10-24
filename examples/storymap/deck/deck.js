@@ -145,6 +145,12 @@
     const ov = $("#overview");
     const on = force ?? !ov.classList.contains("show");
     if (on && !ovBuilt) {
+      const top = el("div", { className: "ov-top" }, ov);
+      ov.prepend(top);
+      el("b", { textContent: "總覽" }, top);
+      const play = el("button", { textContent: "▶ 播放全部" }, top);
+      play.onclick = (e) => { e.stopPropagation(); toggleOverview(false); toggleWall(true); };
+      el("span", { textContent: "點縮圖跳到那一頁・Esc 關閉" }, top);
       const grid = $(".grid", ov);
       Deck.slides.forEach((_, i) => {
         const it = el("div", { className: "ov-item" }, grid); it.dataset.k = i;
@@ -453,41 +459,89 @@
   Deck.loadEffects = loadEffects;
 
   // ---------- keys ----------
-  const KEYS = [
-    ["→ / 空白", "下一步、下一頁"], ["←", "上一頁"], ["G", "總覽（也可以點右下頁碼）"],
-    ["W", "一次看全部：每一頁同時播放"], ["P", "講者視窗：講稿只在你的螢幕"], ["N", "講稿"],
-    ["R", "重播這一頁"], ["F", "全螢幕"], ["E", "直接改字，⌘S 存回檔案"], ["A", "標註給 AI：點一下或拖拉框選"], ["?", "這份說明"],
+  // Actions and their keys. Letter keys can be changed from the ? panel (handy when another
+  // tool already grabs one); the choice is remembered in this browser for every deck.
+  const fullscreen = () => (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen());
+  const ACTIONS = [
+    { id: "next", fixed: "→ / 空白", label: "下一步、下一頁", run: () => next() },
+    { id: "prev", fixed: "←", label: "上一頁", run: () => show(Deck.cur - 1) },
+    { id: "overview", key: "g", label: "總覽：點縮圖跳頁，也能「播放全部」", run: () => toggleOverview() },
+    { id: "presenter", key: "p", label: "講者視窗：講稿只在你的螢幕", run: () => openPresenter() },
+    { id: "notes", key: "n", label: "講稿（在同一個視窗）", run: () => notes.classList.toggle("show") },
+    { id: "replay", key: "r", label: "重播這一頁", run: () => show(Deck.cur) },
+    { id: "fullscreen", key: "f", label: "全螢幕", run: fullscreen },
+    { id: "edit", key: "e", label: "直接改字，⌘S 存回檔案", run: () => setEditing(!document.body.classList.contains("editing")) },
+    { id: "annotate", key: "a", label: "標註給 AI：點一下或拖拉框選", run: () => setAnnotating(!document.body.classList.contains("annotating")) },
+    { id: "help", key: "?", label: "這份說明", run: () => toggleKeys() },
   ];
+  const keyStore = "slidejam-keys";
+  const customKeys = () => store.get(keyStore) || {};
+  const keyOf = (a) => customKeys()[a.id] ?? a.key;
+  let rebinding = null;
+  function renderKeys() {
+    const box = $("#keys");
+    box.innerHTML = "";
+    el("b", { textContent: "快捷鍵" }, box);
+    el("small", { className: "keys-hint", textContent: "點一列直接執行・點右邊的鍵可以換掉" }, box);
+    ACTIONS.forEach((a) => {
+      const row = el("div", { className: "key-row" }, box);
+      el("span", { textContent: a.label }, row);
+      if (a.fixed) el("kbd", { textContent: a.fixed }, row);
+      else {
+        const waiting = rebinding === a.id;
+        const cap = el("button", { className: "key-cap" + (waiting ? " wait" : ""), textContent: waiting ? "按新的鍵…" : keyOf(a).toUpperCase(), title: "換一個鍵" }, row);
+        cap.onclick = (ev) => { ev.stopPropagation(); rebinding = a.id; renderKeys(); };
+      }
+      row.onclick = () => { if (a.id !== "help") toggleKeys(false); a.run(); };
+    });
+    if (Object.keys(customKeys()).length) {
+      const reset = el("button", { className: "keys-reset", textContent: "恢復預設按鍵" }, box);
+      reset.onclick = (ev) => { ev.stopPropagation(); store.set(keyStore, {}); renderKeys(); toast("按鍵恢復預設"); };
+    }
+  }
+  // while a key cap is waiting, the next key press becomes its new key; a key does one
+  // thing only, so if another action had it the two swap
+  function rebind(e) {
+    if (!rebinding) return false;
+    e.preventDefault();
+    if (e.key === "Escape") { rebinding = null; renderKeys(); return true; }
+    if (e.key.length !== 1 || e.key === " " || e.metaKey || e.ctrlKey) { toast("請按一個字母、數字或符號鍵"); return true; }
+    const k = e.key.toLowerCase(), me = ACTIONS.find((a) => a.id === rebinding);
+    const map = customKeys(), owner = ACTIONS.find((a) => !a.fixed && a !== me && keyOf(a) === k);
+    if (owner) map[owner.id] = keyOf(me);
+    map[me.id] = k;
+    store.set(keyStore, map);
+    toast(owner ? `「${me.label}」改用 ${k.toUpperCase()}；「${owner.label}」換成 ${map[owner.id].toUpperCase()}` : `「${me.label}」改用 ${k.toUpperCase()}`, 4000);
+    rebinding = null;
+    renderKeys();
+    return true;
+  }
   function toggleKeys(force) {
-    const k = $("#keys");
-    k.classList.toggle("show", force ?? !k.classList.contains("show"));
+    const box = $("#keys"), on = force ?? !box.classList.contains("show");
+    if (on) renderKeys(); else rebinding = null;
+    box.classList.toggle("show", on);
   }
   function onKey(e) {
+    if (rebind(e)) return;
     const typing = e.target.isContentEditable || /INPUT|TEXTAREA/.test(e.target.tagName);
     if ((e.metaKey || e.ctrlKey) && e.key === "s") { e.preventDefault(); save(); return; }
     if (e.key === "Escape") {
       if (typing) return e.target.blur();
       if ($("#keys").classList.contains("show")) return toggleKeys(false);
-      if (walled) return toggleWall(false);
+      if (walled) { toggleWall(false); return toggleOverview(true); }
       if (document.body.classList.contains("editing")) return setEditing(false);
       if (document.body.classList.contains("annotating")) return setAnnotating(false);
       return toggleOverview(false);
     }
     if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
-    const k = e.key.toLowerCase();
-    if (e.key === "?") toggleKeys();
-    else if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); next(); }
+    if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); next(); }
     else if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); show(Deck.cur - 1); }
-    else if (k === "g" || k === "o") toggleOverview();
-    else if (k === "w") toggleWall();
-    else if (k === "p") openPresenter();
-    else if (k === "r") show(Deck.cur);
     else if (e.key === "Home") show(0);
     else if (e.key === "End") show(Deck.slides.length - 1);
-    else if (k === "n") notes.classList.toggle("show");
-    else if (k === "f") document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
-    else if (k === "e") setEditing(!document.body.classList.contains("editing"));
-    else if (k === "a") setAnnotating(!document.body.classList.contains("annotating"));
+    else {
+      const k = e.key.toLowerCase(), a = ACTIONS.find((x) => !x.fixed && keyOf(x) === k);
+      if (a) { e.preventDefault(); a.run(); }
+    }
   }
 
   // ---------- P: presenter window ----------
@@ -541,7 +595,11 @@
     if (on) {
       leave(Deck.cur);
       const wall = el("div", { id: "wall" }, document.body);
-      el("p", { className: "wall-hint", textContent: "滑過去重播・點一下打開那一頁・W 或 Esc 回去" }, wall);
+      const top = el("div", { className: "ov-top" }, wall);
+      el("b", { textContent: "總覽・播放中" }, top);
+      const stopBtn = el("button", { textContent: "■ 停止播放" }, top);
+      stopBtn.onclick = () => { toggleWall(false); toggleOverview(true); };
+      el("span", { textContent: "滑過去重播・點一下打開那一頁・Esc 回到總覽" }, top);
       const grid = el("div", { className: "wall-grid" }, wall);
       Deck.slides.forEach((s, i) => {
         const cell = el("div", { className: "wall-cell" }, grid);
@@ -588,11 +646,13 @@
     el("div", { className: "hint", textContent: "Enter 送出・Shift+Enter 換行・Esc 取消" }, ai);
     chrome("div", "anno-panel", document.body);
     const help = chrome("button", "help", document.body);
-    help.textContent = "?"; help.title = "快捷鍵（?）";
+    help.textContent = "?"; help.title = "快捷鍵";
     help.onclick = () => toggleKeys();
-    const keys = chrome("div", "keys", document.body);
-    el("b", { textContent: "快捷鍵" }, keys);
-    KEYS.forEach(([k, what]) => { const row = el("div", {}, keys); el("kbd", { textContent: k }, row); row.append(what); });
+    chrome("div", "keys", document.body);
+    addEventListener("click", (e) => {
+      // a click outside the ? panel only closes it; it doesn't also turn the page
+      if ($("#keys").classList.contains("show") && !e.target.closest("#keys, #help")) { e.stopPropagation(); toggleKeys(false); }
+    }, true);
     $("#page").title = "總覽（G）";
     $("#page").addEventListener("click", (e) => { e.stopPropagation(); toggleOverview(true); });
     const badge = () => ($("#modebadge").textContent = document.body.classList.contains("editing") ? "編輯 · ⌘S 存檔" : "標註");
@@ -613,7 +673,7 @@
       addEventListener("keydown", onKey);
       stage.addEventListener("click", (e) => {
         if (document.body.classList.contains("editing") || document.body.classList.contains("annotating")) return;
-        if (e.target.closest("a, button, iframe, .leaflet-container")) return;
+        if (e.target.closest("a, button, input, select, label, iframe, .leaflet-container")) return;
         next();
       });
       addEventListener("hashchange", () => { const i = hashIndex(); if (i != null && i !== Deck.cur) show(i); });

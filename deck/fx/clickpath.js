@@ -5,7 +5,7 @@
 (() => {
   const { register, gen, timers, stop } = Deck.lib;
   Deck.lib.css(`
-.clickpath{position:relative;aspect-ratio:16/10;border-radius:14px;overflow:hidden;border:1px solid var(--line-strong);box-shadow:0 30px 60px -30px rgb(15 26 29/.4);background:#fff}
+.clickpath{position:relative;aspect-ratio:16/10;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line-strong);box-shadow:var(--shadow);background:var(--surface)}
 .clickpath > :not(.cursor){position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s}
 .clickpath > .on{opacity:1}
 .cursor{position:absolute;left:70%;top:85%;width:34px;height:34px;transition:left 1s var(--ease),top 1s var(--ease);pointer-events:none;z-index:3}

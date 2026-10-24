@@ -5,12 +5,12 @@
   const { register, gen, ms, delay, timers, stop, kids } = Deck.lib;
   Deck.lib.css(`
 .hotspots{position:relative}
-.hotspots > img{display:block;width:100%;border-radius:14px;border:1px solid var(--line-strong)}
-.hs-dot{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgb(255 255 255/.9);opacity:0;transform:scale(.3);transition:opacity .4s,transform .5s var(--ease)}
+.hotspots > img{display:block;width:100%;border-radius:var(--radius);border:1px solid var(--line-strong)}
+.hs-dot{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--surface) 90%,transparent);opacity:0;transform:scale(.3);transition:opacity .4s,transform .5s var(--ease)}
 .hs-dot::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:3px solid var(--accent);animation:hs-pulse 1.8s ease-out infinite}
 @keyframes hs-pulse{from{transform:scale(1);opacity:.8}to{transform:scale(2.6);opacity:0}}
 .hotspots.lit .hs-dot{opacity:1;transform:none}
-.hs-note{position:absolute;margin:0;transform:translate(28px,-50%) scale(.9);transform-origin:0 50%;max-width:420px;background:var(--surface);border-radius:12px;padding:12px 18px;font-size:24px;line-height:1.45;color:var(--ink);box-shadow:0 18px 40px -12px rgb(15 26 29/.35);opacity:0;transition:opacity .4s,transform .5s var(--ease);z-index:3}
+.hs-note{position:absolute;margin:0;transform:translate(28px,-50%) scale(.9);transform-origin:0 50%;max-width:420px;background:var(--surface);border-radius:12px;padding:12px 18px;font-size:24px;line-height:1.45;color:var(--ink);box-shadow:0 18px 40px -12px rgb(var(--shadow-rgb)/.35);opacity:0;transition:opacity .4s,transform .5s var(--ease);z-index:3}
 .hs-note.open{opacity:1;transform:translate(28px,-50%)}
 body.editing .hs-note,body.annotating .hs-note,.thumb .hs-note:first-of-type{opacity:1}
 `);

@@ -4,7 +4,7 @@
 (() => {
   const { register, gen, delay, timers, stop } = Deck.lib;
   Deck.lib.css(`
-.spot{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--line-strong)}
+.spot{position:relative;overflow:hidden;border-radius:var(--radius);border:1px solid var(--line-strong)}
 .spot > img{display:block;width:100%}
 .spot-hole{position:absolute;border-radius:10px;box-shadow:0 0 0 9999px rgb(10 16 19/0);outline:3px solid transparent;transition:all .7s var(--ease)}
 .spot.lit .spot-hole{box-shadow:0 0 0 9999px rgb(10 16 19/.55);outline-color:var(--warn)}

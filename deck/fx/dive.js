@@ -3,7 +3,7 @@
 (() => {
   const { register, num, delay, stop, anim, kids, trigger, fire } = Deck.lib;
   Deck.lib.css(`
-.dive,.wipe{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--line-strong);background:var(--surface)}
+.dive,.wipe{position:relative;overflow:hidden;border-radius:var(--radius);border:1px solid var(--line-strong);background:var(--surface)}
 .dive > *,.wipe > :not(.wipe-band){display:block;width:100%;height:100%;object-fit:cover}
 .dive > :nth-child(2),.wipe > :nth-child(2){position:absolute;inset:0}
 .dive > :nth-child(2){opacity:0}

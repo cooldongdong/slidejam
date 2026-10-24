@@ -3,7 +3,7 @@
 (() => {
   const { register, num, delay, clamp, lerp, stop, loopRaf, rnd, keep, restore, splitChars } = Deck.lib;
   Deck.lib.css(`
-.flap-cell{display:inline-block;min-width:.92em;text-align:center;margin:0 .03em;padding:.05em .04em;border-radius:.1em;color:#f2f5f6;background:linear-gradient(#232c31 0 49%,#11181b 49% 51%,#1b2327 51%);box-shadow:0 .05em .1em rgb(0 0 0/.3);transform-origin:50% 50%}
+.flap-cell{display:inline-block;min-width:.92em;text-align:center;margin:0 .03em;padding:.05em .04em;border-radius:.1em;color:var(--on-dark);background:linear-gradient(color-mix(in srgb,var(--dark) 88%,#fff) 0 49%,color-mix(in srgb,var(--dark) 80%,#000) 49% 51%,var(--dark) 51%);box-shadow:0 .05em .1em rgb(0 0 0/.3);transform-origin:50% 50%}
 `);
 
   register("flap", {

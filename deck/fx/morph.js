@@ -4,7 +4,7 @@
 (() => {
   const { register, $$, gen, delay, clamp, lerp, stop, loopRaf } = Deck.lib;
   Deck.lib.css(`
-.morph{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--line-strong);box-shadow:0 30px 60px -30px rgb(15 26 29/.4);background:var(--paper)}
+.morph{position:relative;overflow:hidden;border-radius:var(--radius);border:1px solid var(--line-strong);box-shadow:var(--shadow);background:var(--paper)}
 .slide.full > .morph{position:absolute;inset:0;border:0;border-radius:0;box-shadow:none}
 .mx{position:absolute;left:0;top:0;overflow:hidden;transform-origin:0 0}
 .mx > *{position:absolute;left:0;top:0}
