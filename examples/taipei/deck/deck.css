@@ -30,6 +30,8 @@ body{font-family:var(--sans);color:var(--ink);-webkit-font-smoothing:antialiased
 
 /* ---------- stage & slides ---------- */
 #stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform-origin:center;background:var(--paper);overflow:hidden}
+/* a finger on the slide can still scroll the page around it and pinch-zoom; sideways is a swipe */
+#stage{touch-action:pan-y pinch-zoom}
 .slide{position:absolute;inset:0;padding:96px 120px;display:flex;flex-direction:column;justify-content:center;opacity:0;visibility:hidden;transition:opacity .45s var(--ease),visibility 0s .45s}
 .slide.active{opacity:1;visibility:visible;transition:opacity .45s var(--ease)}
 .slide.video{padding:0;background:#000}

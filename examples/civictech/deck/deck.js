@@ -805,28 +805,46 @@
     // ?embed: a deck shown inside another page — no chrome, no keys, plays by itself
     const q = new URLSearchParams(location.search);
     const embed = q.has("embed");
+    let auto = 0;
     if (embed) {
       document.body.classList.add("embed");
       // ?embed&tour=6 walks through the whole deck by itself (a step every 6 s, then starts
       // over); otherwise ?embed&loop=8 just replays the one slide
       if (q.has("tour")) {
         const every = +(q.get("tour") || 6) * 1000;
-        setInterval(() => {
+        auto = setInterval(() => {
           if (document.hidden) return;
           Deck.cur === Deck.slides.length - 1 ? show(0) : next();
         }, every);
       } else {
         const every = +(q.get("loop") || 9) * 1000;
-        setInterval(() => !document.hidden && show(Deck.cur), every);
+        auto = setInterval(() => !document.hidden && show(Deck.cur), every);
       }
     }
+    // Click or tap to go on. On a touch screen a tap on the left third goes back, and a
+    // sideways swipe turns the page either way. An embedded deck only takes touch, and the
+    // first touch stops it playing by itself. Links, form fields, embedded sites and maps you
+    // can drag (data-interactive) keep their own taps.
+    let ptr = "mouse", from = null;
+    const mine = (e) => !document.body.classList.contains("editing") && !document.body.classList.contains("annotating")
+      && !e.target.closest("a, button, input, select, label, iframe, [data-interactive]");
+    stage.addEventListener("pointerdown", (e) => { ptr = e.pointerType; from = ptr === "mouse" ? null : [e.clientX, e.clientY]; });
+    stage.addEventListener("pointerup", (e) => {
+      if (!from) return;
+      const dx = e.clientX - from[0], dy = e.clientY - from[1];
+      from = null;
+      if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5 || !mine(e)) return;
+      clearInterval(auto);
+      dx < 0 ? next() : show(Deck.cur - 1);
+    });
+    stage.addEventListener("click", (e) => {
+      if ((embed && ptr === "mouse") || !mine(e)) return;
+      clearInterval(auto);
+      const r = stage.getBoundingClientRect();
+      ptr !== "mouse" && e.clientX - r.left < r.width / 3 ? show(Deck.cur - 1) : next();
+    });
     if (!embed) {
       addEventListener("keydown", onKey);
-      stage.addEventListener("click", (e) => {
-        if (document.body.classList.contains("editing") || document.body.classList.contains("annotating")) return;
-        if (e.target.closest("a, button, input, select, label, iframe, .leaflet-container")) return;
-        next();
-      });
       addEventListener("hashchange", () => { const i = hashIndex(); if (i != null && i !== Deck.cur) show(i); });
       addEventListener("beforeunload", (e) => { if (dirty.size) e.preventDefault(); });
     }
