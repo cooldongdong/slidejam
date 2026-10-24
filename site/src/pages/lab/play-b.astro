@@ -13,8 +13,12 @@ const list = decks.map((d, i) => ({ ...d, ...deckStats(d.file), n: String(i + 1)
   <p class="pb-sub"><span lang="zh">往下捲，一份一份推到你眼前。</span><span lang="en">Scroll, and each one is pushed up close.</span></p>
 </section>
 
+<nav class="fx-mini pb-mini" aria-label="decks">
+  {list.map((d) => <a href={`#${d.id}`}><i></i><span lang="zh">{d.zh[0]}</span><span lang="en">{d.en[0]}</span></a>)}
+</nav>
+
 {list.map((d) => (
-  <section class="pb-ch" data-file={d.file}>
+  <section class="pb-ch" id={d.id} data-file={d.file}>
     <div class="pb-sticky">
       <span class="pb-num" aria-hidden="true">{d.n}</span>
       <div class="pb-frame"><iframe data-src={`${B}${d.file}?embed&tour=5`} tabindex="-1" title=""></iframe><img src={`${B}posters/${d.id}.jpg`} alt="" /></div>
@@ -53,7 +57,20 @@ function tick() {
     if (!near && ifr.src) { ifr.removeAttribute("src"); f.classList.remove("live"); }
   });
 }
-addEventListener("scroll", () => requestAnimationFrame(tick), { passive: true });
+// the outline: lights the chapter you are in; a click lands where its story is showing
+const mini = [...document.querySelectorAll(".pb-mini a")];
+function outline() {
+  const k = chs.findIndex((c) => c.getBoundingClientRect().bottom > innerHeight / 2);
+  document.querySelector(".pb-mini").classList.toggle("show", chs[0].getBoundingClientRect().top < innerHeight);
+  mini.forEach((a, j) => { a.classList.toggle("on", j === k); a.classList.toggle("done", k > j || k < 0); });
+}
+mini.forEach((a, j) => a.addEventListener("click", (e) => {
+  e.preventDefault();
+  const c = chs[j];
+  scrollTo({ top: c.offsetTop + 0.85 * (c.offsetHeight - innerHeight), behavior: "smooth" });
+}));
+addEventListener("scroll", () => requestAnimationFrame(() => { tick(); outline(); }), { passive: true });
+outline();
 addEventListener("resize", tick);
 tick();
 </script>
@@ -63,7 +80,9 @@ tick();
 .pb-hero h1{font-size:clamp(56px,9vw,150px);line-height:.98;letter-spacing:-.045em;color:#fff;margin:12px 0 26px}
 .pb-hero h1 em{font-style:normal;color:#7fd1e2}
 .pb-sub{color:#8a9ca3;font-size:18px}
-.pb-ch{height:300vh;position:relative}
+.pb-ch{height:220vh;position:relative}
+.pb-mini{position:fixed;right:28px;top:50%;transform:translateY(-50%);z-index:20;display:grid;gap:2px;font-size:13px;width:28px;opacity:0;pointer-events:none;transition:opacity .4s}
+.pb-mini.show{opacity:1;pointer-events:auto}
 .pb-sticky{position:sticky;top:64px;height:calc(100vh - 64px);display:grid;place-items:center;overflow:hidden;perspective:1600px}
 .pb-num{position:absolute;font:700 clamp(240px,38vw,560px)/1 var(--mono);letter-spacing:-.08em;color:transparent;-webkit-text-stroke:2px rgb(127 209 226/.4);pointer-events:none;user-select:none}
 .pb-frame{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 0 0 1px rgb(255 255 255/.1),0 80px 160px -40px rgb(0 0 0/.95);will-change:width,transform}
@@ -77,6 +96,6 @@ tick();
 .pb-info .meta{color:#7d9096;font-size:14px;margin:14px 0}
 .pb-info .chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 22px}
 .pb-info .chips span{font:12px var(--mono);color:#7fd1e2;background:rgb(127 209 226/.08);border:1px solid rgb(127 209 226/.18);padding:3px 9px;border-radius:999px}
-@media (max-width:860px){.pb-ch{height:auto}.pb-sticky{position:relative;height:auto;padding:40px 20px;gap:24px}.pb-frame{width:100% !important;transform:none !important}.pb-info{position:static;translate:none;width:auto;opacity:1 !important;transform:none !important}.pb-num{display:none}}
+@media (max-width:860px){.pb-mini{display:none}.pb-ch{height:auto}.pb-sticky{position:relative;height:auto;padding:40px 20px;gap:24px}.pb-frame{width:100% !important;transform:none !important}.pb-info{position:static;translate:none;width:auto;opacity:1 !important;transform:none !important}.pb-num{display:none}}
 </style>
 </Base>
