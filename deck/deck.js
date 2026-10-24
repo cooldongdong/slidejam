@@ -543,7 +543,7 @@
         keepBand(band); band = null;
         setBox([Math.min(x0, x1), Math.min(y0, y1), Math.abs(x1 - x0), Math.abs(y1 - y0)]);
       }
-      box.style.left = Math.min(innerWidth - 400, ev.clientX + 12) + "px";
+      box.style.left = Math.max(8, Math.min(innerWidth - Math.min(380, innerWidth - 16) - 8, ev.clientX + 12)) + "px";
       box.style.top = Math.min(innerHeight - 160, ev.clientY + 12) + "px";
       box.style.display = "block"; ta.value = ""; ta.focus();
     });
