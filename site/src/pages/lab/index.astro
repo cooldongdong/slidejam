@@ -6,12 +6,13 @@ const cuts = [
   ["play-a", "A　播放牆", "開場是一面傾斜的牆：四份簡報同時播放，上下鋪效果縮圖，大標壓在上面。往下接現在的章節。"],
   ["play-b", "B　推到眼前", "每一章往下捲：簡報從中央小卡被推到幾乎滿版，再退到左邊，說明從右邊滑進來。背後是巨大的空心編號。"],
   ["play-c", "C　片頭", "一頁一份：簡報滿版播放當背景，左下角是電影海報式的大標，捲動會吸附到下一份。"],
+  ["effects-stage", "效果圖鑑：大舞台", "圖鑑的開場改成一個大舞台，自己一個一個換效果，名字用翻牌翻出來；滑鼠停在舞台上就暫停。"],
 ];
 ---
-<Base title="範例頁試做 — slidejam" description="範例頁的三個試做版本。">
+<Base title="範例頁試做 — slidejam" description="範例頁與效果圖鑑的試做版本。">
 <section class="wrap" style="padding:12vh 0 16vh">
   <p class="kicker">lab</p>
-  <h1 style="font-size:64px;letter-spacing:-.03em;color:#fff;margin:8px 0 40px">範例頁，三個版本</h1>
+  <h1 style="font-size:64px;letter-spacing:-.03em;color:#fff;margin:8px 0 40px">範例頁與效果圖鑑的試做</h1>
   <div style="display:grid;gap:18px;max-width:760px">
     {cuts.map(([id, name, desc]) => (
       <a href={`${B}lab/${id}/`} style="display:block;padding:24px 28px;border:1px solid #1f2a2f;border-radius:14px;text-decoration:none;background:#0c1113">
@@ -19,7 +20,7 @@ const cuts = [
         <span style="color:#8a9ca3;font-size:15px;line-height:1.7">{desc}</span>
       </a>
     ))}
-    <a href={`${B}play/`} style="color:#7d9096;font-size:14px;margin-top:8px">對照：現在的範例頁 →</a>
+    <a href={`${B}play/`} style="color:#7d9096;font-size:14px;margin-top:8px">範例頁已經照 A＋B 做成正式版（加上右側大綱）→</a>
   </div>
 </section>
 </Base>

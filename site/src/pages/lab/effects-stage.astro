@@ -1,0 +1,219 @@
+---
+// Trial cut of the effects page hero: one big stage that runs through the effects, the name
+// changing on a split-flap board. The rest of the page is today's.
+import Base from "../../layouts/Base.astro";
+import { groups, effects } from "../../data/effects";
+const B = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const ORDER = ["particles", "bento", "map", "morph", "tunnel", "explode", "flap", "network", "swarm", "compare", "dive", "textmask"];
+---
+<Base title="效果圖鑑 — slidejam" description="slidejam 的 44 種簡報效果：每一種都看得到動起來的樣子，挑好跟 AI 說名字就好。">
+<section class="st-hero">
+  <div class="st-grid wrap">
+    <div class="st-text">
+      <p class="kicker"><span lang="zh">效果圖鑑</span><span lang="en">Effects</span></p>
+      <p class="st-count"><b id="st-n">01</b> / {String(effects.length).padStart(2, "0")} · <span id="st-group"></span></p>
+      <h1 class="st-name" id="st-name" aria-live="polite"></h1>
+      <p class="st-zh" id="st-zh"></p>
+      <p class="st-desc" id="st-desc"></p>
+      <div class="cta" style="justify-content:flex-start">
+        <a class="btn primary" href={B + "play/effects/?wall"}><span lang="zh">全部一起播放</span><span lang="en">Play them all</span></a>
+        <a class="btn ghost" id="st-open" href={B + "play/effects/?slide=1"}><span lang="zh">打開這一個</span><span lang="en">Open this one</span></a>
+      </div>
+    </div>
+    <div class="st-stage-wrap">
+      <div class="st-stage"><iframe id="st-frame" title="effects" tabindex="-1"></iframe></div>
+      <div class="st-ticks" id="st-ticks"></div>
+    </div>
+  </div>
+</section>
+<script is:inline define:vars={{ base: B, effects, groups, order: ORDER }}>
+// the stage: the gallery deck in an iframe, cropped to the demo half; every few seconds it
+// moves to the next effect and the name flips over on a split-flap board
+const zh = () => document.documentElement.dataset.lang !== "en";
+const seq = [...order, ...effects.map((e) => e.id).filter((id) => !order.includes(id))].map((id) => effects.find((e) => e.id === id));
+const frame = document.getElementById("st-frame"), ticks = document.getElementById("st-ticks");
+seq.forEach((e, i) => { const t = document.createElement("button"); t.title = e.id; t.onclick = () => go(i, true); ticks.append(t); });
+let k = 0, timer = 0, held = false;
+const GLYPHS = "abcdefghijklmnopqrstuvwxyz";
+function flap(el, text) {
+  el.innerHTML = "";
+  const cells = [...text].map((ch, i) => { const c = document.createElement("span"); c.className = "st-cell"; c.textContent = ch; el.append(c); return { c, ch, stop: 160 + i * 45 + Math.random() * 120 }; });
+  const t0 = performance.now();
+  const step = (now) => {
+    let busy = false;
+    cells.forEach((p) => { if (now - t0 < p.stop) { busy = true; p.c.textContent = GLYPHS[Math.floor(Math.random() * GLYPHS.length)]; p.c.classList.add("flip"); } else { p.c.textContent = p.ch; p.c.classList.remove("flip"); } });
+    if (busy) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+function go(i, user) {
+  k = (i + seq.length) % seq.length;
+  const e = seq[k], w = frame.contentWindow;
+  const idx = w?.Deck?.slides?.findIndex((s) => s.id === e.id);
+  if (idx >= 0) w.Deck.show(idx);
+  flap(document.getElementById("st-name"), e.id);
+  document.getElementById("st-zh").textContent = zh() ? e.zh : e.en;
+  document.getElementById("st-desc").textContent = zh() ? e.zhDesc : e.enDesc;
+  document.getElementById("st-group").textContent = (g => zh() ? g.zh : g.en)(groups.find((g) => g.id === e.group));
+  document.getElementById("st-n").textContent = String(effects.indexOf(e) + 1).padStart(2, "0");
+  document.getElementById("st-open").href = `${base}play/effects/?slide=${e.id}`;
+  [...ticks.children].forEach((t, j) => t.classList.toggle("on", j === k));
+  clearTimeout(timer);
+  if (!held) timer = setTimeout(() => go(k + 1), user ? 9000 : 5200);
+}
+frame.src = `${base}effects.html?embed&slide=${seq[0].id}`;
+frame.onload = () => { const w = frame.contentWindow; const ready = () => (w.Deck?.slides?.length ? go(0) : setTimeout(ready, 100)); ready(); };
+// hovering the stage holds the current effect
+const wrap = document.querySelector(".st-stage");
+wrap.addEventListener("mouseenter", () => { held = true; clearTimeout(timer); });
+wrap.addEventListener("mouseleave", () => { held = false; timer = setTimeout(() => go(k + 1), 2500); });
+</script>
+
+<section class="fx-list"><div class="wrap">
+  <div class="fx-filter">
+    <button class="on" data-g="all"><span lang="zh">全部</span><span lang="en">All</span> <small>{effects.length}</small></button>
+    {groups.map((g) => (
+      <button data-g={g.id}><span lang="zh">{g.zh}</span><span lang="en">{g.en}</span> <small>{effects.filter((e) => e.group === g.id).length}</small></button>
+    ))}
+    <input type="search" data-zh="搜尋：地圖、map、數字…" data-en="Search: map, chart, text…" aria-label="search" />
+  </div>
+  <div class="fx-grid">
+    {effects.map((e, i) => (
+      <a class="fx-card" href={`${B}play/effects/?slide=${e.id}`} data-id={e.id} data-g={e.group} data-q={`${e.id} ${e.zh} ${e.en} ${e.zhDesc} ${e.enDesc}`.toLowerCase()} style={`--d:${(i % 6) * 60}ms`}>
+        <div class="fx-thumb"><img src={`${B}thumbs/${e.id}.jpg`} alt="" loading="lazy" /><span class="fx-live"><span lang="zh">播放中</span><span lang="en">live</span></span></div>
+        <div class="fx-meta">
+          <code>{e.id}</code>
+          <b><span lang="zh">{e.zh}</span><span lang="en">{e.en}</span></b>
+          <p><span lang="zh">{e.zhDesc}</span><span lang="en">{e.enDesc}</span></p>
+        </div>
+      </a>
+    ))}
+  </div>
+  <p class="fx-empty" hidden><span lang="zh">沒有找到，換個字試試。</span><span lang="en">Nothing found; try another word.</span></p>
+</div></section>
+</Base>
+
+<script is:inline define:vars={{ deck: B + "effects.html" }}>
+// filter by group or text
+const cards = [...document.querySelectorAll(".fx-card")];
+const search = document.querySelector(".fx-filter input");
+let group = "all";
+function filter() {
+  const q = search.value.trim().toLowerCase();
+  let shown = 0;
+  cards.forEach((c) => {
+    const ok = (group === "all" || c.dataset.g === group) && (!q || c.dataset.q.includes(q));
+    c.hidden = !ok; if (ok) shown++;
+  });
+  document.querySelector(".fx-empty").hidden = shown > 0;
+}
+document.querySelectorAll(".fx-filter button").forEach((b) => b.addEventListener("click", () => {
+  group = b.dataset.g;
+  document.querySelectorAll(".fx-filter button").forEach((x) => x.classList.toggle("on", x === b));
+  filter();
+}));
+search.addEventListener("input", filter);
+// the placeholder follows the language switch
+const ph = () => (search.placeholder = search.dataset[document.documentElement.dataset.lang] || search.dataset.zh);
+ph(); new MutationObserver(ph).observe(document.documentElement, { attributes: true, attributeFilter: ["data-lang"] });
+
+// cards rise in as they scroll into view
+const io = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && (e.target.classList.add("in"), io.unobserve(e.target))), { rootMargin: "0px 0px -40px 0px" });
+cards.forEach((c) => io.observe(c));
+
+// hover a card: after a short pause, the real effect plays over its picture
+if (matchMedia("(hover: hover)").matches) {
+  cards.forEach((c) => {
+    let t = 0;
+    c.addEventListener("mouseenter", () => {
+      t = setTimeout(() => {
+        const box = c.querySelector(".fx-thumb");
+        if (box.querySelector("iframe")) return;
+        const f = document.createElement("iframe");
+        f.src = `${deck}?embed&loop=7&slide=${c.dataset.id}`;
+        f.tabIndex = -1;
+        f.onload = () => c.classList.add("playing");
+        box.appendChild(f);
+      }, 350);
+    });
+    c.addEventListener("mouseleave", () => {
+      clearTimeout(t);
+      c.classList.remove("playing");
+      c.querySelector(".fx-thumb iframe")?.remove();
+    });
+  });
+}
+</script>
+
+<style is:global>
+/* ---- hero: a tilted wall of the effects, drifting ---- */
+.fx-hero{position:relative;overflow:hidden;background:#0b1013;color:#fff;min-height:620px;display:flex;align-items:center;margin-top:-1px}
+.fx-wall{position:absolute;inset:-30% -20%;display:grid;gap:22px;align-content:center;transform:perspective(1400px) rotateX(24deg) rotateZ(-10deg);opacity:.55}
+.fx-row{display:flex;gap:22px;width:max-content;animation:fx-drift 90s linear infinite}
+.fx-row.r1{animation-direction:reverse;animation-duration:110s}
+.fx-row.r2{animation-duration:75s}
+.fx-row img{height:200px;border-radius:12px;background:#f6f7f8;box-shadow:0 20px 40px rgb(0 0 0/.45)}
+@keyframes fx-drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.fx-hero::after{content:"";position:absolute;inset:0;background:radial-gradient(70% 90% at 25% 50%,rgb(11 16 19/.94) 25%,rgb(11 16 19/.55) 60%,rgb(11 16 19/.2));pointer-events:none}
+.fx-hero-text{position:relative;z-index:1;padding-top:56px;padding-bottom:56px}
+.fx-hero .kicker{color:#7fd1e2}
+.fx-title{font-size:clamp(44px,7.5vw,96px);line-height:1.05;margin:0;letter-spacing:-.03em;font-weight:800}
+.fx-title i{display:inline-block;font-style:normal;opacity:0;transform:translateY(60%) rotate(6deg);filter:blur(10px);animation:fx-letter .9s cubic-bezier(.16,1,.3,1) forwards;animation-delay:calc(var(--i) * 55ms + 150ms)}
+@keyframes fx-letter{to{opacity:1;transform:none;filter:none}}
+.fx-sub{font-size:clamp(17px,2vw,21px);color:#c7d6db;margin:20px 0 30px;max-width:560px}
+.btn.ghost{background:transparent;color:#fff;border-color:rgb(255 255 255/.35)}
+@media (prefers-reduced-motion:reduce){.fx-row{animation:none}.fx-title i{animation:none;opacity:1;transform:none;filter:none}}
+
+/* ---- filter + grid ---- */
+.fx-list{padding:0 0 80px}
+.fx-filter{position:sticky;top:64px;z-index:3;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:16px 0;background:rgb(7 9 10/.88);backdrop-filter:blur(8px);margin-bottom:12px}
+.fx-filter button{font:600 14px var(--sans);border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-2);border-radius:999px;padding:7px 14px;cursor:pointer}
+.fx-filter button small{font:12px var(--mono);color:var(--ink-muted);margin-left:2px}
+.fx-filter button.on{background:var(--ink);border-color:var(--ink);color:#07090a}
+.fx-filter button.on small{color:#5b6a71}
+.fx-filter input{margin-left:auto;font:15px var(--sans);border:1px solid var(--line-strong);border-radius:999px;padding:8px 16px;min-width:220px;background:var(--surface)}
+.fx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px}
+.fx-card{display:block;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;opacity:0;transform:translateY(24px);transition:opacity .6s cubic-bezier(.16,1,.3,1) var(--d),transform .6s cubic-bezier(.16,1,.3,1) var(--d),box-shadow .25s,border-color .25s}
+.fx-card.in{opacity:1;transform:none}
+.fx-card:hover{box-shadow:0 30px 60px -30px rgb(15 26 29/.45);border-color:var(--line-strong);transform:translateY(-4px)}
+.fx-card[hidden]{display:none}
+.fx-thumb{position:relative;aspect-ratio:16/10;background:#f6f7f8;border-bottom:1px solid var(--line);overflow:hidden}
+.fx-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transition:transform .5s cubic-bezier(.16,1,.3,1),opacity .4s}
+.fx-card:hover .fx-thumb img{transform:scale(1.04)}
+/* the live slide is drawn larger and shifted so only its demo half (x 60–1000 of 1600) shows */
+.fx-thumb iframe{position:absolute;left:-6.4%;top:50%;width:170.2%;aspect-ratio:16/9;height:auto;transform:translateY(-50%);border:0;pointer-events:none;opacity:0;transition:opacity .4s}
+.fx-card.playing .fx-thumb iframe{opacity:1}
+.fx-card.playing .fx-thumb img{opacity:0}
+.fx-live{position:absolute;left:10px;top:10px;z-index:2;font:600 11px var(--mono);letter-spacing:.06em;color:#fff;background:#d4380d;border-radius:999px;padding:3px 9px;opacity:0;transition:opacity .3s}
+.fx-card.playing .fx-live{opacity:1}
+.fx-meta{padding:14px 18px 18px}
+.fx-meta code{font:13px var(--mono);color:var(--accent-ink);background:var(--accent-soft);border-radius:6px;padding:2px 8px}
+.fx-meta b{display:block;font-size:19px;margin:8px 0 4px}
+.fx-meta p{margin:0;font-size:14px;color:var(--ink-muted);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fx-empty{text-align:center;color:var(--ink-muted);padding:40px 0}
+@media (max-width:860px){.fx-filter{top:64px}.fx-filter input{margin-left:0;flex:1}.fx-hero{min-height:520px}}
+</style>
+
+<style is:global>
+.st-hero{position:relative;background:radial-gradient(70% 90% at 75% 50%,#0f1c20,#07090a 70%);min-height:calc(100vh - 64px);display:flex;align-items:center;overflow:hidden}
+.st-grid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:56px;align-items:center;width:100%;padding-top:40px;padding-bottom:40px}
+.st-count{font:13px var(--mono);color:#5b6a71;letter-spacing:.08em;margin:0 0 18px}
+.st-count b{color:#7fd1e2;font-weight:500}
+/* sized so the longest name (9 letters) stays on one line */
+.st-name{font:600 clamp(36px,4.4vw,70px)/1 var(--mono);letter-spacing:-.02em;color:#fff;margin:0 0 18px;display:flex;flex-wrap:nowrap;gap:.06em;min-height:1.1em}
+.st-cell{display:inline-block;min-width:.62em;text-align:center;padding:.04em .02em;border-radius:.08em;background:linear-gradient(#162226 0 49%,#0b1215 49% 51%,#121c20 51%);box-shadow:0 .04em .08em rgb(0 0 0/.5)}
+.st-cell.flip{color:#7fd1e2}
+.st-zh{font-size:28px;color:#e8eef5;margin:0 0 12px;font-weight:600}
+.st-desc{color:#8a9ca3;font-size:16px;line-height:1.7;max-width:30em;min-height:3.4em;margin:0 0 28px}
+.st-stage{position:relative;aspect-ratio:940/900;border-radius:16px;overflow:hidden;background:#f6f7f8;box-shadow:0 0 0 1px rgb(255 255 255/.12),0 80px 160px -40px rgb(0 0 0/.95),0 0 120px -20px rgb(127 209 226/.18)}
+/* only the demo half of a gallery slide (x 60–1000 of 1600) shows */
+.st-stage iframe{position:absolute;left:-6.4%;top:0;width:170.2%;aspect-ratio:16/9;height:auto;border:0;pointer-events:none}
+/* as big as fits: the stage (940:900) plus its ticks under the header */
+.st-stage-wrap{justify-self:end;width:min(100%,calc((100vh - 160px) * 940 / 900))}
+.st-ticks{display:flex;gap:3px;margin-top:16px}
+.st-ticks button{flex:1;height:14px;border:0;padding:0;background:none;cursor:pointer;position:relative}
+.st-ticks button::after{content:"";position:absolute;left:0;right:0;top:6px;height:2px;border-radius:1px;background:#1f2c31;transition:background .2s}
+.st-ticks button:hover::after{background:#4a5a60}
+.st-ticks button.on::after{background:#7fd1e2}
+@media (max-width:960px){.st-grid{grid-template-columns:1fr}.st-stage-wrap{width:100%}}
+</style>
