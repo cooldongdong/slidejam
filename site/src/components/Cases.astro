@@ -22,6 +22,10 @@ const list = decks.map((d, i) => ({ ...d, ...deckStats(d.file), n: String(i + 1)
   </nav>
 </section>
 
+<nav class="fx-mini play-mini" aria-label="decks">
+  {list.map((d) => <a href={`${B}play/${d.id}/`} data-id={d.id}><i></i><span lang="zh">{d.zh[0]}</span><span lang="en">{d.en[0]}</span></a>)}
+</nav>
+
 {list.map((d) => (
   <section class="case" id={`case-${d.id}`} data-id={d.id} data-file={d.file} data-title-zh={d.zh[0]} data-title-en={d.en[0]}>
     <div class="case-grid wrap-wide">
@@ -52,7 +56,7 @@ const list = decks.map((d, i) => ({ ...d, ...deckStats(d.file), n: String(i + 1)
 <div class="theater" id="theater" hidden>
   <div class="th-bar">
     <b id="th-title"></b>
-    <span class="hint"><span lang="zh">← → 翻頁・試試 E 改字、A 標註・? 看所有快捷鍵</span><span lang="en">← → to move · try E to edit, A to annotate · ? for every key</span></span>
+    <span class="hint"><span lang="zh">← → 翻頁・P 講者視窗・試試 E 改字、A 標註・? 看所有快捷鍵</span><span lang="en">← → to move · P for presenter view · try E to edit, A to annotate · ? for every key</span></span>
     <span class="sp"></span>
     <button id="th-full"><span lang="zh">全螢幕</span><span lang="en">Full screen</span></button>
     <button id="th-close"><span lang="zh">關閉</span><span lang="en">Close</span></button>
@@ -81,13 +85,19 @@ const seen = new IntersectionObserver((es) => es.forEach((e) => {
   if (id === shown) return;
   shown = id;
   document.querySelectorAll(".case-index a").forEach((a) => a.classList.toggle("on", a.dataset.id === id));
+  const k = cases.indexOf(e.target);
+  document.querySelectorAll(".play-mini a").forEach((a, j) => { a.classList.toggle("on", j === k); a.classList.toggle("done", j < k); });
   if (!theater.hidden) return;
   history.replaceState(null, "", `${base}play/${id}/${location.search}`);
 }), { threshold: 0.55 });
 cases.forEach((c) => seen.observe(c));
-document.querySelectorAll(".case-index a").forEach((a) => a.addEventListener("click", (e) => {
+document.querySelectorAll(".case-index a, .play-mini a").forEach((a) => a.addEventListener("click", (e) => {
   e.preventDefault(); document.getElementById(`case-${a.dataset.id}`).scrollIntoView({ behavior: "smooth", block: "start" });
 }));
+
+// the thin-line outline on the right shows up once the poster index has scrolled away
+const mini = document.querySelector(".play-mini");
+new IntersectionObserver(([e]) => mini.classList.toggle("show", !e.isIntersecting)).observe(document.querySelector(".case-index"));
 
 // theater: the real deck, big, yours to drive
 const theater = document.getElementById("theater"), tframe = document.getElementById("th-frame");
@@ -101,13 +111,16 @@ function open(c, slide, wall) {
   tframe.onload = () => {
     tframe.focus();
     // Esc inside the deck closes the theater, unless the deck has something of its own open
-    // (overview, keys, themes, edit or annotate) — then Esc is the deck's to handle
+    // (overview, keys, themes, notes, edit or annotate) — then Esc is the deck's to handle.
+    // In full screen, Esc with nothing open leaves full screen first.
     const w = tframe.contentWindow;
     w.addEventListener("keydown", (e) => {
       if (e.key !== "Escape") return;
-      const d = w.document, busy = d.querySelector("#overview.show, #keys.show, #themes.show, #wall")
+      const d = w.document, busy = d.querySelector("#overview.show, #keys.show, #themes.show, #notes.show, #wall")
         || d.body.classList.contains("editing") || d.body.classList.contains("annotating");
-      if (!busy) close();
+      if (busy) return;
+      e.stopImmediatePropagation();
+      document.fullscreenElement ? document.exitFullscreen() : close();
     }, true);
   };
 }
@@ -121,6 +134,12 @@ cases.forEach((c) => c.querySelector(".frame").addEventListener("click", () => o
 document.getElementById("th-close").onclick = close;
 document.getElementById("th-full").onclick = () => { tframe.requestFullscreen?.(); tframe.focus(); };
 addEventListener("keydown", (e) => { if (e.key === "Escape" && !theater.hidden) close(); });
+// full screen (from the button, or F inside the deck): take Esc from the browser so it reaches
+// the deck — the lock only works here, in the top page (Chrome, Edge)
+document.addEventListener("fullscreenchange", () => {
+  if (document.fullscreenElement) navigator.keyboard?.lock?.(["Escape"]).catch(() => {});
+  else navigator.keyboard?.unlock?.();
+});
 theater.addEventListener("click", (e) => { if (e.target === theater || e.target.classList.contains("th-stage")) close(); });
 
 // copy a chapter's own address
@@ -146,6 +165,9 @@ cases.forEach((c) => c.querySelector(".share").addEventListener("click", async (
 .cases-head h1{font-size:clamp(40px,6vw,76px);line-height:1.05;letter-spacing:-.03em;margin:0;color:#fff}
 .cases-head .sub{font-size:19px;color:#8a9ca3;margin:18px 0 34px}
 /* the three decks up front, as posters */
+.play-mini{position:fixed;right:28px;top:50%;transform:translateY(-50%);z-index:20;display:grid;gap:2px;font-size:13px;width:28px;opacity:0;transition:opacity .4s}
+.play-mini:not(.show){pointer-events:none}
+.play-mini.show{opacity:1}
 .case-index{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
 .case-index a{display:block;color:#8a9ca3;text-decoration:none;animation:card-in .9s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(var(--i) * .1s + .15s)}
 @keyframes card-in{from{opacity:0;transform:translateY(30px)}}
@@ -201,6 +223,7 @@ cases.forEach((c) => c.querySelector(".share").addEventListener("click", async (
 @media (max-width:960px){
   .case-grid{grid-template-columns:1fr;gap:32px}
   .case-index{grid-template-columns:1fr 1fr}
+  .play-mini{display:none}
   .case{min-height:0;padding:50px 0}
   .wrap-wide{padding:0 20px}
   .th-bar .hint{display:none}
