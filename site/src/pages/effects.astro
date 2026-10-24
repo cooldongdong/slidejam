@@ -23,8 +23,8 @@ const rows = [0, 1, 2].map((r) => effects.filter((_, i) => i % 3 === r));
     </h1>
     <p class="fx-sub"><span lang="zh">滑鼠停在卡片上就會動。挑一個，跟 AI 說名字就好。</span><span lang="en">Hover a card to see it move. Pick one and tell the AI its name.</span></p>
     <div class="cta" style="justify-content:flex-start">
-      <a class="btn primary" href={B + "play/effects/?wall"}><span lang="zh">▶ 全部一起播放</span><span lang="en">▶ Play them all</span></a>
-      <a class="btn ghost" href={B + "play/effects/"}><span lang="zh">一頁一頁看</span><span lang="en">One by one</span></a>
+      <a class="btn primary" href={B + "play/?deck=effects&wall"}><span lang="zh">▶ 全部一起播放</span><span lang="en">▶ Play them all</span></a>
+      <a class="btn ghost" href={B + "play/?deck=effects"}><span lang="zh">一頁一頁看</span><span lang="en">One by one</span></a>
     </div>
   </div>
 </section>
@@ -39,7 +39,7 @@ const rows = [0, 1, 2].map((r) => effects.filter((_, i) => i % 3 === r));
   </div>
   <div class="fx-grid">
     {effects.map((e, i) => (
-      <a class="fx-card" href={`${B}play/effects/#${e.id}`} data-id={e.id} data-g={e.group} data-q={`${e.id} ${e.zh} ${e.en} ${e.zhDesc} ${e.enDesc}`.toLowerCase()} style={`--d:${(i % 6) * 60}ms`}>
+      <a class="fx-card" href={`${B}play/?deck=effects&slide=${e.id}`} data-id={e.id} data-g={e.group} data-q={`${e.id} ${e.zh} ${e.en} ${e.zhDesc} ${e.enDesc}`.toLowerCase()} style={`--d:${(i % 6) * 60}ms`}>
         <div class="fx-thumb"><img src={`${B}thumbs/${e.id}.jpg`} alt="" loading="lazy" /><span class="fx-live"><span lang="zh">播放中</span><span lang="en">live</span></span></div>
         <div class="fx-meta">
           <code>{e.id}</code>

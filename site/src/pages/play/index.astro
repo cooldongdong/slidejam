@@ -7,12 +7,12 @@ const B = import.meta.env.BASE_URL.replace(/\/?$/, "/");
 const list = decks.map((d) => ({ ...d, ...deckStats(d.file) }));
 const first = list[0];
 ---
-<Base title="範例 — slidejam" description="用 slidejam 做的簡報，在放映室裡自己播放。挑一份，看它用了哪些效果。">
+<Base title="範例 — slidejam" description="用 slidejam 做的簡報，在放映室裡自己播放。挑一份，看它用了哪些效果。" dark>
 <section class="room">
   <div class="wrap room-head">
     <p class="kicker"><span lang="zh">放映室</span><span lang="en">Screening room</span></p>
     <h1><span lang="zh">用 slidejam 做的簡報</span><span lang="en">Decks made with slidejam</span></h1>
-    <p class="room-sub"><span lang="zh">螢幕上的簡報會自己一頁一頁播。挑下面一份換台；想自己操作，就全螢幕打開。</span><span lang="en">The deck on screen plays itself. Pick another below to switch; open it full screen to drive it yourself.</span></p>
+    <p class="room-sub"><span lang="zh">螢幕上的簡報會自己一頁一頁播。挑下面一份換台；想自己翻，切到「自己操作」，點投影片就能用鍵盤，也可以全螢幕。</span><span lang="en">The deck on screen plays itself. Pick another below to switch; to drive it, choose Drive and click the slide — keys work, and it can go full screen.</span></p>
   </div>
 
   <div class="screen-wrap">
@@ -23,15 +23,23 @@ const first = list[0];
     </div>
     <div class="screen-bar">
       <b id="now"><span lang="zh">{first.zh[0]}</span><span lang="en">{first.en[0]}</span></b>
+      <div class="seg" role="group">
+        <button data-mode="auto" class="on"><span lang="zh">▶ 自動播放</span><span lang="en">▶ Auto</span></button>
+        <button data-mode="drive"><span lang="zh">✋ 自己操作</span><span lang="en">✋ Drive</span></button>
+      </div>
       <span class="sp"></span>
-      <a class="btn primary" id="open" href={`${B}play/${first.id}/`}><span lang="zh">全螢幕打開 →</span><span lang="en">Open it →</span></a>
+      <button class="ctl" id="prev" title="上一頁">←</button>
+      <span class="count" id="count">1 / {first.slides}</span>
+      <button class="ctl" id="next" title="下一步">→</button>
+      <button class="ctl" id="full" title="全螢幕"><span lang="zh">⛶ 全螢幕</span><span lang="en">⛶ Full screen</span></button>
+      <a class="ctl" id="src" href={`https://github.com/cooldongdong/slidejam/blob/master/${first.file}`}><span lang="zh">原始碼</span><span lang="en">Source</span></a>
     </div>
   </div>
 
   <div class="wrap">
     <div class="posters">
       {list.map((d, i) => (
-        <button class={`poster${i === 0 ? " on" : ""}`} data-file={d.file} data-id={d.id} data-zh={d.zh[0]} data-en={d.en[0]}>
+        <button class={`poster${i === 0 ? " on" : ""}`} data-file={d.file} data-id={d.id} data-zh={d.zh[0]} data-en={d.en[0]} data-slides={d.slides}>
           <span class="poster-img"><img src={`${B}posters/${d.id}.jpg`} alt="" /></span>
           <span class="poster-meta">
             <b><span lang="zh">{d.zh[0]}</span><span lang="en">{d.en[0]}</span></b>
@@ -56,19 +64,64 @@ const first = list[0];
 </Base>
 
 <script is:inline define:vars={{ base: B }}>
-// switch channels: a burst of static, then the new deck
+// Everything happens here: Auto lets the deck tour itself; Drive loads the deck as it is,
+// so clicks and keys work; arrows, counter and full screen talk to the deck directly.
+// ?deck=effects&slide=bento (&wall) opens a deck at a slide in Drive mode.
 const frame = document.getElementById("frame"), screen = document.getElementById("screen");
-const now = document.getElementById("now"), open = document.getElementById("open");
-document.querySelectorAll(".poster[data-file]").forEach((p) => p.addEventListener("click", () => {
-  if (p.classList.contains("on")) return;
-  document.querySelectorAll(".poster").forEach((x) => x.classList.toggle("on", x === p));
+const now = document.getElementById("now"), count = document.getElementById("count");
+const posters = [...document.querySelectorAll(".poster[data-file]")];
+let deck = posters[0], mode = "auto", extra = "";
+const win = () => { try { return screen.contentWindow.Deck ? screen.contentWindow : null; } catch { return null; } };
+function load(slide) {
+  const q = new URLSearchParams();
+  if (mode === "auto") { q.set("embed", ""); q.set("tour", "5"); }
+  if (slide) q.set("slide", slide);
   frame.classList.add("switching");
-  setTimeout(() => { screen.src = `${base}${p.dataset.file}?embed&tour=5`; }, 250);
-  screen.onload = () => setTimeout(() => frame.classList.remove("switching"), 200);
+  setTimeout(() => { screen.src = `${base}${deck.dataset.file}?${q.toString().replace(/=(&|$)/g, "$1")}${extra}`; extra = ""; }, 200);
+  screen.onload = () => {
+    setTimeout(() => frame.classList.remove("switching"), 200);
+    if (mode === "drive") screen.focus({ preventScroll: true });
+  };
+  frame.classList.toggle("drive", mode === "drive");
+  document.querySelectorAll(".seg button").forEach((b) => b.classList.toggle("on", b.dataset.mode === mode));
+}
+function pick(p, slide) {
+  deck = p;
+  posters.forEach((x) => x.classList.toggle("on", x === p));
   now.innerHTML = `<span lang="zh">${p.dataset.zh}</span><span lang="en">${p.dataset.en}</span>`;
-  open.href = `${base}play/${p.dataset.id}/`;
+  document.getElementById("src").href = `https://github.com/cooldongdong/slidejam/blob/master/${p.dataset.file}`;
+  load(slide);
+}
+posters.forEach((p) => p.addEventListener("click", () => {
+  if (p === deck) return;
+  pick(p);
   frame.scrollIntoView({ behavior: "smooth", block: "center" });
 }));
+document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => {
+  if (b.dataset.mode === mode) return;
+  const w = win(), at = w ? w.Deck.cur + 1 : null;
+  mode = b.dataset.mode;
+  load(at);
+}));
+// arrows drive the deck in either mode; in Auto they pause the tour by switching to Drive
+const step = (dir) => {
+  if (mode === "auto") { const w = win(), at = w ? w.Deck.cur + 1 + dir : 1; mode = "drive"; return load(Math.max(1, at)); }
+  const w = win(); if (!w) return;
+  dir > 0 ? w.Deck.next() : w.Deck.prev();
+  screen.focus({ preventScroll: true });
+};
+document.getElementById("prev").onclick = () => step(-1);
+document.getElementById("next").onclick = () => step(1);
+document.getElementById("full").onclick = () => { frame.requestFullscreen?.(); if (mode === "drive") screen.focus(); };
+setInterval(() => { const w = win(); if (w) count.textContent = `${w.Deck.cur + 1} / ${w.Deck.slides.length}`; }, 400);
+// deep links from the rest of the site
+(() => {
+  const q = new URLSearchParams(location.search), want = posters.find((p) => p.dataset.id === q.get("deck"));
+  if (!want) return;
+  mode = "drive";
+  if (q.has("wall")) extra = "&wall";
+  pick(want, q.get("slide"));
+})();
 // posters lean toward the pointer
 document.querySelectorAll(".poster").forEach((p) => {
   p.addEventListener("pointermove", (e) => {
@@ -90,12 +143,21 @@ document.querySelectorAll(".poster").forEach((p) => {
 .glow{position:absolute;left:10%;right:10%;top:12%;bottom:-6%;background:radial-gradient(closest-side,rgb(79 179 201/.28),transparent);filter:blur(40px);pointer-events:none}
 .screen-frame{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 0 0 1px #1d2a30,0 60px 120px -30px rgb(0 0 0/.9),0 0 80px -10px rgb(79 179 201/.25)}
 .screen-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;transition:filter .25s,transform .25s}
+.screen-frame.drive iframe{pointer-events:auto}
+.screen-frame:fullscreen{border-radius:0;aspect-ratio:auto}
 .static{position:absolute;inset:0;opacity:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgb(255 255 255/.08) 0 1px,transparent 1px 3px),radial-gradient(circle,#3a4a50,#05080a);mix-blend-mode:screen;transition:opacity .2s}
 .switching .static{opacity:1;animation:flick .12s steps(2) infinite}
 .switching iframe{filter:brightness(1.8) contrast(.7) blur(2px);transform:scaleY(.96)}
 @keyframes flick{50%{opacity:.6}}
 .screen-bar{display:flex;align-items:center;gap:12px;margin-top:16px}
-.screen-bar b{font-size:18px}
+.screen-bar{flex-wrap:wrap}
+.screen-bar b{font-size:18px;margin-right:6px}
+.seg{display:flex;background:#10171a;border:1px solid #22313a;border-radius:999px;padding:3px}
+.seg button{font:600 13px var(--sans);border:0;background:none;color:#7d9096;border-radius:999px;padding:6px 14px;cursor:pointer}
+.seg button.on{background:#0d5f74;color:#fff}
+.ctl{font:600 14px var(--sans);border:1px solid #22313a;background:#10171a;color:#c7d6db;border-radius:10px;padding:8px 12px;cursor:pointer;text-decoration:none}
+.ctl:hover{border-color:#4fb3c9;color:#fff}
+.count{font:13px var(--mono);color:#7d9096;min-width:64px;text-align:center}
 .screen-bar .sp{flex:1}
 .posters{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px;margin-top:56px}
 .poster{position:relative;display:flex;flex-direction:column;text-align:left;font:inherit;color:inherit;background:#10171a;border:1px solid #1d2a30;border-radius:16px;overflow:hidden;cursor:pointer;padding:0;transition:transform .2s ease-out,border-color .3s,box-shadow .3s;transform-style:preserve-3d;text-decoration:none}
