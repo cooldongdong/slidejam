@@ -31,8 +31,8 @@ export const decks = [
   {
     id: "effects",
     file: "effects.html",
-    zh: ["效果圖鑑", "44 種效果，每一頁一種。"],
-    en: ["The effects gallery", "All 44 effects, one per slide."],
+    zh: ["效果圖鑑", "45 種效果，每一頁一種。"],
+    en: ["The effects gallery", "All 45 effects, one per slide."],
     who: ["正在做簡報、想找效果的人", "Anyone building a deck"],
     goal: ["它本身就是一份 slidejam 簡報：每一頁示範一個效果，附上「跟 AI 這樣說」。", "It is itself a slidejam deck: every slide demonstrates one effect, with the line to ask an AI with."],
   },

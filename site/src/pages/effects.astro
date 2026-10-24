@@ -6,7 +6,7 @@ import { groups, effects } from "../data/effects";
 const B = import.meta.env.BASE_URL.replace(/\/?$/, "/");
 const rows = [0, 1, 2].map((r) => effects.filter((_, i) => i % 3 === r));
 ---
-<Base title="效果圖鑑 — slidejam" description="slidejam 的 44 種簡報效果：每一種都看得到動起來的樣子，挑好跟 AI 說名字就好。">
+<Base title="效果圖鑑 — slidejam" description="slidejam 的 45 種簡報效果：每一種都看得到動起來的樣子，挑好跟 AI 說名字就好。">
 <section class="fx-hero">
   <div class="fx-wall" aria-hidden="true">
     {rows.map((row, r) => (
@@ -18,8 +18,8 @@ const rows = [0, 1, 2].map((r) => effects.filter((_, i) => i % 3 === r));
   <div class="fx-hero-text wrap">
     <p class="kicker"><span lang="zh">效果圖鑑</span><span lang="en">Effects</span></p>
     <h1 class="fx-title">
-      <span lang="zh">{[..."44 種會動的效果"].map((c, i) => <i style={`--i:${i}`}>{c === " " ? " " : c}</i>)}</span>
-      <span lang="en">{[..."44 effects that move"].map((c, i) => <i style={`--i:${i}`}>{c === " " ? " " : c}</i>)}</span>
+      <span lang="zh">{[..."45 種會動的效果"].map((c, i) => <i style={`--i:${i}`}>{c === " " ? " " : c}</i>)}</span>
+      <span lang="en">{[..."45 effects that move"].map((c, i) => <i style={`--i:${i}`}>{c === " " ? " " : c}</i>)}</span>
     </h1>
     <p class="fx-sub"><span lang="zh">滑鼠停在卡片上就會動。挑一個，跟 AI 說名字就好。</span><span lang="en">Hover a card to see it move. Pick one and tell the AI its name.</span></p>
     <div class="cta" style="justify-content:flex-start">
