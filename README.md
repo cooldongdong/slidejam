@@ -40,6 +40,9 @@ Open `effects.html` to see every effect running next to the markup it needs.
 | → / Space | next step or slide |
 | ← | previous slide |
 | G or click the page number | overview |
+| W | wall: every slide at once, all playing |
+| P | presenter window: notes, next slide and a clock, on your screen only |
+| ? or the small button bottom-left | list the keys |
 | hover the progress bar | peek at a slide; click to jump |
 | R | replay this slide |
 | N | speaker notes |

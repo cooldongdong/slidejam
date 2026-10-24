@@ -71,6 +71,7 @@
     $("#page").textContent = `${i + 1} / ${slides.length}`;
     renderNotes();
     renderPins();
+    renderPresenter();
     history.replaceState(null, "", "#" + (i + 1));
   }
 
@@ -451,6 +452,127 @@
   }
   Deck.loadEffects = loadEffects;
 
+  // ---------- keys ----------
+  const KEYS = [
+    ["→ / 空白", "下一步、下一頁"], ["←", "上一頁"], ["G", "總覽（也可以點右下頁碼）"],
+    ["W", "一次看全部：每一頁同時播放"], ["P", "講者視窗：講稿只在你的螢幕"], ["N", "講稿"],
+    ["R", "重播這一頁"], ["F", "全螢幕"], ["E", "直接改字，⌘S 存回檔案"], ["A", "標註給 AI：點一下或拖拉框選"], ["?", "這份說明"],
+  ];
+  function toggleKeys(force) {
+    const k = $("#keys");
+    k.classList.toggle("show", force ?? !k.classList.contains("show"));
+  }
+  function onKey(e) {
+    const typing = e.target.isContentEditable || /INPUT|TEXTAREA/.test(e.target.tagName);
+    if ((e.metaKey || e.ctrlKey) && e.key === "s") { e.preventDefault(); save(); return; }
+    if (e.key === "Escape") {
+      if (typing) return e.target.blur();
+      if ($("#keys").classList.contains("show")) return toggleKeys(false);
+      if (walled) return toggleWall(false);
+      if (document.body.classList.contains("editing")) return setEditing(false);
+      if (document.body.classList.contains("annotating")) return setAnnotating(false);
+      return toggleOverview(false);
+    }
+    if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key.toLowerCase();
+    if (e.key === "?") toggleKeys();
+    else if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); next(); }
+    else if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); show(Deck.cur - 1); }
+    else if (k === "g" || k === "o") toggleOverview();
+    else if (k === "w") toggleWall();
+    else if (k === "p") openPresenter();
+    else if (k === "r") show(Deck.cur);
+    else if (e.key === "Home") show(0);
+    else if (e.key === "End") show(Deck.slides.length - 1);
+    else if (k === "n") notes.classList.toggle("show");
+    else if (k === "f") document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+    else if (k === "e") setEditing(!document.body.classList.contains("editing"));
+    else if (k === "a") setAnnotating(!document.body.classList.contains("annotating"));
+  }
+
+  // ---------- P: presenter window ----------
+  // A second window with the notes, this slide, the next one and a clock. Share or project
+  // the main window; this one stays on your own screen. Either window can drive the deck.
+  let presenter = null, clock = 0, clockStart = 0;
+  function openPresenter() {
+    if (presenter && !presenter.closed) return presenter.focus();
+    presenter = open("", "slidejam-presenter", "width=1180,height=760");
+    if (!presenter) return toast("瀏覽器擋住了新視窗：請允許這個頁面開彈出視窗", 5000);
+    const styles = $$('link[rel="stylesheet"], style').map((n) => (n.tagName === "LINK" ? `<link rel="stylesheet" href="${n.href}">` : n.outerHTML)).join("");
+    const d = presenter.document;
+    d.open();
+    d.write(`<!doctype html><html lang="zh-Hant-TW"><head><meta charset="utf-8"><base href="${location.href}">
+<title>講者視窗 · ${document.title}</title>${styles}</head><body class="presenter">
+<div class="p-top"><b id="p-page"></b><span id="p-clock">00:00</span><button id="p-reset">重新計時</button><span class="p-hint">← → 翻頁・這個視窗只有你看得到</span></div>
+<div class="p-main"><div class="p-notes" id="p-notes"></div>
+<div class="p-side"><small>現在</small><div id="p-cur"></div><small>下一頁</small><div id="p-next"></div>
+<div class="p-nav"><button id="p-prev">← 上一頁</button><button id="p-fwd">下一步 →</button></div></div></div></body></html>`);
+    d.close();
+    d.addEventListener("keydown", onKey);
+    d.getElementById("p-prev").onclick = () => show(Deck.cur - 1);
+    d.getElementById("p-fwd").onclick = () => next();
+    d.getElementById("p-reset").onclick = () => (clockStart = Date.now());
+    clockStart = Date.now();
+    clearInterval(clock);
+    clock = setInterval(() => {
+      if (presenter.closed) return clearInterval(clock);
+      const s = Math.floor((Date.now() - clockStart) / 1000);
+      d.getElementById("p-clock").textContent = `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+    }, 1000);
+    renderPresenter();
+  }
+  function renderPresenter() {
+    if (!presenter || presenter.closed) return;
+    const d = presenter.document, n = Deck.slides.length, i = Deck.cur;
+    const note = notesOf(Deck.slides[i]);
+    d.getElementById("p-page").textContent = `${i + 1} / ${n}　${titleOf(i)}`;
+    d.getElementById("p-notes").textContent = note ? note.textContent.trim() : "（這一頁沒有講稿）";
+    const put = (id, k) => { const box = d.getElementById(id); box.innerHTML = ""; if (k < n) box.appendChild(makeThumb(k, 360)); else box.textContent = "（最後一頁）"; };
+    put("p-cur", i); put("p-next", i + 1);
+  }
+
+  // ---------- W: wall — every slide at once, all playing ----------
+  let walled = false;
+  function toggleWall(force) {
+    const on = force ?? !walled;
+    if (on === walled) return;
+    walled = on;
+    document.body.classList.toggle("wall", on);
+    if (on) {
+      leave(Deck.cur);
+      const wall = el("div", { id: "wall" }, document.body);
+      el("p", { className: "wall-hint", textContent: "滑過去重播・點一下打開那一頁・W 或 Esc 回去" }, wall);
+      const grid = el("div", { className: "wall-grid" }, wall);
+      Deck.slides.forEach((s, i) => {
+        const cell = el("div", { className: "wall-cell" }, grid);
+        el("div", { className: "wall-box" }, cell).appendChild(s);
+        el("span", { textContent: `${i + 1}　${titleOf(i)}` }, cell);
+        cell.onclick = () => { toggleWall(false); show(i); };
+        cell.onmouseenter = () => { eachFx(s, (d, e) => d.leave?.(e)); eachFx(s, (d, e) => d.enter?.(e, s)); };
+      });
+      fitWall();
+      Deck.slides.forEach((s) => {
+        s.classList.add("active");
+        $$("video", s).forEach((v) => { v.currentTime = 0; v.play().catch(() => {}); });
+        eachFx(s, (d, e) => d.enter?.(e, s));
+      });
+    } else {
+      const anchor = $("#hoverzone");
+      Deck.slides.forEach((s) => {
+        eachFx(s, (d, e) => d.leave?.(e));
+        $$("video", s).forEach((v) => v.pause());
+        s.classList.remove("active");
+        s.style.transform = "";
+        stage.insertBefore(s, anchor);
+      });
+      $("#wall").remove();
+      show(Deck.cur);
+    }
+  }
+  function fitWall() {
+    if (walled) $$(".wall-box").forEach((b) => (b.firstChild.style.transform = `scale(${b.clientWidth / W})`));
+  }
+
   // ---------- boot ----------
   async function boot() {
     stage = $("#stage");
@@ -465,12 +587,18 @@
     el("div", { className: "what" }, ai); el("textarea", { placeholder: "想要怎樣？例如：這張圖慢慢放大到右上角" }, ai);
     el("div", { className: "hint", textContent: "Enter 送出・Shift+Enter 換行・Esc 取消" }, ai);
     chrome("div", "anno-panel", document.body);
+    const help = chrome("button", "help", document.body);
+    help.textContent = "?"; help.title = "快捷鍵（?）";
+    help.onclick = () => toggleKeys();
+    const keys = chrome("div", "keys", document.body);
+    el("b", { textContent: "快捷鍵" }, keys);
+    KEYS.forEach(([k, what]) => { const row = el("div", {}, keys); el("kbd", { textContent: k }, row); row.append(what); });
     $("#page").title = "總覽（G）";
     $("#page").addEventListener("click", (e) => { e.stopPropagation(); toggleOverview(true); });
     const badge = () => ($("#modebadge").textContent = document.body.classList.contains("editing") ? "編輯 · ⌘S 存檔" : "標註");
     new MutationObserver(badge).observe(document.body, { attributes: true, attributeFilter: ["class"] });
     setupPeek(); setupAnnotate();
-    addEventListener("resize", fit); fit();
+    addEventListener("resize", () => { fit(); fitWall(); }); fit();
 
     // ?embed: a deck shown inside another page — no chrome, no keys, replays by itself
     // (?embed&loop=8 replays every 8 s; default 9)
@@ -482,28 +610,7 @@
       setInterval(() => !document.hidden && show(Deck.cur), every);
     }
     if (!embed) {
-      addEventListener("keydown", (e) => {
-        const typing = e.target.isContentEditable || /INPUT|TEXTAREA/.test(e.target.tagName);
-        if ((e.metaKey || e.ctrlKey) && e.key === "s") { e.preventDefault(); save(); return; }
-        if (e.key === "Escape") {
-          if (typing) return e.target.blur();
-          if (document.body.classList.contains("editing")) return setEditing(false);
-          if (document.body.classList.contains("annotating")) return setAnnotating(false);
-          return toggleOverview(false);
-        }
-        if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
-        const k = e.key.toLowerCase();
-        if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); next(); }
-        else if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); show(Deck.cur - 1); }
-        else if (k === "g" || k === "o") toggleOverview();
-        else if (k === "r") show(Deck.cur);
-        else if (e.key === "Home") show(0);
-        else if (e.key === "End") show(Deck.slides.length - 1);
-        else if (k === "n") notes.classList.toggle("show");
-        else if (k === "f") document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
-        else if (k === "e") setEditing(!document.body.classList.contains("editing"));
-        else if (k === "a") setAnnotating(!document.body.classList.contains("annotating"));
-      });
+      addEventListener("keydown", onKey);
       stage.addEventListener("click", (e) => {
         if (document.body.classList.contains("editing") || document.body.classList.contains("annotating")) return;
         if (e.target.closest("a, button, iframe, .leaflet-container")) return;
@@ -517,6 +624,7 @@
     Deck.slides.forEach((s) => eachFx(s, (d, e) => d.setup?.(e)));
     Deck.cur = hashIndex() ?? 0;
     show(Deck.cur);
+    if (q.has("wall")) toggleWall(true);
   }
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", boot) : boot();
 })();
