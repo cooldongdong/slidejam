@@ -641,7 +641,11 @@
   // A second window with the notes, this slide, the next one and a clock. Share or project
   // the main window; this one stays on your own screen. Either window can drive the deck.
   let presenter = null, clock = 0, clockStart = 0;
+  // full screen here, or on the page around an embedded deck (same site only)
+  const inFullscreen = () => { try { return !!(document.fullscreenElement || top.document.fullscreenElement); } catch { return !!document.fullscreenElement; } };
   function openPresenter() {
+    // the new window opens behind a full-screen one and nothing seems to happen, so say where it went
+    if (inFullscreen()) toast("講者視窗開在全螢幕後面了：按 Esc 離開全螢幕就看得到。下次可以先按 P，再進全螢幕", 6000);
     if (presenter && !presenter.closed) return presenter.focus();
     presenter = open("", "slidejam-presenter", "width=1180,height=760");
     if (!presenter) return toast("瀏覽器擋住了新視窗：請允許這個頁面開彈出視窗", 5000);
