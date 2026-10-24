@@ -466,19 +466,21 @@
     // click marks a point; drag draws a box (handy for spot / zoom / hotspots positions)
     let down = null, band = null;
     const pct = (v) => Math.round(v * 10) / 10;
-    stage.addEventListener("mousedown", (ev) => {
+    // pointer events, not mouse events: a map (Leaflet) cancels pointerdown, and then the
+    // browser never sends the mouse events
+    stage.addEventListener("pointerdown", (ev) => {
       if (!document.body.classList.contains("annotating") || pendingAnno || ev.button !== 0) return;
       ev.preventDefault();
       down = { ev, t: pick(ev.target) || Deck.slides[Deck.cur], p: stagePoint(ev) };
     }, true);
-    addEventListener("mousemove", (ev) => {
+    addEventListener("pointermove", (ev) => {
       if (!down) return;
       const [x, y] = stagePoint(ev), [x0, y0] = down.p;
       if (!band && Math.hypot(x - x0, y - y0) < 6) return;
       band ??= el("div", { className: "anno-band" }, stage);
       Object.assign(band.style, { left: Math.min(x, x0) + "px", top: Math.min(y, y0) + "px", width: Math.abs(x - x0) + "px", height: Math.abs(y - y0) + "px" });
     });
-    addEventListener("mouseup", (ev) => {
+    addEventListener("pointerup", (ev) => {
       if (!down) return;
       const t = down.t, r = t.getBoundingClientRect(), [x0, y0] = down.p, [x1, y1] = stagePoint(ev), e0 = down.ev;
       const rx = (cx) => ((cx - r.left) / r.width) * 100, ry = (cy) => ((cy - r.top) / r.height) * 100;
@@ -537,6 +539,14 @@
   // Actions and their keys. Letter keys can be changed from the ? panel (handy when another
   // tool already grabs one); the choice is remembered in this browser for every deck.
   const fullscreen = () => (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen());
+  // In full screen the browser takes Esc for itself, so an open note box or overview could
+  // only be closed by leaving full screen. Keyboard Lock (Chrome, Edge) hands Esc to the deck
+  // instead: Esc closes what is open first, and leaves full screen when nothing is.
+  // (Inside an iframe the lock is refused; the page around it has to take it.)
+  document.addEventListener("fullscreenchange", () => {
+    if (document.fullscreenElement) navigator.keyboard?.lock?.(["Escape"]).catch(() => {});
+    else navigator.keyboard?.unlock?.();
+  });
   const ACTIONS = [
     { id: "next", fixed: "→ / 空白", label: "下一步、下一頁", run: () => next() },
     { id: "prev", fixed: "←", label: "上一頁", run: () => show(Deck.cur - 1) },
@@ -601,7 +611,7 @@
   function onKey(e) {
     if (rebind(e)) return;
     // an unsent annotation note goes away as soon as you do anything else
-    if (pendingAnno && !e.target.closest?.("#anno-input")) cancelAnno();
+    if (pendingAnno && !e.target.closest?.("#anno-input")) { cancelAnno(); if (e.key === "Escape") return; }
     const typing = e.target.isContentEditable || /INPUT|TEXTAREA/.test(e.target.tagName);
     if ((e.metaKey || e.ctrlKey) && e.key === "s") { e.preventDefault(); save(); return; }
     if (e.key === "Escape") {
@@ -611,7 +621,10 @@
       if (walled) { toggleWall(false); return toggleOverview(true, true); }
       if (document.body.classList.contains("editing")) return setEditing(false);
       if (document.body.classList.contains("annotating")) return setAnnotating(false);
-      return toggleOverview(false);
+      if ($("#overview").classList.contains("show")) return toggleOverview(false);
+      if (notes.classList.contains("show")) return notes.classList.remove("show");
+      if (document.fullscreenElement) return document.exitFullscreen();
+      return;
     }
     if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
     if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); next(); }

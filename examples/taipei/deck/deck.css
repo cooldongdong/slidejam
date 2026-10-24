@@ -131,6 +131,8 @@ body.editing [data-edit].dirty{outline-color:var(--ui-dirty)}
 body.editing #notes{display:block}
 #notes [contenteditable]{outline:none;min-height:1.7em}
 body.annotating #stage *{cursor:crosshair}
+/* a map or an embedded site would swallow the click or drag; let it reach the slide */
+body.annotating .leaflet-container *,body.annotating #stage iframe{pointer-events:none}
 .anno-hover{outline:2px solid var(--ui-anno) !important;outline-offset:3px}
 .anno-pin{position:absolute;z-index:9;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:var(--ui-anno);color:var(--ui-anno-ink);font:700 15px/30px var(--mono);text-align:center;pointer-events:none;box-shadow:0 4px 10px rgb(0 0 0/.3)}
 .anno-band{position:absolute;z-index:9;border:2px dashed var(--ui-anno);background:color-mix(in srgb,var(--ui-anno) 12%,transparent);pointer-events:none}
