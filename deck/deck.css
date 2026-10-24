@@ -184,15 +184,18 @@ body.annotating #anno-panel{display:block}
 .keys-reset{margin-top:6px;font:13px var(--sans);border:0;border-radius:8px;padding:6px 10px;background:var(--ui-line);color:var(--ui-soft);cursor:pointer;justify-self:start}
 body.embed #help,body.wall #help,body.editing #help,body.annotating #help{display:none}
 body.wall #stage,body.wall #notes{display:none}
-#wall{position:fixed;inset:0;overflow:auto;background:var(--chrome);padding:20px 28px 40px;z-index:12}
+#wall{position:fixed;inset:0;overflow:auto;background:var(--chrome);padding:36px 40px;z-index:12}
 .ov-top{position:sticky;top:-36px;z-index:2;display:flex;align-items:center;gap:16px;margin:-36px -40px 20px;padding:18px 40px;background:rgb(11 16 19/.92);backdrop-filter:blur(8px);color:var(--ui-muted);font:14px var(--sans)}
-#wall .ov-top{top:-20px;margin:-20px -28px 20px;padding:16px 28px}
 .ov-top b{color:var(--ui-ink);font-size:16px}
+.ov-top .ov-back{width:34px;height:34px;padding:0;border-radius:50%;background:var(--ui-line);color:var(--ui-ink);font:600 18px/34px var(--sans);text-align:center}
+.ov-top .ov-back:hover{background:var(--ui-hi);color:var(--ui-anno-ink)}
 .ov-top button{font:600 14px var(--sans);border:0;border-radius:999px;padding:7px 14px;background:var(--ui-anno);color:var(--ui-anno-ink);cursor:pointer}
-.wall-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:22px}
+/* same grid and thumbnail size as the overview, so Play all doesn't zoom in */
+.wall-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:22px}
 .wall-cell{cursor:pointer;color:var(--ui-soft);font:14px/1.4 var(--mono)}
+.wall-cell.cur .wall-box{outline:3px solid var(--ui-anno)}
 .wall-cell > span{display:block;margin-top:6px}
-.wall-box{position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:8px;background:var(--paper);color:var(--ink);text-align:left}
+.wall-box{position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:6px;background:var(--paper);color:var(--ink);text-align:left}
 .wall-cell:hover .wall-box{outline:3px solid var(--ui-hi)}
 .wall-box > .slide{width:1600px;height:900px;transform-origin:0 0;transition:none}
 body.wall .slide [data-step]{opacity:1;transform:none}

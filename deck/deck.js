@@ -147,10 +147,12 @@
     if (on && !ovBuilt) {
       const top = el("div", { className: "ov-top" }, ov);
       ov.prepend(top);
+      const back = el("button", { className: "ov-back", textContent: "←", title: "回到投影片（Esc）" }, top);
+      back.onclick = (e) => { e.stopPropagation(); toggleOverview(false); };
       el("b", { textContent: "總覽" }, top);
       const play = el("button", { textContent: "▶ 播放全部" }, top);
       play.onclick = (e) => { e.stopPropagation(); toggleOverview(false); toggleWall(true); };
-      el("span", { textContent: "點縮圖跳到那一頁・Esc 關閉" }, top);
+      el("span", { textContent: "點縮圖跳到那一頁" }, top);
       const grid = $(".grid", ov);
       Deck.slides.forEach((_, i) => {
         const it = el("div", { className: "ov-item" }, grid); it.dataset.k = i;
@@ -597,13 +599,15 @@
       leave(Deck.cur);
       const wall = el("div", { id: "wall" }, document.body);
       const top = el("div", { className: "ov-top" }, wall);
+      const back = el("button", { className: "ov-back", textContent: "←", title: "回到總覽（Esc）" }, top);
+      back.onclick = () => { toggleWall(false); toggleOverview(true); };
       el("b", { textContent: "總覽・播放中" }, top);
       const stopBtn = el("button", { textContent: "■ 停止播放" }, top);
       stopBtn.onclick = () => { toggleWall(false); toggleOverview(true); };
-      el("span", { textContent: "滑過去重播・點一下打開那一頁・Esc 回到總覽" }, top);
+      el("span", { textContent: "滑過去重播・點一下打開那一頁" }, top);
       const grid = el("div", { className: "wall-grid" }, wall);
       Deck.slides.forEach((s, i) => {
-        const cell = el("div", { className: "wall-cell" }, grid);
+        const cell = el("div", { className: "wall-cell" + (i === Deck.cur ? " cur" : "") }, grid);
         el("div", { className: "wall-box" }, cell).appendChild(s);
         el("span", { textContent: `${i + 1}　${titleOf(i)}` }, cell);
         cell.onclick = () => { toggleWall(false); show(i); };
