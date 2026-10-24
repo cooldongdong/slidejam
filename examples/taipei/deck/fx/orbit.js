@@ -1,6 +1,7 @@
 // orbit — children sit around an ellipse; a dot travels it and lights each one in turn.
 // <div class="orbit" data-fx="orbit" data-ms="14000" style="height:640px"><div>資料庫</div><div>API</div>…</div>
-// A child with class="center" stays in the middle instead of joining the ring.
+// A child with class="center" stays in the middle instead of joining the ring; nodes with
+// data-link get a dashed line to it.
 (() => {
   const { register, gen, ms, stop, loopRaf } = Deck.lib;
   Deck.lib.css(`
@@ -28,6 +29,14 @@
         const a = -Math.PI / 2 + (i / nodes.length) * Math.PI * 2;
         n.classList.add("orbit-node");
         n.style.left = cx + rx * Math.cos(a) + "px"; n.style.top = cy + ry * Math.sin(a) + "px";
+      });
+      svg.querySelectorAll(".link").forEach((l) => l.remove());
+      if (e.querySelector(":scope > .center")) nodes.filter((n) => "link" in n.dataset).forEach((n) => {
+        const x = parseFloat(n.style.left), y = parseFloat(n.style.top);
+        const l = document.createElementNS(svg.namespaceURI, "path");
+        Object.entries({ class: "link", d: `M${x} ${y} Q${(x + cx) / 2} ${cy} ${cx} ${cy}`, fill: "none", stroke: "var(--warn)", "stroke-width": 2.5, "stroke-dasharray": "8 8", opacity: 0.75 })
+          .forEach(([k, v]) => l.setAttribute(k, v));
+        svg.querySelector("ellipse").after(l);
       });
       return { nodes, svg, cx, cy, rx, ry };
     },
