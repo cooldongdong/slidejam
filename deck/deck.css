@@ -185,7 +185,8 @@ body.annotating #anno-panel{display:block}
 body.embed #help,body.wall #help,body.editing #help,body.annotating #help{display:none}
 body.wall #stage,body.wall #notes{display:none}
 #wall{position:fixed;inset:0;overflow:auto;background:var(--chrome);padding:20px 28px 40px;z-index:12}
-.ov-top{display:flex;align-items:center;gap:16px;margin:0 0 20px;color:var(--ui-muted);font:14px var(--sans)}
+.ov-top{position:sticky;top:-36px;z-index:2;display:flex;align-items:center;gap:16px;margin:-36px -40px 20px;padding:18px 40px;background:rgb(11 16 19/.92);backdrop-filter:blur(8px);color:var(--ui-muted);font:14px var(--sans)}
+#wall .ov-top{top:-20px;margin:-20px -28px 20px;padding:16px 28px}
 .ov-top b{color:var(--ui-ink);font-size:16px}
 .ov-top button{font:600 14px var(--sans);border:0;border-radius:999px;padding:7px 14px;background:var(--ui-anno);color:var(--ui-anno-ink);cursor:pointer}
 .wall-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:22px}

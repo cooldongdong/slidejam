@@ -49,8 +49,11 @@ const src = B + file;
 // pass ?query and #slide from the page URL on to the deck, so links like
 // /play/effects/#bento or /play/effects/?wall open the right place
 (() => {
+  // the slide goes in as ?slide= rather than #, so the iframe doesn't scroll this page
   const f = document.getElementById("deck");
-  const url = f.dataset.src + location.search + location.hash;
+  const q = new URLSearchParams(location.search);
+  if (location.hash) q.set("slide", decodeURIComponent(location.hash.slice(1)));
+  const url = f.dataset.src + (q.toString() ? "?" + q : "");
   f.src = url;
   document.getElementById("open-full").href = url;
   // focus the deck so keys work at once, without scrolling the page past its title

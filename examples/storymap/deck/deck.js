@@ -432,9 +432,10 @@
     });
   }
 
-  // #12 is the 12th slide; #bento is the slide with id="bento"
+  // #12 is the 12th slide; #bento is the slide with id="bento". ?slide=bento does the same
+  // without a fragment, so a deck in an iframe doesn't scroll the page around it.
   function hashIndex() {
-    const h = decodeURIComponent(location.hash.slice(1));
+    const h = decodeURIComponent(location.hash.slice(1)) || new URLSearchParams(location.search).get("slide") || "";
     if (/^\d+$/.test(h)) return Math.max(0, +h - 1);
     const i = Deck.slides.findIndex((s) => s.id === h);
     return i >= 0 ? i : null;

@@ -7,13 +7,13 @@ import "../styles/site.css";
 interface Props {
   title: string;
   description: string;
-  /** in-page links for the header: [anchor, 中文, English] */
-  nav?: [string, string, string][];
   /** pages that are mostly a deck want the footer out of the way */
   compact?: boolean;
 }
-const { title, description, nav = [], compact = false } = Astro.props;
+const { title, description, compact = false } = Astro.props;
 const B = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const here = Astro.url.pathname;
+const on = (p: string) => (here.startsWith(B + p) ? "on" : undefined);
 const og = new URL(B + "og.png", Astro.site).href;
 ---
 <!doctype html>
@@ -48,9 +48,8 @@ function pickLang(l) {
 <header id="top"><div class="wrap nav">
   <a class="logo" href={B}>slide<span>jam</span></a>
   <nav>
-    {nav.map(([href, zh, en]) => <a href={href}><span lang="zh">{zh}</span><span lang="en">{en}</span></a>)}
-    <a href={B + "play/effects/"}><span lang="zh">效果圖鑑</span><span lang="en">Effects</span></a>
-    <a href={B + "guide/"}><span lang="zh">使用流程</span><span lang="en">Workflow</span></a>
+    <a href={B + "effects/"} class={on("effects") ?? on("play")}><span lang="zh">效果圖鑑</span><span lang="en">Effects</span></a>
+    <a href={B + "guide/"} class={on("guide")}><span lang="zh">使用流程</span><span lang="en">Workflow</span></a>
     <a href="https://github.com/cooldongdong/slidejam">GitHub</a>
   </nav>
   <div class="lang"><button data-l="zh">中文</button><button data-l="en">EN</button></div>
@@ -61,7 +60,7 @@ function pickLang(l) {
 <footer><div class="wrap">
   <a class="logo" href={B} style="font-size:18px">slide<span>jam</span></a>
   <span class="sp"></span>
-  <a href={B + "play/effects/"}><span lang="zh">效果圖鑑</span><span lang="en">Effects</span></a>
+  <a href={B + "effects/"}><span lang="zh">效果圖鑑</span><span lang="en">Effects</span></a>
   <a href={B + "guide/"}><span lang="zh">使用流程</span><span lang="en">Workflow</span></a>
   <a href="https://github.com/cooldongdong/slidejam/blob/master/docs/%E4%BD%BF%E7%94%A8%E8%AA%AA%E6%98%8E.md"><span lang="zh">使用說明</span><span lang="en">User guide (zh)</span></a>
   <a href="https://github.com/cooldongdong/slidejam">GitHub</a>

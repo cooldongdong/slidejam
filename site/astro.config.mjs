@@ -2,7 +2,10 @@
 // into public/ as they are, so they keep working from a double-click too.
 import { defineConfig } from "astro/config";
 
+// Production is GitHub Pages under /slidejam/ (set by the deploy workflow); Cloudflare
+// previews and local runs serve from the root.
 export default defineConfig({
-  site: "https://slidejam.pages.dev",
+  site: process.env.SITE || "https://slidejam.pages.dev",
+  base: process.env.BASE || "/",
   trailingSlash: "ignore",
 });
