@@ -271,6 +271,8 @@
   const escapeHTML = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
   async function save() {
+    // a deck on a website can be tried (edit, annotate, themes) but not saved back
+    if (location.protocol !== "file:") return toast("這是網站上的簡報，改了只是試試看。\n下載整個資料夾、在自己電腦打開，⌘S 就會存回檔案。", 5000);
     if (!dirty.size && !themeDirty()) return toast("沒有要存的修改");
     if (!window.showOpenFilePicker) return toast("這個瀏覽器不能直接存檔，請用 Chrome。也可以按 A 把要改的地方標給 AI", 5000);
     let h;
@@ -384,6 +386,11 @@
     const si = Deck.slides.indexOf(e);
     return [`.slide:nth-of-type(${si + 1})`, ...parts].join(" > ");
   }
+  function cancelAnno() {
+    pendingAnno = null;
+    const box = $("#anno-input");
+    if (box) box.style.display = "none";
+  }
   function setAnnotating(on) {
     if (on === document.body.classList.contains("annotating")) return;
     const was = authoring();
@@ -391,6 +398,7 @@
     if (on) setEditing(false);
     if (was !== authoring()) freezeFx(on);
     hoverEl?.classList.remove("anno-hover");
+    if (!on) cancelAnno();
     renderPanel(); renderPins();
     if (on) toast("標註模式：點一下標位置，拖拉可以框範圍，寫下想要怎樣。右上角可以複製給 AI。A 或 Esc 離開");
   }
@@ -549,7 +557,12 @@
   function renderKeys() {
     const box = $("#keys");
     box.innerHTML = "";
-    el("b", { textContent: "快捷鍵" }, box);
+    const head = el("div", { className: "keys-head" }, box);
+    el("b", { textContent: "快捷鍵" }, head);
+    if (Object.keys(customKeys()).length) {
+      const reset = el("button", { className: "keys-reset", textContent: "↺", title: "恢復預設按鍵" }, head);
+      reset.onclick = (ev) => { ev.stopPropagation(); store.set(keyStore, {}); renderKeys(); toast("按鍵恢復預設"); };
+    }
     el("small", { className: "keys-hint", textContent: "點一列直接執行・點右邊的鍵可以換掉" }, box);
     ACTIONS.forEach((a) => {
       const row = el("div", { className: "key-row" }, box);
@@ -562,10 +575,6 @@
       }
       row.onclick = () => { if (a.id !== "help") toggleKeys(false); a.run(); };
     });
-    if (Object.keys(customKeys()).length) {
-      const reset = el("button", { className: "keys-reset", textContent: "恢復預設按鍵" }, box);
-      reset.onclick = (ev) => { ev.stopPropagation(); store.set(keyStore, {}); renderKeys(); toast("按鍵恢復預設"); };
-    }
   }
   // while a key cap is waiting, the next key press becomes its new key; a key does one
   // thing only, so if another action had it the two swap
@@ -591,6 +600,8 @@
   }
   function onKey(e) {
     if (rebind(e)) return;
+    // an unsent annotation note goes away as soon as you do anything else
+    if (pendingAnno && !e.target.closest?.("#anno-input")) cancelAnno();
     const typing = e.target.isContentEditable || /INPUT|TEXTAREA/.test(e.target.tagName);
     if ((e.metaKey || e.ctrlKey) && e.key === "s") { e.preventDefault(); save(); return; }
     if (e.key === "Escape") {

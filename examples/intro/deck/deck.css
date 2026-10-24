@@ -181,7 +181,9 @@ body.annotating #anno-panel{display:block}
 .key-cap{cursor:pointer}
 .key-cap:hover{border-color:var(--ui-hi)}
 .key-cap.wait{color:var(--ui-edit);border-color:var(--ui-edit)}
-.keys-reset{margin-top:6px;font:13px var(--sans);border:0;border-radius:8px;padding:6px 10px;background:var(--ui-line);color:var(--ui-soft);cursor:pointer;justify-self:start}
+.keys-head{display:flex;align-items:center;justify-content:space-between}
+.keys-reset{width:28px;height:28px;font:16px/1 var(--sans);border:0;border-radius:8px;background:var(--ui-line);color:var(--ui-soft);cursor:pointer}
+.keys-reset:hover{background:var(--ui-hi);color:var(--ui-anno-ink)}
 body.embed #help,body.wall #help,body.editing #help,body.annotating #help{display:none}
 body.wall #stage,body.wall #notes{display:none}
 #wall{position:fixed;inset:0;overflow:auto;background:var(--chrome);padding:36px 40px;z-index:12}

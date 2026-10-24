@@ -26,7 +26,14 @@
       const id = setInterval(() => { k = (k + 1) % spans.length; set(); }, ms(e, 2200));
       timers.set(e, () => clearInterval(id));
     },
-    leave(e) { stop(e); restore(e); },
+    leave(e) {
+      stop(e);
+      // restoring shows the raw "a｜b｜c" text, so wait for the slide to fade out first —
+      // except when editing or annotating, which need the authored text right away
+      if (document.body.classList.contains("editing") || document.body.classList.contains("annotating")) return restore(e);
+      const t = setTimeout(() => { if (!e.closest(".slide.active")) restore(e); }, 500);
+      timers.set(e, () => clearTimeout(t));
+    },
     thumb(e) { if (!e.querySelector(".rot-box")) e.textContent = e.textContent.split(/[|｜]/)[0]; },
   });
 })();

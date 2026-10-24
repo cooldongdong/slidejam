@@ -10,8 +10,8 @@ const list = decks.map((d, i) => ({ ...d, ...deckStats(d.file), n: String(i + 1)
 ---
 <section class="cases-head wrap">
   <p class="kicker"><span lang="zh">範例</span><span lang="en">Examples</span></p>
-  <h1><span lang="zh">用 slidejam 做的簡報</span><span lang="en">Decks made with slidejam</span></h1>
-  <p class="sub"><span lang="zh">每一份都在自己播。按「播放」，換你來翻。</span><span lang="en">Each one plays by itself. Press Play to drive it.</span></p>
+  <h1><span lang="zh">這些簡報，都是 slidejam 做的</span><span lang="en">All made with slidejam</span></h1>
+  <p class="sub"><span lang="zh">每一份都會自動播放。想自己翻頁，按「播放」進到劇場。</span><span lang="en">Each one plays on its own. To turn the pages yourself, press Play.</span></p>
   <nav class="case-index">
     {list.map((d, i) => (
       <a href={`${B}play/${d.id}/`} data-id={d.id} style={`--i:${i}`}>
@@ -52,7 +52,7 @@ const list = decks.map((d, i) => ({ ...d, ...deckStats(d.file), n: String(i + 1)
 <div class="theater" id="theater" hidden>
   <div class="th-bar">
     <b id="th-title"></b>
-    <span class="hint"><span lang="zh">點投影片後可用鍵盤 ← →；按 ? 看所有快捷鍵</span><span lang="en">Click the slide, then ← →; ? lists every key</span></span>
+    <span class="hint"><span lang="zh">← → 翻頁・試試 E 改字、A 標註・? 看所有快捷鍵</span><span lang="en">← → to move · try E to edit, A to annotate · ? for every key</span></span>
     <span class="sp"></span>
     <button id="th-full"><span lang="zh">全螢幕</span><span lang="en">Full screen</span></button>
     <button id="th-close"><span lang="zh">關閉</span><span lang="en">Close</span></button>
@@ -91,8 +91,9 @@ document.querySelectorAll(".case-index a").forEach((a) => a.addEventListener("cl
 
 // theater: the real deck, big, yours to drive
 const theater = document.getElementById("theater"), tframe = document.getElementById("th-frame");
-function open(c, slide) {
-  tframe.src = `${base}${c.dataset.file}${slide ? `?slide=${encodeURIComponent(slide)}` : ""}`;
+function open(c, slide, wall) {
+  const q = [slide && `slide=${encodeURIComponent(slide)}`, wall && "wall"].filter(Boolean).join("&");
+  tframe.src = `${base}${c.dataset.file}${q ? `?${q}` : ""}`;
   document.getElementById("th-title").textContent = c.dataset[lang() === "en" ? "titleEn" : "titleZh"];
   theater.hidden = false;
   requestAnimationFrame(() => theater.classList.add("on"));
@@ -134,7 +135,8 @@ cases.forEach((c) => c.querySelector(".share").addEventListener("click", async (
   const c = document.getElementById(`case-${first}`);
   c.scrollIntoView({ block: "start" });
   const q = new URLSearchParams(location.search);
-  if (q.has("slide")) open(c, q.get("slide"));
+  // ?slide=… opens the deck at a slide; ?wall opens its overview with every slide playing
+  if (q.has("slide") || q.has("wall")) open(c, q.get("slide"), q.has("wall"));
 })();
 </script>
 

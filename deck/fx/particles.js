@@ -18,9 +18,14 @@
       const off = document.createElement("canvas"); off.width = w; off.height = h;
       const oc = off.getContext("2d", { willReadFrequently: true });
       oc.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
-      oc.textBaseline = "middle";
+      // draw on the browser's own baseline (half-leading: the line box is split evenly above
+      // the ascent and below the descent), so the dots land exactly where the text will be
+      oc.textBaseline = "alphabetic";
       oc.textAlign = cs.textAlign === "center" ? "center" : /right|end/.test(cs.textAlign) ? "right" : "left";
-      oc.fillText(e.textContent.trim(), oc.textAlign === "center" ? w / 2 : oc.textAlign === "right" ? w : 0, h / 2);
+      const m = oc.measureText(e.textContent.trim()), asc = m.fontBoundingBoxAscent, desc = m.fontBoundingBoxDescent;
+      const lineH = parseFloat(cs.lineHeight) || h, top = parseFloat(cs.paddingTop) || 0;
+      const base = top + (lineH - (asc + desc)) / 2 + asc;
+      oc.fillText(e.textContent.trim(), oc.textAlign === "center" ? w / 2 : oc.textAlign === "right" ? w : 0, base);
       const px = oc.getImageData(0, 0, w, h).data, step = Math.max(3, Math.round(parseFloat(cs.fontSize) / 34));
       const pts = [];
       for (let y = 0; y < h; y += step) for (let x = 0; x < w; x += step) {
