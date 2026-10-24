@@ -1,8 +1,9 @@
 // slidejam core: a 1600×900 stage, slides, keyboard nav, overview, notes,
 // plus two authoring modes — E edits text in place and writes it back to this
 // file, A collects "do X here" notes you can paste to an AI.
-// Effects live in fx.js and register themselves through Deck.fx.register().
+// Effects live one per file in fx/; only the ones a deck uses are loaded.
 (() => {
+  const FX_BASE = new URL("fx/", document.currentScript.src).href;
   const W = 1600, H = 900;
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -432,8 +433,26 @@
     return i >= 0 ? i : null;
   }
 
+  // ---------- effects on demand ----------
+  // Every name in a data-fx attribute becomes fx/<name>.js. Plain <script> tags work
+  // from file://, so decks still open by double-click with no build step.
+  const loadScript = (src) => new Promise((res) => {
+    const s = document.createElement("script");
+    s.src = src; s.onload = res;
+    s.onerror = () => { console.warn(`[slidejam] could not load ${src}`); res(); };
+    document.head.appendChild(s);
+  });
+  async function loadEffects() {
+    const names = new Set();
+    $$("[data-fx]").forEach((e) => e.dataset.fx.split(/\s+/).forEach((n) => n && !Deck.fx[n] && names.add(n)));
+    if (!names.size) return;
+    if (!Deck.lib) await loadScript(FX_BASE + "_lib.js");
+    await Promise.all([...names].map((n) => loadScript(FX_BASE + n + ".js")));
+  }
+  Deck.loadEffects = loadEffects;
+
   // ---------- boot ----------
-  function boot() {
+  async function boot() {
     stage = $("#stage");
     Deck.slides = $$(".slide", stage).filter((s) => s.parentElement === stage);
     const chrome = (tag, id, parent) => el(tag, { id }, parent);
@@ -494,6 +513,7 @@
       addEventListener("beforeunload", (e) => { if (dirty.size) e.preventDefault(); });
     }
 
+    await loadEffects();
     Deck.slides.forEach((s) => eachFx(s, (d, e) => d.setup?.(e)));
     Deck.cur = hashIndex() ?? 0;
     show(Deck.cur);

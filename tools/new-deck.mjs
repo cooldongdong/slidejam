@@ -6,7 +6,7 @@
 //
 // The engine is copied, not linked, so a deck folder keeps working on its own:
 // zip it, mail it, open index.html from a USB stick.
-import { cpSync, existsSync, mkdirSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
 import { resolve, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -21,6 +21,8 @@ if (!update && existsSync(join(dir, "index.html"))) {
   process.exit(1);
 }
 mkdirSync(join(dir, "media"), { recursive: true });
+// deck/ holds only the engine, so it is replaced whole (no stale files left behind)
+rmSync(join(dir, "deck"), { recursive: true, force: true });
 cpSync(join(root, "deck"), join(dir, "deck"), { recursive: true });
 if (!update) cpSync(join(root, "template/index.html"), join(dir, "index.html"));
 console.log(update ? `✓ refreshed ${dir}/deck` : `✓ new deck at ${dir}\n  open ${join(dir, "index.html")}`);

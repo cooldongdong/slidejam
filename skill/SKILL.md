@@ -77,15 +77,22 @@ replaces only that. Write markup it can find:
 - Map pages need `wait: "map"`. Popups go in `init` (localStorage flags) or `hide`.
 - Re-shoot at 2.2–3.5 s to check the moment the box grows.
 
-## Adding a new effect
+## Where effects live, and adding one
 
-1. Register it in `deck/fx.js` with `register("name", { enter, leave, step?, thumb? })`.
-   - `leave` must restore the authored state. Edit mode relies on this.
-   - Mark generated nodes with the `gen()` helper so edit mode and annotation skip them.
-2. Add its CSS under `/* effects */` in `deck/deck.css`.
-3. Add a slide to `effects.html`: a demo, a sentence for 「跟 AI 說」, and the markup.
-   Also add it to the index on slide 1.
-4. Run `tools/new-deck.mjs <deck> --update` for decks that need it.
+Each effect is one file, `deck/fx/<name>.js`, holding its JS and its CSS
+(`Deck.lib.css(...)`). `deck.js` reads every `data-fx` name on the page and loads
+only those files, so a deck never lists scripts by hand. Shared helpers are in
+`deck/fx/_lib.js` (`Deck.lib`). To change an effect, read just its file.
+
+1. Create `deck/fx/<name>.js`. Start from a similar effect. It should:
+   - take what it needs from `Deck.lib`;
+   - put its styles in `Deck.lib.css(`…`)`;
+   - call `register("<name>", { setup?, enter, leave, step?, thumb? })`.
+2. `leave` must restore the authored state. Edit mode relies on this.
+3. Mark generated nodes with `gen()`, so edit mode and annotation skip them.
+4. Add a slide to `effects.html` with `id="<name>"`. It needs a demo, a line for
+   「跟 AI 說」 and the markup. Then add it to the index on slide 1.
+5. Run `tools/new-deck.mjs <deck> --update` for any deck that needs the effect.
 
 ## Writing the talk
 

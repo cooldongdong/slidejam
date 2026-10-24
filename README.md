@@ -96,7 +96,7 @@ node tools/shoot.mjs index.html 12 --at 0.5,2,4             # one slide at sever
 ## Layout
 
 ```
-deck/        the engine: deck.css, deck.js (core and modes), fx.js (effects)
+deck/        the engine: deck.css, deck.js (core and modes), fx/ (one file per effect, loaded on demand)
 template/    the starting index.html
 tools/       new-deck, capture-morph, shoot
 effects.html gallery of every effect
