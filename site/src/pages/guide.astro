@@ -19,12 +19,12 @@ const STEPS = [
   { zh: "大綱", en: "Outline", gate: true,
     ai: ["每頁一句話，標出用哪個效果、需要哪些截圖。", "One line per slide, with the effect by name and the screenshots it needs."],
     you: ["刪、改、換順序，滿意了說「可以動工」。", "Cut, reword, reorder; say go when it's right."],
-    cli: [["ai", "（步驟 2／6）大綱，12 頁：\n 1  開場　　　　letters\n 2  四個痛點　　bento\n 3  找得到　　　morph（拍 civictech.tw）\n …\n可以動工嗎？", "(step 2/6) Outline, 12 slides:\n 1  opening     letters\n 2  four pains  bento\n 3  findable    morph (capture civictech.tw)\n …\nGo?"], ["you", "第 5 頁拿掉，可以動工", "Drop slide 5 — go"]],
+    cli: [["ai", "（步驟 2／6）大綱，12 頁：\n 1  開場　　　　letters\n 2  四個痛點　　bento\n 3  找得到　　　morph（用 civictech.tw 做）\n …\n可以動工嗎？", "(step 2/6) Outline, 12 slides:\n 1  opening     letters\n 2  four pains  bento\n 3  findable    morph (capture civictech.tw)\n …\nGo?"], ["you", "第 5 頁拿掉，可以動工", "Drop slide 5 — go"]],
     tree: [] },
   { zh: "建檔", en: "Set up",
-    ai: ["開資料夾、截圖、拍頁面重組動畫。", "Makes the folder, takes screenshots, captures morphs."],
+    ai: ["開資料夾、截圖、做頁面重組動畫。", "Makes the folder, takes screenshots, captures morphs."],
     you: ["等。網站要登入的話，AI 會請你幫忙。", "Wait. If a site needs a login, the AI asks."],
-    cli: [["tool", "Bash(node tools/new-deck.mjs ~/talks/civictech)", "Bash(node tools/new-deck.mjs ~/talks/civictech)", "✓ new deck at ~/talks/civictech"], ["tool", "Bash(node tools/capture-morph.mjs morph.config.mjs)", "Bash(node tools/capture-morph.mjs morph.config.mjs)", "✓ media/morph-project  (2 pairs, 3 rows)"], ["ai", "（步驟 3／6）資料夾開好了，拍了 6 張截圖、1 段 morph。", "(step 3/6) Folder ready: 6 screenshots and 1 morph."]],
+    cli: [["tool", "Bash(node tools/new-deck.mjs ~/talks/civictech)", "Bash(node tools/new-deck.mjs ~/talks/civictech)", "✓ new deck at ~/talks/civictech"], ["tool", "Bash(node tools/capture-morph.mjs morph.config.mjs)", "Bash(node tools/capture-morph.mjs morph.config.mjs)", "✓ media/morph-project  (2 pairs, 3 rows)"], ["ai", "（步驟 3／6）資料夾開好了，截了 6 張圖、做了 1 段 morph。", "(step 3/6) Folder ready: 6 screenshots and 1 morph."]],
     tree: ["+civictech/", "+  index.html", "+  deck/", "+  media/", "+    home.png …", "+    morph-project/"] },
   { zh: "第一版", en: "First version",
     ai: ["做完全部頁面和講稿，自己截圖檢查，告訴你哪裡不確定。", "Writes every slide and the notes, checks its own screenshots, says what it's unsure of."],
@@ -32,7 +32,7 @@ const STEPS = [
     cli: [["tool", "Bash(node tools/shoot.mjs ~/talks/civictech/index.html --sheet)", "Bash(node tools/shoot.mjs ~/talks/civictech/index.html --sheet)", "✓ 12 slide(s) → .shots"], ["tool", "Read(.shots/sheet.png)", "Read(.shots/sheet.png)", "Read image"], ["ai", "（步驟 4／6）12 頁做好了，打開 ~/talks/civictech/index.html。\n不確定：第 7 頁的數字是去年的。\n字按 E 自己改；效果按 A 標起來貼給我。", "(step 4/6) 12 slides done — open ~/talks/civictech/index.html.\nUnsure: slide 7's numbers are last year's.\nFix words with E; mark effects with A and paste."]],
     tree: ["civictech/", "  index.html", "  deck/", "  media/", "    home.png …", "    morph-project/", "+  .shots/sheet.png"] },
   { zh: "來回修", en: "Rounds of changes",
-    ai: ["一則一則處理，只重拍改到的頁，逐項回報。", "Handles each item, re-shoots only what changed, reports item by item."],
+    ai: ["一則一則處理，只重新截圖改到的頁，逐項回報。", "Handles each item, re-shoots only what changed, reports item by item."],
     you: ["字按 E 自己改；效果、版面按 A 點或框，貼清單。", "Words: E. Effects and layout: A, then paste the list."],
     cli: [["you", "1. 第 12 頁〈找得到〉\n   框住：元素內 9.6 18.9 24 7.7\n   想要：聚光燈打在標題上", "1. slide 12 (findable)\n   box: 9.6 18.9 24 7.7\n   want: spotlight on the title"], ["tool", "Edit(index.html)", "Edit(index.html)", "Updated with 1 change"], ["ai", "（步驟 5／6）第 12 頁加了 spot，框在標題。截圖如下。", "(step 5/6) Slide 12 now has a spot on the title. Screenshot below."]],
     tree: ["civictech/", "*  index.html", "  deck/", "  media/", "    home.png …", "    morph-project/", "  .shots/sheet.png"] },
@@ -74,13 +74,13 @@ const KEYS = [
   <div>
     <p class="kicker"><span lang="zh">準備，只要一次</span><span lang="en">Setup, once</span></p>
     <h2><span lang="zh">三行指令</span><span lang="en">Three lines</span></h2>
-    <p class="g-lead"><span lang="zh">拿到 slidejam、裝好拍網站用的瀏覽器、把 skill 接進 Claude Code。之後在任何資料夾都能叫它。</span><span lang="en">Get slidejam, install the browser it captures sites with, and plug the skill into Claude Code. Then call it from any folder.</span></p>
+    <p class="g-lead"><span lang="zh">拿到 slidejam、裝好截網站畫面用的瀏覽器、把 skill 接進 Claude Code。之後在任何資料夾都能叫它。</span><span lang="en">Get slidejam, install the browser it captures sites with, and plug the skill into Claude Code. Then call it from any folder.</span></p>
     <p class="g-note"><span lang="zh">沒有 Claude Code？打開<a href={B + "effects/"}>效果圖鑑</a>挑效果，把按 A 標好的清單貼給任何 AI 也行。需要 Chrome 和 Node.js 22.23 以上。</span><span lang="en">No Claude Code? Pick from the <a href={B + "effects/"}>effects</a> and paste lists marked with A into any AI. Needs Chrome and Node.js 22.23+.</span></p>
   </div>
   <div class="g-cmds reveal">
     {[
       ["git clone https://github.com/cooldongdong/slidejam && cd slidejam", "拿到 slidejam", "get slidejam"],
-      ["npm install && npx playwright install chromium-headless-shell", "拍真網站用的瀏覽器", "a browser for capturing sites"],
+      ["npm install && npx playwright install chromium-headless-shell", "截真網站畫面用的瀏覽器", "a browser for capturing sites"],
       ["ln -s \"$PWD/skill\" ~/.claude/skills/slidejam", "接進 Claude Code", "plug into Claude Code"],
     ].map(([cmd, zh, en], i) => (
       <div class="g-cmd" style={`--i:${i}`}>

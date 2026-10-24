@@ -183,7 +183,7 @@ export const effects = [
     "group": "shots",
     "zh": "頁面重組",
     "en": "Morph",
-    "zhDesc": "從真的網站拍下來：游標點一張卡片，卡片長成整頁，標題飛到新位置，其他內容浮上來。",
+    "zhDesc": "用真的網站做出來：游標點一張卡片，卡片長成整頁，標題飛到新位置，其他內容浮上來。",
     "enDesc": "Click a real site and the page rebuilds itself, captured live."
   },
   {
