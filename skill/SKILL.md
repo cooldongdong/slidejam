@@ -44,7 +44,10 @@ like this:
 - Find the element with the selector, then confirm it with the 元素 text. The
   selector is counted against authored elements only.
 - "元素內 (x%, y%)" is the exact point inside that element. Use it for `zoom`'s
-  `data-at` and `spot`'s `data-rects`.
+  `data-at` and `hotspots`' `data-at`.
+- "框住：元素內 x y 寬 高" means the user dragged a box. The numbers are percentages
+  of that element and can go straight into `spot`'s `data-rects`. Never guess these
+  positions from a screenshot; ask the user to box them with A instead.
 - Map each wish to an effect from `effects.html`. If nothing fits, build a new
   effect (see below) rather than one-off inline code.
 - Handle every item, re-shoot the affected slides, and report back per item.

@@ -24,6 +24,13 @@
 .keys{display:grid;grid-template-columns:repeat(2,1fr);gap:16px 60px;margin-top:20px}
 .keys div{font-size:28px;color:var(--ink-2)}
 .keys kbd{display:inline-block;min-width:56px;text-align:center;font:600 22px var(--mono);background:var(--surface);border:1px solid var(--line-strong);border-bottom-width:3px;border-radius:8px;padding:4px 10px;margin-right:16px;color:var(--ink)}
+.fx.wide{grid-template-columns:1fr;gap:28px;align-content:center;padding:48px 96px}
+.fx.wide .info{display:grid;grid-template-columns:auto 1fr 1fr;gap:20px 36px;align-items:start}
+.fx.wide .info > p:not(.kicker){display:none}
+.fx.wide .info .kicker{grid-column:1;margin:0}
+.fx.wide .info h2{grid-column:1;margin:0}
+.fx.wide .info .ask,.fx.wide .info .how{grid-row:1 / span 2;margin:0}
+.fx.wide .info .ask{grid-column:2}.fx.wide .info .how{grid-column:3;font-size:14px}
 .demo-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:26px 30px;font-size:26px}
 </style>
 </head>
@@ -35,12 +42,12 @@
   <h1 data-i="2">效果圖鑑</h1>
   <p class="lede" data-i="3">挑一個效果，跟 AI 說「第幾頁的哪裡用哪個」就好。點名字直接跳過去看。</p>
   <div class="index" data-i="4">
-    <div><b>基本</b><a href="#3">stagger<span>依序浮出</span></a><a href="#4">step<span>按一下才出現</span></a><a href="#21">video<span>影片轉場</span></a></div>
-    <div><b>文字</b><a href="#7">type<span>打字</span></a><a href="#8">mark<span>螢光筆</span></a><a href="#22">letters<span>逐字浮現</span></a><a href="#23">rotate<span>換詞輪播</span></a><a href="#24">flap<span>翻牌看板</span></a><a href="#26">particles<span>粒子聚字</span></a><a href="#27">textmask<span>文字遮罩</span></a></div>
-    <div><b>數字與資料</b><a href="#6">count<span>數字跳動</span></a><a href="#25">slot<span>數字滾輪</span></a><a href="#5">bars<span>長條圖</span></a><a href="#39">ring<span>圓環進度</span></a><a href="#13">orbit<span>循環流程</span></a><a href="#38">network<span>議題星團</span></a><a href="#37">tunnel<span>名稱隧道</span></a><a href="#41">swarm<span>蜂群飛入</span></a></div>
-    <div><b>截圖</b><a href="#9">pan<span>長截圖捲動</span></a><a href="#10">zoom<span>推近</span></a><a href="#11">cycle<span>輪播</span></a><a href="#15">spot<span>聚光燈</span></a><a href="#33">hotspots<span>熱點導覽</span></a><a href="#28">tilt<span>3D 斜放</span></a><a href="#29">explode<span>拆層</span></a><a href="#30">parallax<span>景深</span></a><a href="#31">dive<span>鑽進去</span></a><a href="#32">wipe<span>擦過去</span></a><a href="#16">morph<span>頁面重組</span></a></div>
-    <div><b>操作示範</b><a href="#12">clickpath<span>游標示範</span></a><a href="#34">story<span>步驟配畫面</span></a><a href="#35">chat<span>聊天對話</span></a><a href="#36">terminal<span>終端機</span></a><a href="#19">live<span>真網站</span></a><a href="#18">map<span>地圖</span></a></div>
-    <div><b>版面與外框</b><a href="#14">assemble<span>飛進來組合</span></a><a href="#40">feature<span>輪流當主角</span></a><a href="#42">collapse<span>收成網址</span></a><a href="#20">frames<span>瀏覽器／手機框</span></a><a href="#43">devices<span>多裝置</span></a></div>
+    <div><b>基本</b><a href="#stagger">stagger<span>依序浮出</span></a><a href="#step">step<span>按一下才出現</span></a><a href="#video">video<span>影片轉場</span></a></div>
+    <div><b>文字</b><a href="#type">type<span>打字</span></a><a href="#mark">mark<span>螢光筆</span></a><a href="#letters">letters<span>逐字浮現</span></a><a href="#rotate">rotate<span>換詞輪播</span></a><a href="#flap">flap<span>翻牌看板</span></a><a href="#particles">particles<span>粒子聚字</span></a><a href="#textmask">textmask<span>文字遮罩</span></a></div>
+    <div><b>數字與資料</b><a href="#count">count<span>數字跳動</span></a><a href="#slot">slot<span>數字滾輪</span></a><a href="#bars">bars<span>長條圖</span></a><a href="#ring">ring<span>圓環進度</span></a><a href="#orbit">orbit<span>循環流程</span></a><a href="#network">network<span>議題星團</span></a><a href="#tunnel">tunnel<span>名稱隧道</span></a><a href="#swarm">swarm<span>蜂群飛入</span></a></div>
+    <div><b>截圖</b><a href="#pan">pan<span>長截圖捲動</span></a><a href="#zoom">zoom<span>推近</span></a><a href="#cycle">cycle<span>輪播</span></a><a href="#spot">spot<span>聚光燈</span></a><a href="#hotspots">hotspots<span>熱點導覽</span></a><a href="#tilt">tilt<span>3D 斜放</span></a><a href="#explode">explode<span>拆層</span></a><a href="#parallax">parallax<span>景深</span></a><a href="#dive">dive<span>鑽進去</span></a><a href="#wipe">wipe<span>擦過去</span></a><a href="#morph">morph<span>頁面重組</span></a></div>
+    <div><b>操作示範</b><a href="#clickpath">clickpath<span>游標示範</span></a><a href="#story">story<span>步驟配畫面</span></a><a href="#chat">chat<span>聊天對話</span></a><a href="#terminal">terminal<span>終端機</span></a><a href="#live">live<span>真網站</span></a><a href="#map">map<span>地圖</span></a></div>
+    <div><b>版面與外框</b><a href="#bento">bento<span>功能格狀總覽</span></a><a href="#assemble">assemble<span>飛進來組合</span></a><a href="#feature">feature<span>輪流當主角</span></a><a href="#collapse">collapse<span>收成網址</span></a><a href="#frames">frames<span>瀏覽器／手機框</span></a><a href="#devices">devices<span>多裝置</span></a></div>
   </div>
 <aside class="notes">這份圖鑑本身就是用 web-deck 做的簡報。按 G 看全部縮圖。</aside></section>
 
@@ -57,7 +64,7 @@
 <aside class="notes">E 跟 A 是做簡報時用的，上台不用管。</aside></section>
 
 <!-- ===== stagger ===== -->
-<section class="slide fx">
+<section class="slide fx" id="stagger">
   <div class="grid3">
     <div class="demo-card" data-i="1">第一個</div><div class="demo-card" data-i="2">第二個</div><div class="demo-card" data-i="3">第三個</div>
     <div class="demo-card" data-i="4">第四個</div><div class="demo-card" data-i="5">第五個</div><div class="demo-card" data-i="6">第六個</div>
@@ -71,7 +78,7 @@
 </section>
 
 <!-- ===== step ===== -->
-<section class="slide fx">
+<section class="slide fx" id="step">
   <div style="position:relative;height:440px">
     <div data-step-out="1" class="grid3" style="position:absolute;inset:0;align-content:center">
       <div class="demo-card muted">好長一段介紹……</div><div class="demo-card muted">另一段介紹……</div><div class="demo-card muted">更多介紹……</div>
@@ -92,7 +99,7 @@ data-step-out="1"　按第一下消失</div>
 </section>
 
 <!-- ===== bars ===== -->
-<section class="slide fx">
+<section class="slide fx" id="bars">
   <div data-fx="bars" data-max="65">
     <div class="bar hot" data-v="60"><span>政府預算</span><em>60%</em></div>
     <div class="bar" data-v="45"><span>假訊息防治</span><em>45%</em></div>
@@ -111,7 +118,7 @@ data-step-out="1"　按第一下消失</div>
 </section>
 
 <!-- ===== count ===== -->
-<section class="slide fx">
+<section class="slide fx" id="count">
   <div class="row" style="gap:80px">
     <div class="stat"><div class="n" data-fx="count">1,165</div><div class="l">部影片</div></div>
     <div class="stat"><div class="n" data-fx="count" data-delay="0.6">48%</div><div class="l">有寫簡介</div></div>
@@ -127,7 +134,7 @@ data-delay="0.3"　等多久才開始</div>
 </section>
 
 <!-- ===== type ===== -->
-<section class="slide fx">
+<section class="slide fx" id="type">
   <div class="demo-card" style="font-size:40px;padding:40px 44px">
     <p class="muted" style="font-size:22px;margin-bottom:12px">在 Google 搜尋</p>
     <p data-fx="type" style="font-size:44px;color:var(--ink)">台灣有哪些公民科技專案？</p>
@@ -141,7 +148,7 @@ data-delay="0.3"　等多久才開始</div>
 </section>
 
 <!-- ===== mark ===== -->
-<section class="slide fx">
+<section class="slide fx" id="mark">
   <p style="font-size:52px;line-height:1.5;color:var(--ink)">想參與的人，最常卡在<b data-fx="mark">不知道從哪裡開始</b>。</p>
   <div class="info">
     <p class="kicker">mark</p><h2>螢光筆</h2>
@@ -152,7 +159,7 @@ data-delay="0.3"　等多久才開始</div>
 </section>
 
 <!-- ===== pan ===== -->
-<section class="slide fx">
+<section class="slide fx" id="pan">
   <div class="pan" data-fx="pan" style="height:640px"><img src="examples/media/tall-cat.png" alt=""></div>
   <div class="info">
     <p class="kicker">pan</p><h2>長截圖捲動</h2>
@@ -165,7 +172,7 @@ data-ms="7000"　捲一趟多久</div>
 </section>
 
 <!-- ===== zoom ===== -->
-<section class="slide fx">
+<section class="slide fx" id="zoom">
   <div class="zoom" data-fx="zoom" data-at="20% 40%" data-scale="2" style="aspect-ratio:16/10"><img src="examples/media/p-cofacts.png" alt=""></div>
   <div class="info">
     <p class="kicker">zoom</p><h2>推近</h2>
@@ -177,7 +184,7 @@ data-scale="2"　放大幾倍</div>
 </section>
 
 <!-- ===== cycle ===== -->
-<section class="slide fx">
+<section class="slide fx" id="cycle">
   <div data-fx="cycle" data-ms="2500" style="aspect-ratio:16/10;border-radius:14px;overflow:hidden;border:1px solid var(--line-strong)">
     <img src="examples/media/home.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
     <img src="examples/media/c-budget.png" alt="">
@@ -193,7 +200,7 @@ data-scale="2"　放大幾倍</div>
 </section>
 
 <!-- ===== clickpath ===== -->
-<section class="slide fx">
+<section class="slide fx" id="clickpath">
   <div class="clickpath" data-fx="clickpath" data-script="move 70 85; move 22 18; wait 500; click; wait 200; frame 1; wait 900; move 30 42; wait 500; click; wait 200; frame 2; wait 2500">
     <img src="examples/media/home.png" alt=""><img src="examples/media/c-budget.png" alt=""><img src="examples/media/p-cofacts.png" alt="">
   </div>
@@ -207,7 +214,7 @@ frame N（換第幾張）· wait 毫秒</div>
 </section>
 
 <!-- ===== orbit ===== -->
-<section class="slide fx">
+<section class="slide fx" id="orbit">
   <div class="orbit" data-fx="orbit" style="height:640px">
     <div>資料庫<small>Airtable</small></div><div>API<small>每天同步</small></div><div>網站<small>civictech.tw</small></div>
     <div>使用者<small>看到錯字</small></div><div>建議修改<small>表單</small></div><div>審核<small>揪松團</small></div>
@@ -222,7 +229,7 @@ frame N（換第幾張）· wait 毫秒</div>
 </section>
 
 <!-- ===== assemble ===== -->
-<section class="slide fx">
+<section class="slide fx" id="assemble">
   <div class="grid3" data-fx="assemble" style="grid-template-rows:repeat(2,190px)">
     <div class="demo-card">找得到</div><div class="demo-card">看得懂</div><div class="demo-card">進得去</div>
     <div class="demo-card">拿得走</div><div class="demo-card">放得回</div><div class="demo-card">留得住</div>
@@ -235,19 +242,40 @@ frame N（換第幾張）· wait 毫秒</div>
   </div>
 </section>
 
+<section class="slide fx wide" id="bento">
+  <div class="bento" data-fx="bento" style="grid-template-rows:repeat(2,300px);order:2">
+    <div class="tile"><div class="pan" data-fx="pan" data-delay="1.8"><img src="examples/media/tall-home.png" alt=""></div><div class="cap"><span class="tag">找不到</span><b>照議題找專案</b></div></div>
+    <div class="tile"><div class="pan" data-fx="pan" data-delay="1.8"><img src="examples/media/tall-cat.png" alt=""></div><div class="cap"><span class="tag">找不到</span><b>每個專案一頁</b></div></div>
+    <div class="tile"><div class="zoom" data-fx="zoom" data-at="22% 40%" data-delay="1.8"><img src="examples/media/p-cofacts.png" alt=""></div><div class="cap"><span class="tag">看不懂</span><b>四行講清楚</b></div></div>
+    <div class="tile"><div data-fx="cycle" data-ms="2500"><img src="examples/media/home.png" alt=""><img src="examples/media/c-budget.png" alt=""></div><div class="cap"><span class="tag">找不到人</span><b>一鍵到討論區</b></div></div>
+    <div class="tile"><div class="pan" data-fx="pan" data-delay="1.8"><img src="examples/media/tall-guides.png" alt=""></div><div class="cap"><span class="tag">找不到人</span><b>行動指引</b></div></div>
+    <div class="tile"><div class="pan" data-fx="pan" data-delay="1.8"><img src="examples/media/tall-edit.png" alt=""></div><div class="cap"><span class="tag">資料會舊</span><b>誰都能建議修改</b></div></div>
+  </div>
+  <div class="info">
+    <p class="kicker">bento</p><h2>功能格狀總覽</h2>
+    <p>一格一個功能，從四周飛進來排好；每格裡的截圖還會自己捲、自己推近、自己換。適合「我們做了這些事」。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「做一頁 bento：六格，各放一張截圖和一句話，上面標它解決哪個痛點」</p></div>
+    <div class="how">&lt;div class="bento" data-fx="bento"&gt;
+  &lt;div class="tile"&gt;
+    &lt;div class="pan" data-fx="pan"&gt;&lt;img&gt;
+    &lt;div class="cap"&gt;&lt;span class="tag"&gt;…
+      &lt;b&gt;一句話&lt;/b&gt;</div>
+  </div>
+</section>
+
 <!-- ===== spot ===== -->
-<section class="slide fx">
-  <div class="spot" data-fx="spot" data-rects="12 16 46 12, 12 33 40 30, 62 30 30 50"><img src="examples/media/p-cofacts.png" alt=""></div>
+<section class="slide fx" id="spot">
+  <div class="spot" data-fx="spot" data-rects="9 18.4 24.5 8.1, 9 38.2 48.6 14.2, 59.7 38 22.6 18.4"><img src="examples/media/p-cofacts.png" alt=""></div>
   <div class="info">
     <p class="kicker">spot</p><h2>聚光燈</h2>
     <p>截圖其他地方變暗，只亮一塊。有好幾塊的話，每按一下 → 移到下一塊。</p>
-    <div class="ask"><b>跟 AI 說</b><p>「第 25 頁的截圖用 spot，依序亮標題、簡介、右邊的連結」<br>（用 A 點那幾個位置最準）</p></div>
+    <div class="ask"><b>跟 AI 說</b><p>「第 25 頁的截圖用 spot，依序亮標題、簡介、右邊的連結」<br>（按 A 拖拉框出範圍最準）</p></div>
     <div class="how">data-rects="x y 寬 高, …"（百分比）</div>
   </div>
 </section>
 
 <!-- ===== morph (framed) ===== -->
-<section class="slide fx">
+<section class="slide fx" id="morph">
   <div class="morph" data-fx="morph" data-src="examples/media/morph-project"></div>
   <div class="info">
     <p class="kicker">morph</p><h2>頁面重組</h2>
@@ -259,12 +287,9 @@ frame N（換第幾張）· wait 毫秒</div>
   </div>
 </section>
 
-<section class="slide full">
-  <div class="morph" data-fx="morph" data-src="examples/media/morph-project" data-delay="0.3"></div>
-<aside class="notes">同一段 morph 放滿整頁的樣子：slide 加 class="full"。</aside></section>
 
 <!-- ===== map ===== -->
-<section class="slide fx">
+<section class="slide fx" id="map">
   <div class="map" data-fx="map" style="height:660px"
     data-center="24.984 121.408" data-zoom="13.75"
     data-pins="24.99122 121.42454 樹林車站; 24.99386 121.42693 濟安宮; 24.97269 121.39257 山佳車站"
@@ -279,7 +304,7 @@ data-tour="緯度 經度 縮放; …"</div>
 <aside class="notes">座標取自 OpenStreetMap，跟樹林 storymap 用的是同一組。</aside></section>
 
 <!-- ===== live ===== -->
-<section class="slide fx">
+<section class="slide fx" id="live">
   <div style="display:flex;justify-content:center"><div class="phone"><div class="live" data-fx="live" data-src="https://misheng.app" data-w="390" data-h="844"></div></div></div>
   <div class="info">
     <p class="kicker">live</p><h2>真網站</h2>
@@ -291,7 +316,7 @@ data-tour="緯度 經度 縮放; …"</div>
 <aside class="notes">有些網站不讓別人嵌入（X-Frame-Options），那種就要改用截圖或 morph。</aside></section>
 
 <!-- ===== frames ===== -->
-<section class="slide fx">
+<section class="slide fx" id="frames">
   <div style="display:grid;grid-template-columns:1fr 240px;gap:40px;align-items:center">
     <div class="browser"><span class="url">civictech.tw</span><img src="examples/media/home.png" alt=""></div>
     <div class="phone" style="width:240px"><img src="examples/media/c-budget.png" alt="" style="object-position:0 0"></div>
@@ -306,7 +331,7 @@ data-tour="緯度 經度 縮放; …"</div>
 </section>
 
 <!-- ===== video ===== -->
-<section class="slide fx">
+<section class="slide fx" id="video">
   <div class="demo-card" style="aspect-ratio:16/9;display:grid;place-items:center;background:#000;color:#9cc9d4;font:28px var(--mono)">▶ 整頁影片</div>
   <div class="info">
     <p class="kicker">video</p><h2>影片轉場</h2>
@@ -318,7 +343,7 @@ data-tour="緯度 經度 縮放; …"</div>
 </section>
 
 <!-- ===== letters ===== -->
-<section class="slide fx">
+<section class="slide fx" id="letters">
   <div><h1 data-fx="letters" style="font-size:110px">想改變的事，</h1><h1 data-fx="letters" data-delay="0.6" style="font-size:110px">已經有人在做</h1></div>
   <div class="info">
     <p class="kicker">letters</p><h2>逐字浮現</h2>
@@ -330,7 +355,7 @@ data-stagger="0.05"　字跟字的間隔</div>
 </section>
 
 <!-- ===== rotate ===== -->
-<section class="slide fx">
+<section class="slide fx" id="rotate">
   <p style="font-size:56px;font-weight:650;color:var(--ink)">在這裡，你可以<br><span data-fx="rotate">讀別人的經驗｜串接資料｜找到夥伴｜開始一個專案</span></p>
   <div class="info">
     <p class="kicker">rotate</p><h2>換詞輪播</h2>
@@ -341,7 +366,7 @@ data-stagger="0.05"　字跟字的間隔</div>
 </section>
 
 <!-- ===== flap ===== -->
-<section class="slide fx">
+<section class="slide fx" id="flap">
   <div style="display:grid;gap:18px;font-size:52px;font-weight:650">
     <p data-fx="flap" style="font-size:52px">17 個議題</p>
     <p data-fx="flap" data-delay="0.6" style="font-size:52px">226 個專案</p>
@@ -355,7 +380,7 @@ data-stagger="0.05"　字跟字的間隔</div>
 </section>
 
 <!-- ===== slot ===== -->
-<section class="slide fx">
+<section class="slide fx" id="slot">
   <div class="row" style="gap:90px">
     <div class="stat"><div class="n" data-fx="slot">226</div><div class="l">個專案</div></div>
     <div class="stat"><div class="n" data-fx="slot" data-delay="0.5">1,165</div><div class="l">部影片</div></div>
@@ -369,7 +394,7 @@ data-stagger="0.05"　字跟字的間隔</div>
 </section>
 
 <!-- ===== particles ===== -->
-<section class="slide fx">
+<section class="slide fx" id="particles">
   <div style="text-align:center"><h1 class="mono" data-fx="particles" style="font-size:120px;font-weight:600">civictech.tw</h1></div>
   <div class="info">
     <p class="kicker">particles</p><h2>粒子聚字</h2>
@@ -380,7 +405,7 @@ data-stagger="0.05"　字跟字的間隔</div>
 </section>
 
 <!-- ===== textmask ===== -->
-<section class="slide fx">
+<section class="slide fx" id="textmask">
   <h1 data-fx="textmask" data-img="examples/media/hero-dark.png" style="font-size:190px;font-weight:900;line-height:1.1;white-space:nowrap">公民科技</h1>
   <div class="info">
     <p class="kicker">textmask</p><h2>文字遮罩</h2>
@@ -392,7 +417,7 @@ data-stagger="0.05"　字跟字的間隔</div>
 </section>
 
 <!-- ===== tilt ===== -->
-<section class="slide fx">
+<section class="slide fx" id="tilt">
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center">
     <div data-fx="tilt"><img class="shot" src="examples/media/c-budget.png" alt=""></div>
     <div data-fx="tilt" data-mode="sway"><img class="shot" src="examples/media/p-cofacts.png" alt=""></div>
@@ -407,7 +432,7 @@ data-mode="settle｜sway｜hold"</div>
 </section>
 
 <!-- ===== explode ===== -->
-<section class="slide fx">
+<section class="slide fx" id="explode">
   <div class="explode" data-fx="explode" style="width:752px;height:382px">
     <div style="background:#fff;border:2px solid var(--line-strong);border-radius:14px;box-shadow:0 30px 60px -30px rgb(15 26 29/.35)"><img src="examples/media/pc-shell.png" alt="" style="width:100%;opacity:0"></div>
     <div data-label="專案名稱"><img src="examples/media/pc-name.png" alt="" style="position:absolute;left:40px;top:37px;width:671px"></div>
@@ -425,7 +450,7 @@ data-mode="settle｜sway｜hold"</div>
 </section>
 
 <!-- ===== parallax ===== -->
-<section class="slide fx">
+<section class="slide fx" id="parallax">
   <div class="parallax" data-fx="parallax" style="height:600px;border-radius:14px">
     <img data-depth="0.15" src="examples/media/hero.png" alt="" style="inset:-40px;width:calc(100% + 80px);height:calc(100% + 80px);object-fit:cover;filter:blur(2px) brightness(1.05)">
     <div data-depth="0.6" class="card" style="left:8%;top:18%;width:46%"><p class="kicker" style="margin-bottom:10px">每個專案</p><h3>都有自己的一頁</h3></div>
@@ -442,7 +467,7 @@ data-mode="settle｜sway｜hold"</div>
 </section>
 
 <!-- ===== dive ===== -->
-<section class="slide fx">
+<section class="slide fx" id="dive">
   <div class="dive" data-fx="dive" data-at="21% 47%" style="aspect-ratio:16/10"><img src="examples/media/c-budget.png" alt=""><img src="examples/media/p-cofacts.png" alt=""></div>
   <div class="info">
     <p class="kicker">dive</p><h2>鑽進去</h2>
@@ -454,7 +479,7 @@ data-mode="settle｜sway｜hold"</div>
 </section>
 
 <!-- ===== wipe ===== -->
-<section class="slide fx">
+<section class="slide fx" id="wipe">
   <div class="wipe" data-fx="wipe" style="aspect-ratio:16/9"><img src="examples/media/hero.png" alt=""><img src="examples/media/hero-dark.png" alt=""></div>
   <div class="info">
     <p class="kicker">wipe</p><h2>擦過去</h2>
@@ -466,7 +491,7 @@ data-mode="settle｜sway｜hold"</div>
 </section>
 
 <!-- ===== hotspots ===== -->
-<section class="slide fx">
+<section class="slide fx" id="hotspots">
   <div class="hotspots" data-fx="hotspots">
     <img src="examples/media/p-cofacts.png" alt="">
     <p data-at="22 21">專案名稱和一句話介紹</p>
@@ -484,7 +509,7 @@ data-mode="settle｜sway｜hold"</div>
 </section>
 
 <!-- ===== story ===== -->
-<section class="slide fx">
+<section class="slide fx" id="story">
   <div class="story" data-fx="story">
     <ol>
       <li><span><b>挑一個議題</b><small>17 個議題，從關心的開始</small></span></li>
@@ -504,7 +529,7 @@ data-mode="settle｜sway｜hold"</div>
 </section>
 
 <!-- ===== chat ===== -->
-<section class="slide fx">
+<section class="slide fx" id="chat">
   <div style="display:flex;justify-content:center"><div class="phone" style="width:340px"><div class="chat" data-fx="chat">
     <p>有沒有網站整理台灣的公民科技專案？</p>
     <p class="me">有！每個專案都有自己的網址</p>
@@ -522,7 +547,7 @@ data-mode="settle｜sway｜hold"</div>
 </section>
 
 <!-- ===== terminal ===== -->
-<section class="slide fx">
+<section class="slide fx" id="terminal">
   <div class="terminal" data-fx="terminal">
     <div class="cmd">curl https://data.civictech.tw/v0/tech/projects.json</div>
     <div>{</div>
@@ -546,7 +571,7 @@ data-mode="settle｜sway｜hold"</div>
 </section>
 
 <!-- ===== tunnel ===== -->
-<section class="slide fx">
+<section class="slide fx" id="tunnel">
   <div class="tunnel" data-fx="tunnel" style="height:660px;border-radius:14px;background:radial-gradient(circle,#fff 0,var(--paper) 70%)">
     <span>一鍵開大松</span><span>中央政府預算視覺化</span><span>選前大補帖</span><span>高雄氣爆</span><span>碳匯城鄉</span><span>CC0 繁體中文句庫</span><span>資料申請小幫手</span><span>disinfo</span><span>公務人員出國考察網</span><span>Think Tank Info</span><span>公民即時報</span><span>政治承諾追蹤網</span><span>阿龜微氣候</span><span>Wikidata</span><span>福利請聽</span><span>國家寶藏</span><span>LostSAR 無人機</span><span>騎樓抓漏</span><span>政府公開通訊錄</span><span>台灣路更平</span><span>HackingMap</span><span>國會大代誌</span><span>享食台灣</span><span>議見零時差</span><span>HackStory</span><span>秒懂災害潛勢</span><span>寵物需要我</span><span>立委投票指南</span><span>Vaxx.tw</span><span>零時空汙觀測網</span><span>來個判決書吧</span><span>臺灣好植地</span><span>美國國會台灣觀測站</span><span>國會調查兵團</span><span>血庫資訊</span><span>里伯 LINEbot</span><span>台灣 l10n 共筆</span><span>GoodJob 職場透明化</span><span>ChhoeTaigi</span><span>Disfactory</span><span>鄉民關心你</span><span>金流百科</span><span>農業災損幾多錢</span><span>零時小學校</span><span>公民記者證產生器</span><span>g0v 公報</span><span>開源出版</span><span>割闌尾計畫</span><span>司法陽光網</span><span>HackFoldr</span><span>公民科學計畫蒐集</span><span>新聞小幫手</span><span>政治獻金數位化</span><span>你被服貿了嗎?</span><span>CoTeach</span><span>臺灣黑熊通報</span><span>無麩質安全網</span><span>萌典</span><span>Cofacts 真的假的</span><span>vTaiwan</span>
   </div>
@@ -560,7 +585,7 @@ data-mode="settle｜sway｜hold"</div>
 </section>
 
 <!-- ===== network ===== -->
-<section class="slide fx">
+<section class="slide fx" id="network">
   <div class="network" data-fx="network" style="height:660px">
     <div data-color="#7c5632"><b>政府預算</b><span>中央政府預算視覺化</span><span>公務人員出國考察網</span><span>標案資料瀏覽</span><span>總預算案審查監督平台</span><span>台電睦鄰金流大解析</span><span>預算視覺化產生器</span><span>貪汙查詢網站</span><span>OpenBudget</span><span>預算查詢</span></div>
     <div data-color="#715080"><b>假訊息防治</b><span>disinfo</span><span>Cofacts</span><span>Lee-Su-Threads</span><span>新聞小幫手</span><span>收款人帳戶安全守護站</span><span>詐騙情境蒐集</span><span>查無此人</span></div>
@@ -582,7 +607,7 @@ data-mode="settle｜sway｜hold"</div>
 </section>
 
 <!-- ===== ring ===== -->
-<section class="slide fx">
+<section class="slide fx" id="ring">
   <div class="row" style="gap:60px;justify-content:center">
     <div class="ring" data-fx="ring" data-v="84" data-max="226"><b data-fx="count">84</b><span>／ 226</span></div>
     <div class="ring" data-fx="ring" data-v="199" data-max="226" data-delay="0.5"><b data-fx="count" data-delay="0.5">199</b><span>／ 226</span></div>
@@ -598,7 +623,7 @@ data-mode="settle｜sway｜hold"</div>
 </section>
 
 <!-- ===== feature ===== -->
-<section class="slide fx">
+<section class="slide fx" id="feature">
   <div class="feature" data-fx="feature" style="height:600px">
     <div class="card"><span class="tag">找得到</span><p>兩步就到每一個專案</p></div>
     <div class="card"><span class="tag">看得懂</span><p>四行讀完一個專案</p></div>
@@ -616,7 +641,7 @@ data-mode="settle｜sway｜hold"</div>
 </section>
 
 <!-- ===== swarm ===== -->
-<section class="slide fx">
+<section class="slide fx" id="swarm">
   <div class="swarm" data-fx="swarm" style="height:640px">
     <span>一鍵開大松</span><span>中央政府預算視覺化</span><span>選前大補帖</span><span>高雄氣爆</span><span>碳匯城鄉</span><span>CC0 繁體中文句庫</span><span>資料申請小幫手</span><span>disinfo</span><span>公務人員出國考察網</span><span>Think Tank Info</span><span>公民即時報</span><span>政治承諾追蹤網</span><span>阿龜微氣候</span><span>Wikidata</span><span>福利請聽</span><span>國家寶藏</span><span>LostSAR 無人機</span><span>騎樓抓漏</span><span>政府公開通訊錄</span><span>台灣路更平</span><span>HackingMap</span><span>國會大代誌</span><span>享食台灣</span><span>議見零時差</span><span>HackStory</span><span>秒懂災害潛勢</span><span>寵物需要我</span><span>立委投票指南</span><span>Vaxx.tw</span><span>零時空汙觀測網</span><span>來個判決書吧</span><span>臺灣好植地</span><span>美國國會台灣觀測站</span><span>國會調查兵團</span><span>血庫資訊</span><span>里伯 LINEbot</span><span>台灣 l10n 共筆</span><span>GoodJob 職場透明化</span><span>ChhoeTaigi</span><span>Disfactory</span><span>鄉民關心你</span><span>金流百科</span><span>農業災損幾多錢</span><span>零時小學校</span><span>公民記者證產生器</span><span>g0v 公報</span><span>開源出版</span><span>割闌尾計畫</span><span>司法陽光網</span><span>HackFoldr</span><span>公民科學計畫蒐集</span><span>新聞小幫手</span><span>政治獻金數位化</span><span>你被服貿了嗎?</span><span>CoTeach</span><span>臺灣黑熊通報</span><span>無麩質安全網</span><span>萌典</span><span>Cofacts 真的假的</span><span>vTaiwan</span>
   </div>
@@ -630,7 +655,7 @@ data-mode="settle｜sway｜hold"</div>
 </section>
 
 <!-- ===== collapse ===== -->
-<section class="slide fx">
+<section class="slide fx" id="collapse">
   <div class="collapse" data-fx="collapse" style="height:560px">
     <div class="grid3" style="height:100%;grid-template-rows:1fr 1fr">
       <img class="shot" src="examples/media/home.png" alt="" style="height:100%;object-fit:cover;object-position:top">
@@ -653,7 +678,7 @@ data-mode="settle｜sway｜hold"</div>
 </section>
 
 <!-- ===== devices ===== -->
-<section class="slide fx">
+<section class="slide fx" id="devices">
   <div class="devices" data-fx="tilt" data-mode="sway" data-ms="7000">
     <div class="laptop"><img src="examples/media/dev-desktop.png" alt=""></div>
     <div class="tablet"><img src="examples/media/dev-tablet.png" alt=""></div>

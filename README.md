@@ -41,7 +41,7 @@ Open `effects.html` to see every effect running next to the markup it needs.
 | N | speaker notes |
 | F | fullscreen |
 | E, then ⌘S | edit text in place and save it to the file (Chrome) |
-| A | annotate: click and describe what you want, then copy the list for an AI |
+| A | annotate: click a point or drag a box, describe what you want, then copy the list for an AI |
 
 ## Effects
 
@@ -53,7 +53,7 @@ Elements opt in to an effect with `data-fx="name"`:
 | Numbers & data | `count` counts up · `slot` odometer reels · `bars` bar chart · `ring` progress ring · `orbit` steps around a loop · `network` topics and projects as a turning 3D cluster · `tunnel` names stream down a tunnel · `swarm` many items rush in and settle |
 | Screenshots | `pan` scroll a tall shot · `zoom` push in · `cycle` cross-fade · `spot` stepped spotlight · `hotspots` pulsing dots with notes · `tilt` 3D tilt / sway · `explode` layers lift apart with labels · `parallax` depth layers · `dive` zoom into a spot until it becomes the next page · `wipe` coloured band reveals an after-image · `morph` page rebuild captured from a real site |
 | Walkthroughs | `clickpath` cursor clicks through screenshots · `story` steps synced with screens · `chat` messages pop in · `terminal` command types, output prints · `live` real website in the slide · `map` Leaflet map with pins and a fly-to tour |
-| Layout | `assemble` cards fly into a grid · `feature` tiles take turns being big · `collapse` everything shrinks into one last line |
+| Layout | `bento` feature grid whose tiles fly in and keep moving inside · `assemble` cards fly into a grid · `feature` tiles take turns being big · `collapse` everything shrinks into one last line |
 
 Frames are plain classes: `.browser`, `.phone`, `.tablet`, `.laptop`, and `.devices` to group them.
 Effects that wait for → instead of starting by themselves take `data-on="step"`.

@@ -318,13 +318,18 @@
     if (was !== authoring()) freezeFx(on);
     hoverEl?.classList.remove("anno-hover");
     renderPanel(); renderPins();
-    if (on) toast("標註模式：點任何地方，寫下想要怎樣。右上角可以複製給 AI。A 或 Esc 離開");
+    if (on) toast("標註模式：點一下標位置，拖拉可以框範圍，寫下想要怎樣。右上角可以複製給 AI。A 或 Esc 離開");
   }
   function renderPins() {
-    $$(".anno-pin", stage).forEach((p) => p.remove());
+    $$(".anno-pin, .anno-band.done", stage).forEach((p) => p.remove());
     if (!document.body.classList.contains("annotating")) return;
     annos.forEach((a, n) => {
       if (a.slide !== Deck.cur) return;
+      if (a.stageBox) {
+        const b = el("div", { className: "anno-band done" }, stage);
+        const [x, y, w, h] = a.stageBox;
+        Object.assign(b.style, { left: x + "px", top: y + "px", width: w + "px", height: h + "px" });
+      }
       const p = el("div", { className: "anno-pin", textContent: n + 1 }, stage);
       p.style.left = a.x + "px"; p.style.top = a.y + "px";
     });
@@ -355,10 +360,15 @@
       `\n${n + 1}. 第 ${a.slide + 1} 頁〈${a.title}〉`,
       `   元素：${a.what}`,
       `   選擇器：${a.selector}`,
-      `   點在：(${Math.round(a.x)}, ${Math.round(a.y)})，元素內 ${a.rel}`,
+      a.box ? `   框住：元素內 ${a.box}（x y 寬 高，%；可直接當 data-rects）` : `   點在：(${Math.round(a.x)}, ${Math.round(a.y)})，元素內 ${a.rel}`,
       `   想要：${a.note}`,
     ].join("\n")).join("\n");
   }
+  // what a click means: skip anything an effect generated and land on authored markup
+  const pick = (t) => {
+    while (t && t.dataset && "gen" in t.dataset) t = t.parentElement;
+    return t?.closest?.(".slide *") || null;
+  };
   const stagePoint = (ev) => {
     const r = stage.getBoundingClientRect();
     return [((ev.clientX - r.left) / r.width) * W, ((ev.clientY - r.top) / r.height) * H];
@@ -367,22 +377,43 @@
     const box = $("#anno-input"), ta = $("textarea", box);
     stage.addEventListener("mousemove", (ev) => {
       if (!document.body.classList.contains("annotating") || pendingAnno) return;
-      const t = ev.target.closest(".slide *");
+      const t = pick(ev.target);
       if (t === hoverEl) return;
       hoverEl?.classList.remove("anno-hover"); hoverEl = t; t?.classList.add("anno-hover");
     });
-    stage.addEventListener("click", (ev) => {
-      if (!document.body.classList.contains("annotating")) return;
-      ev.stopPropagation();
-      const t = ev.target.closest(".slide *") || Deck.slides[Deck.cur];
-      const [x, y] = stagePoint(ev), r = t.getBoundingClientRect();
-      const rel = `(${Math.round(((ev.clientX - r.left) / r.width) * 100)}%, ${Math.round(((ev.clientY - r.top) / r.height) * 100)}%)`;
-      pendingAnno = { slide: Deck.cur, title: titleOf(Deck.cur), what: describe(t), selector: selectorOf(t), x, y, rel };
-      $(".what", box).textContent = `第 ${Deck.cur + 1} 頁 · ${pendingAnno.what}`;
+    // click marks a point; drag draws a box (handy for spot / zoom / hotspots positions)
+    let down = null, band = null;
+    const pct = (v) => Math.round(v * 10) / 10;
+    stage.addEventListener("mousedown", (ev) => {
+      if (!document.body.classList.contains("annotating") || pendingAnno || ev.button !== 0) return;
+      ev.preventDefault();
+      down = { ev, t: pick(ev.target) || Deck.slides[Deck.cur], p: stagePoint(ev) };
+    }, true);
+    addEventListener("mousemove", (ev) => {
+      if (!down) return;
+      const [x, y] = stagePoint(ev), [x0, y0] = down.p;
+      if (!band && Math.hypot(x - x0, y - y0) < 6) return;
+      band ??= el("div", { className: "anno-band" }, stage);
+      Object.assign(band.style, { left: Math.min(x, x0) + "px", top: Math.min(y, y0) + "px", width: Math.abs(x - x0) + "px", height: Math.abs(y - y0) + "px" });
+    });
+    addEventListener("mouseup", (ev) => {
+      if (!down) return;
+      const t = down.t, r = t.getBoundingClientRect(), [x0, y0] = down.p, [x1, y1] = stagePoint(ev), e0 = down.ev;
+      const rx = (cx) => ((cx - r.left) / r.width) * 100, ry = (cy) => ((cy - r.top) / r.height) * 100;
+      pendingAnno = { slide: Deck.cur, title: titleOf(Deck.cur), what: describe(t), selector: selectorOf(t), x: x0, y: y0, rel: `(${Math.round(rx(e0.clientX))}%, ${Math.round(ry(e0.clientY))}%)` };
+      if (band) {
+        const bx = Math.min(rx(e0.clientX), rx(ev.clientX)), by = Math.min(ry(e0.clientY), ry(ev.clientY));
+        pendingAnno.box = `${pct(bx)} ${pct(by)} ${pct(Math.abs(rx(ev.clientX) - rx(e0.clientX)))} ${pct(Math.abs(ry(ev.clientY) - ry(e0.clientY)))}`;
+        pendingAnno.stageBox = [Math.min(x0, x1), Math.min(y0, y1), Math.abs(x1 - x0), Math.abs(y1 - y0)];
+        band.remove(); band = null;
+      }
+      down = null;
+      $(".what", box).textContent = `第 ${Deck.cur + 1} 頁 · ${pendingAnno.what}` + (pendingAnno.box ? `\n框：${pendingAnno.box}（%）` : "");
       box.style.left = Math.min(innerWidth - 400, ev.clientX + 12) + "px";
       box.style.top = Math.min(innerHeight - 160, ev.clientY + 12) + "px";
       box.style.display = "block"; ta.value = ""; ta.focus();
-    }, true);
+    });
+    stage.addEventListener("click", (ev) => { if (document.body.classList.contains("annotating")) ev.stopPropagation(); }, true);
     ta.addEventListener("keydown", (ev) => {
       ev.stopPropagation();
       if (ev.key === "Enter" && !ev.shiftKey) {
@@ -391,6 +422,14 @@
         box.style.display = "none"; pendingAnno = null; renderPanel(); renderPins();
       } else if (ev.key === "Escape") { box.style.display = "none"; pendingAnno = null; }
     });
+  }
+
+  // #12 is the 12th slide; #bento is the slide with id="bento"
+  function hashIndex() {
+    const h = decodeURIComponent(location.hash.slice(1));
+    if (/^\d+$/.test(h)) return Math.max(0, +h - 1);
+    const i = Deck.slides.findIndex((s) => s.id === h);
+    return i >= 0 ? i : null;
   }
 
   // ---------- boot ----------
@@ -441,12 +480,11 @@
       if (e.target.closest("a, button, iframe, .leaflet-container")) return;
       next();
     });
-    addEventListener("hashchange", () => { const n = parseInt(location.hash.slice(1), 10); if (Number.isFinite(n) && n - 1 !== Deck.cur) show(n - 1); });
+    addEventListener("hashchange", () => { const i = hashIndex(); if (i != null && i !== Deck.cur) show(i); });
     addEventListener("beforeunload", (e) => { if (dirty.size) e.preventDefault(); });
 
     Deck.slides.forEach((s) => eachFx(s, (d, e) => d.setup?.(e)));
-    const start = parseInt(location.hash.slice(1), 10);
-    Deck.cur = Number.isFinite(start) ? Math.max(0, start - 1) : 0;
+    Deck.cur = hashIndex() ?? 0;
     show(Deck.cur);
   }
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", boot) : boot();

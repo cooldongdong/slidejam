@@ -959,6 +959,24 @@
     leave(e) { stop(e); kids(e).forEach(stop); },
   });
 
+  // bento — a grid of tiles flies in from around the edges and settles; tiles can hold
+  // their own effects (pan, zoom, cycle…) and a caption.
+  // <div class="bento" data-fx="bento"><div class="tile"><div class="pan" data-fx="pan"><img></div>
+  //   <div class="cap"><span class="tag">找不到</span><b>照議題找專案</b></div></div>…</div>
+  register("bento", {
+    enter(e) {
+      const tiles = kids(e), st = num(e.dataset.stagger, 0.15), d = delay(e, 0.1);
+      const cx = e.offsetWidth / 2, cy = e.offsetHeight / 2;
+      tiles.forEach((c, i) => {
+        const dx = (c.offsetLeft + c.offsetWidth / 2 - cx) * 0.9, dy = (c.offsetTop + c.offsetHeight / 2 - cy) * 1.4;
+        const r = (rnd(i, 4) - 0.5) * 18;
+        anim(c, [{ opacity: 0, transform: `translate(${dx}px, ${dy}px) rotate(${r}deg) scale(.7)` }, { opacity: 1, transform: "none" }],
+          { duration: 1000, delay: (d + i * st) * 1000, easing: EASE });
+      });
+    },
+    leave(e) { kids(e).forEach(stop); },
+  });
+
   // preload every morph on the page so thumbnails have something to show
   const preload = () => document.querySelectorAll('[data-fx~="morph"]').forEach(loadMorph);
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", preload) : preload();
