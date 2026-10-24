@@ -55,7 +55,6 @@ const rowA = ids.slice(0, 16), rowC = ids.slice(16, 32);
         <p class="facts">{d.slides} <span lang="zh">頁</span><span lang="en">slides</span> · <span lang="zh">主題</span><span lang="en">theme</span> {d.theme}</p>
         <div class="actions">
           <button class="play"><span lang="zh">播放</span><span lang="en">Play</span></button>
-          <button class="full"><span lang="zh">全螢幕</span><span lang="en">Full screen</span></button>
           <button class="share" data-url={`${B}play/${d.id}/`}><span lang="zh">複製連結</span><span lang="en">Copy link</span></button>
           <a class="plain" href={`https://github.com/cooldongdong/slidejam/blob/master/${d.file}`}><span lang="zh">原始碼</span><span lang="en">Source</span></a>
         </div>
@@ -152,9 +151,9 @@ cases.forEach((c) => c.querySelector(".play").addEventListener("click", () => op
 // on a phone the deck itself takes the taps; Play opens the theater
 cases.forEach((c) => c.querySelector(".frame").addEventListener("click", () => narrow() || open(c)));
 document.getElementById("th-close").onclick = close;
-// Full screen: phones that allow it (Android, iPad) get the deck full screen, turned sideways
-// when they let us; an iPhone only allows video full screen, so it opens the deck itself
-// at the same slide, which fills the browser.
+// The theater's full screen: phones that allow it (Android, iPad) get the deck full screen,
+// turned sideways when they let us; an iPhone only allows video full screen, so it opens
+// the deck itself at the same slide, which fills the browser.
 function fullScreen(frame, c) {
   const go = frame.requestFullscreen || frame.webkitRequestFullscreen;
   if (go) {
@@ -169,7 +168,6 @@ function openDeck(frame, c) {
 }
 let theaterCase = null;
 document.getElementById("th-full").onclick = () => fullScreen(tframe, theaterCase);
-cases.forEach((c) => c.querySelector(".full").addEventListener("click", () => fullScreen(c.querySelector(".frame iframe"), c)));
 addEventListener("keydown", (e) => { if (e.key === "Escape" && !theater.hidden) close(); });
 // full screen (from the button, or F inside the deck): take Esc from the browser so it reaches
 // the deck — the lock only works here, in the top page (Chrome, Edge)
@@ -250,7 +248,6 @@ tick();
 .actions .share,.actions .plain{font:500 14px var(--sans);border:0;background:none;color:#8a9ca3;cursor:pointer;text-decoration:none;padding:4px 0;border-bottom:1px solid transparent}
 .actions .share:hover,.actions .plain:hover{color:#fff;border-bottom-color:#fff}
 .actions .share.done{color:#7ddc8a}
-.actions .full{display:none}
 /* theater */
 .theater{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;background:rgb(3 4 5/.94);backdrop-filter:blur(14px);opacity:0;transition:opacity .3s}
 .theater[hidden]{display:none}
@@ -271,7 +268,6 @@ tick();
   .frame{width:100%;cursor:auto}
   /* on a phone the deck right here takes taps and swipes; Play still opens the theater */
   .frame iframe{pointer-events:auto}
-  .actions .full{display:inline;font:500 14px var(--sans);border:0;background:none;color:#8a9ca3;cursor:pointer;padding:4px 0}
   .actions{flex-wrap:wrap}
   .tap-hint{display:block;margin:-16px 0 0;font:12px var(--mono);color:#5b6a71}
   .case-text{position:static;translate:none;width:auto;opacity:1}
