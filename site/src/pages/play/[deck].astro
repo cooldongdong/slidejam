@@ -1,0 +1,14 @@
+---
+// /play/<deck>/: the screening room tuned to one deck — its own address, to share.
+import Base from "../../layouts/Base.astro";
+import Room from "../../components/Room.astro";
+import { decks } from "../../data/decks";
+
+export function getStaticPaths() {
+  return decks.map((d) => ({ params: { deck: d.id }, props: { d } }));
+}
+const { d } = Astro.props;
+---
+<Base title={`${d.zh[0]} — slidejam`} description={d.zh[1]} dark>
+  <Room current={d.id} />
+</Base>

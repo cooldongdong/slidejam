@@ -340,7 +340,7 @@
   function setTheme(name) {
     const l = themeEl();
     l.setAttribute("href", l.getAttribute("href").replace(/themes\/[\w-]+\.css/, `themes/${name}.css`));
-    if ($("#themes").classList.contains("show")) renderThemes();
+    if ($("#themes")?.classList.contains("show")) renderThemes(); // may run before boot
     Deck.onTheme?.(name);
   }
   function renderThemes() {
