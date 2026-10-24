@@ -271,7 +271,7 @@
   const escapeHTML = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
   async function save() {
-    if (!dirty.size) return toast("沒有要存的修改");
+    if (!dirty.size && !themeDirty()) return toast("沒有要存的修改");
     if (!window.showOpenFilePicker) return toast("這個瀏覽器不能直接存檔，請用 Chrome。也可以按 A 把要改的地方標給 AI", 5000);
     let h;
     try { h = await fileHandle(); } catch { return; }
@@ -293,15 +293,75 @@
       doc.body && twin && (twin.innerHTML = after);
       orig.set(e, after); ok.push(e);
     }
-    if (ok.length) {
+    // a theme picked with T: swap the theme file named in the <link>, nothing else
+    let themeSaved = false, themeNote = "";
+    if (themeDirty()) {
+      const now = themeLink.getAttribute("href"), needle = `href="${themeFrom}"`;
+      const n = src.split(needle).length - 1;
+      if ("gen" in themeLink.dataset) themeNote = "\n主題沒存：這份簡報的 <head> 裡沒有主題那一行，請先加上 <link rel=\"stylesheet\" href=\"deck/themes/default.css\">";
+      else if (n !== 1) themeNote = "\n主題沒存：檔案裡找不到唯一的主題那一行";
+      else { src = src.replace(needle, `href="${now}"`); themeFrom = now; themeSaved = true; }
+    }
+    if (ok.length || themeSaved) {
       const w = await h.createWritable(); await w.write(src); await w.close();
     }
     ok.forEach((e) => { dirty.delete(e); e.classList?.remove("dirty"); });
+    if (themeSaved && !fail.length && !themeNote) return toast(`已存到 ${h.name}：${ok.length ? `${ok.length} 處文字、` : ""}主題 ${themeName()}`);
     if (fail.length) {
       const list = fail.map((e) => `・第 ${Deck.slides.findIndex((s) => s.contains(e)) + 1} 頁：「${e.textContent.trim().slice(0, 20)}」`).join("\n");
       toast(`存了 ${ok.length} 處；${fail.length} 處找不到原文，沒存（紅框）：\n${list}\n可以按 A 標起來交給 AI 改`, 8000);
-    } else toast(`已存 ${ok.length} 處到 ${h.name}`);
+    } else toast(`已存 ${ok.length} 處到 ${h.name}` + themeNote, themeNote ? 7000 : 2600);
   }
+
+  // ---------- T: themes — preview any theme here; ⌘S writes the choice into the file ----------
+  // Swatches: paper, ink, accent, second accent, dark block (from deck/themes/*.css).
+  const THEMES = {
+    default: { zh: "石油藍", c: ["#f6f7f8", "#111a1f", "#0d5f74", "#b45309", "#0f1a1d"] },
+    warm: { zh: "暖紙張", c: ["#faf6f0", "#2a1f17", "#9a4a1f", "#3f6b4a", "#2a1f17"] },
+    night: { zh: "深色", c: ["#0e1417", "#eef4f6", "#4fd1c5", "#f4b860", "#071012"] },
+    mono: { zh: "黑白", c: ["#ffffff", "#000000", "#000000", "#d4380d", "#000000"] },
+  };
+  let themeLink = null, themeFrom = null; // the <link> and its href as the file has it
+  function themeEl() {
+    if (!themeLink) {
+      themeLink = $('link[href*="themes/"]');
+      if (!themeLink) { // no theme line yet: add one for previewing (it can't be saved)
+        const base = $('link[href$="deck.css"]');
+        themeLink = el("link", { rel: "stylesheet" });
+        themeLink.setAttribute("href", base.getAttribute("href").replace(/deck\.css$/, "themes/default.css"));
+        base.after(themeLink);
+      }
+      themeFrom = themeLink.getAttribute("href");
+    }
+    return themeLink;
+  }
+  const themeName = () => (themeEl().getAttribute("href").match(/themes\/([\w-]+)\.css/) || [])[1] || "default";
+  const themeDirty = () => !!themeLink && themeLink.getAttribute("href") !== themeFrom;
+  function setTheme(name) {
+    const l = themeEl();
+    l.setAttribute("href", l.getAttribute("href").replace(/themes\/[\w-]+\.css/, `themes/${name}.css`));
+    if ($("#themes").classList.contains("show")) renderThemes();
+    Deck.onTheme?.(name);
+  }
+  function renderThemes() {
+    const box = $("#themes"), cur = themeName();
+    box.innerHTML = "";
+    el("b", { textContent: "主題" }, box);
+    el("small", { className: "keys-hint", textContent: themeDirty() ? "按 ⌘S 把這個主題存進檔案" : "選了只是預覽，不會改到檔案" }, box);
+    const grid = el("div", { className: "th-grid" }, box);
+    Object.entries(THEMES).forEach(([name, t]) => {
+      const [paper, ink, accent, warn, dark] = t.c;
+      const sw = el("button", { className: "th" + (name === cur ? " on" : "") }, grid);
+      sw.innerHTML = `<span class="th-card" style="background:${paper};color:${ink}"><b>Aa 標題</b><s style="background:${accent}"></s><s style="background:${warn};width:40%"></s><u style="background:${dark}"></u></span><span>${name} <small>${t.zh}</small></span>`;
+      sw.onclick = (e) => { e.stopPropagation(); setTheme(name); };
+    });
+  }
+  function toggleThemes(force) {
+    const box = $("#themes"), on = force ?? !box.classList.contains("show");
+    if (on) renderThemes();
+    box.classList.toggle("show", on);
+  }
+  Object.assign(Deck, { setTheme, themeName, themes: Object.keys(THEMES) });
 
   // ---------- A: annotate — click anything, say what you want there ----------
   const annoKey = "slidejam-anno:" + location.pathname;
@@ -479,6 +539,7 @@
     { id: "fullscreen", key: "f", label: "全螢幕", run: fullscreen },
     { id: "edit", key: "e", label: "直接改字，⌘S 存回檔案", run: () => setEditing(!document.body.classList.contains("editing")) },
     { id: "annotate", key: "a", label: "標註給 AI：點一下或拖拉框選", run: () => setAnnotating(!document.body.classList.contains("annotating")) },
+    { id: "theme", key: "t", label: "換主題（預覽；⌘S 存進檔案）", run: () => toggleThemes() },
     { id: "help", key: "?", label: "這份說明", run: () => toggleKeys() },
   ];
   const keyStore = "slidejam-keys";
@@ -535,6 +596,7 @@
     if (e.key === "Escape") {
       if (typing) return e.target.blur();
       if ($("#keys").classList.contains("show")) return toggleKeys(false);
+      if ($("#themes").classList.contains("show")) return toggleThemes(false);
       if (walled) { toggleWall(false); return toggleOverview(true, true); }
       if (document.body.classList.contains("editing")) return setEditing(false);
       if (document.body.classList.contains("annotating")) return setAnnotating(false);
@@ -660,9 +722,11 @@
     help.textContent = "?"; help.title = "快捷鍵";
     help.onclick = () => toggleKeys();
     chrome("div", "keys", document.body);
+    chrome("div", "themes", document.body);
     addEventListener("click", (e) => {
       // a click outside the ? panel only closes it; it doesn't also turn the page
       if ($("#keys").classList.contains("show") && !e.target.closest("#keys, #help")) { e.stopPropagation(); toggleKeys(false); }
+      if ($("#themes").classList.contains("show") && !e.target.closest("#themes, #keys")) { e.stopPropagation(); toggleThemes(false); }
     }, true);
     $("#page").title = "總覽（G）";
     $("#page").addEventListener("click", (e) => { e.stopPropagation(); toggleOverview(true); });

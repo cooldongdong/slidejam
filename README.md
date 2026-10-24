@@ -43,6 +43,7 @@ Open `effects.html` to see every effect running next to the markup it needs.
 | ← | previous slide |
 | G or click the page number | overview; its ▶ Play all button runs every slide at once |
 | P | presenter window: notes, next slide and a clock, on your screen only |
+| T | themes: preview any theme live; ⌘S writes the choice into the file |
 | ? or the small button bottom-left | list the keys; click a row to run it, click a key to change it |
 | hover the progress bar | peek at a slide; click to jump |
 | R | replay this slide |
