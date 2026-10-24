@@ -1,5 +1,7 @@
 # slidejam
 
+English · [中文](README.zh-TW.md)
+
 Jam on a slide deck with an AI: slides that move, in one HTML file.
 
 ![slidejam: slides that move, made with an AI](og.png)
