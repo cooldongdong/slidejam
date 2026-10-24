@@ -36,6 +36,8 @@ body{font-family:var(--sans);color:var(--ink);-webkit-font-smoothing:antialiased
 .slide.active{opacity:1;visibility:visible;transition:opacity .45s var(--ease)}
 .slide.video{padding:0;background:#000}
 .slide.video > video{width:100%;height:100%;object-fit:cover;display:block}
+/* the browser refused to start the video by itself: a tap plays it */
+.slide.video-blocked::after{content:"▶  點一下播放";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:600 40px var(--sans);color:#fff;background:rgb(0 0 0/.6);padding:26px 48px;border-radius:999px;pointer-events:none;z-index:5}
 .slide.full{padding:0}
 
 /* entrance: data-i sets the order (1–10) */

@@ -64,7 +64,7 @@
     $$("[data-step]", s).forEach((e) => e.classList.remove("on"));
     $$("[data-step-out]", s).forEach((e) => e.classList.remove("off"));
     s.classList.add("active");
-    $$("video", s).forEach((v) => { v.currentTime = 0; v.play().catch(() => {}); });
+    playVideos(s);
     if (!authoring()) eachFx(s, (d, e) => d.enter?.(e, s));
     stage.classList.toggle("on-dark", s.classList.contains("section") || s.classList.contains("video") || s.classList.contains("dark"));
     $("#bar").style.width = ((i + 1) / slides.length) * 100 + "%";
@@ -75,6 +75,17 @@
     history.replaceState(null, "", "#" + (i + 1));
   }
 
+  // Phones only start a video by themselves when it is muted and plays inline, and some
+  // (low-power or data-saver modes) refuse even then. A refused slide gets a "tap to play"
+  // cover, and the next tap starts its videos instead of turning the page.
+  function playVideos(s) {
+    s.classList.remove("video-blocked");
+    $$("video", s).forEach((v) => {
+      v.muted = true; v.playsInline = true; v.setAttribute("playsinline", "");
+      v.currentTime = 0;
+      v.play().catch((err) => { if (err?.name === "NotAllowedError" && s.classList.contains("active")) s.classList.add("video-blocked"); });
+    });
+  }
   function next() {
     const s = Deck.slides[Deck.cur];
     // effects with their own steps get the key first, then data-step groups
@@ -840,6 +851,8 @@
     stage.addEventListener("click", (e) => {
       if ((embed && ptr === "mouse") || !mine(e)) return;
       clearInterval(auto);
+      const s = Deck.slides[Deck.cur];
+      if (s.classList.contains("video-blocked")) return playVideos(s);
       const r = stage.getBoundingClientRect();
       ptr !== "mouse" && e.clientX - r.left < r.width / 3 ? show(Deck.cur - 1) : next();
     });
