@@ -31,6 +31,7 @@
 .fx.wide .info h2{grid-column:1;margin:0}
 .fx.wide .info .ask,.fx.wide .info .how{grid-row:1 / span 2;margin:0}
 .fx.wide .info .ask{grid-column:2}.fx.wide .info .how{grid-column:3;font-size:14px}
+#stack .card{padding:28px 32px}#stack .card b{font-size:34px}#stack .card p{font-size:24px}#stack .card .tag{font-size:16px}
 .demo-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:26px 30px;font-size:26px}
 </style>
 </head>
@@ -47,7 +48,7 @@
     <div><b>數字與資料</b><a href="#count">count<span>數字跳動</span></a><a href="#slot">slot<span>數字滾輪</span></a><a href="#bars">bars<span>長條圖</span></a><a href="#ring">ring<span>圓環進度</span></a><a href="#orbit">orbit<span>循環流程</span></a><a href="#network">network<span>議題星團</span></a><a href="#tunnel">tunnel<span>名稱隧道</span></a><a href="#swarm">swarm<span>蜂群飛入</span></a></div>
     <div><b>截圖</b><a href="#pan">pan<span>長截圖捲動</span></a><a href="#zoom">zoom<span>推近</span></a><a href="#cycle">cycle<span>輪播</span></a><a href="#spot">spot<span>聚光燈</span></a><a href="#hotspots">hotspots<span>熱點導覽</span></a><a href="#tilt">tilt<span>3D 斜放</span></a><a href="#explode">explode<span>拆層</span></a><a href="#parallax">parallax<span>景深</span></a><a href="#dive">dive<span>鑽進去</span></a><a href="#wipe">wipe<span>擦過去</span></a><a href="#morph">morph<span>頁面重組</span></a></div>
     <div><b>操作示範</b><a href="#clickpath">clickpath<span>游標示範</span></a><a href="#story">story<span>步驟配畫面</span></a><a href="#chat">chat<span>聊天對話</span></a><a href="#terminal">terminal<span>終端機</span></a><a href="#live">live<span>真網站</span></a><a href="#map">map<span>地圖</span></a></div>
-    <div><b>版面與外框</b><a href="#bento">bento<span>功能格狀總覽</span></a><a href="#bento">pop · compare · stack<span>格子裡的小效果</span></a><a href="#assemble">assemble<span>飛進來組合</span></a><a href="#feature">feature<span>輪流當主角</span></a><a href="#collapse">collapse<span>收成網址</span></a><a href="#frames">frames<span>瀏覽器／手機框</span></a><a href="#devices">devices<span>多裝置</span></a></div>
+    <div><b>版面與外框</b><a href="#bento">bento<span>功能格狀總覽</span></a><a href="#pop">pop<span>依序彈出</span></a><a href="#compare">compare<span>左右對照</span></a><a href="#stack">stack<span>卡片疊</span></a><a href="#assemble">assemble<span>飛進來組合</span></a><a href="#feature">feature<span>輪流當主角</span></a><a href="#collapse">collapse<span>收成網址</span></a><a href="#frames">frames<span>瀏覽器／手機框</span></a><a href="#devices">devices<span>多裝置</span></a></div>
   </div>
 <aside class="notes">這份圖鑑本身就是用 web-deck 做的簡報。按 G 看全部縮圖。</aside></section>
 
@@ -275,6 +276,47 @@ frame N（換第幾張）· wait 毫秒</div>
   </div>
 <aside class="notes">照 civictech-video 的 28-bento-assemble 做的。格子大小用 w2（兩格寬）、h2（兩格高）調。
 格子底下放標籤加一句話的寫法（演講用的那種）也可以：&lt;div class="cap"&gt;&lt;span class="tag"&gt;找不到&lt;/span&gt;&lt;b&gt;照議題找專案&lt;/b&gt;&lt;/div&gt;</aside></section>
+
+<section class="slide fx" id="pop">
+  <div class="pop-demo" data-fx="pop" data-delay="0.6" data-stagger="0.08"><span style="--c:#7c5632">政府預算、決算與標案</span><span style="--c:#715080">假訊息與詐騙防治</span><span style="--c:#7b5720">地方發展與地方創生</span><span style="--c:#864f33">防災與災害應變</span><span style="--c:#7b5064">法律、立法歷程</span><span style="--c:#834e4d">居住與租屋</span><span style="--c:#5e6244">環境汙染與公害</span><span style="--c:#426b3d">生態與生物多樣性</span><span style="--c:#2e6a6a">健康與醫療</span><span style="--c:#516171">交通與道路安全</span><span style="--c:#356580">水環境（河川、海洋）</span><span style="--c:#6a5d44">土地使用與違章建築</span><span style="--c:#4d5c8e">學習、教育與母語</span><span style="--c:#626235">選舉、監督與公共參與</span><span style="--c:#4d6934">能源、農業與氣候</span><span style="--c:#834a65">工作與生活權益</span><span style="--c:#576165">公民科技社群自己的工具</span></div>
+  <div class="info">
+    <p class="kicker">pop</p><h2>依序彈出</h2>
+    <p>一組小東西一個接一個「啵」地彈出來，最後微微回彈。適合標籤、色塊、logo 牆。按 R 重播看比較清楚。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「17 個議題的標籤用 pop 一個個彈出來」</p></div>
+    <div class="how">&lt;div data-fx="pop"&gt;
+  &lt;span&gt;…&lt;/span&gt;…
+data-stagger="0.05"　間隔幾秒</div>
+  </div>
+</section>
+
+<section class="slide fx" id="compare">
+  <div class="compare" data-fx="compare" style="aspect-ratio:16/9;border-radius:14px;border:1px solid var(--line-strong)"><img src="examples/media/hero.png" alt=""><img src="examples/media/hero-dark.png" alt=""></div>
+  <div class="info">
+    <p class="kicker">compare</p><h2>左右對照</h2>
+    <p>兩張圖疊在一起，一條線左右來回掃：線左邊是第一張，右邊是第二張。適合淺色／深色、改版前後。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「首頁淺色和深色用 compare 對照」</p></div>
+    <div class="how">&lt;div class="compare" data-fx="compare"&gt;
+  &lt;img 左&gt;&lt;img 右&gt;
+data-ms="3200"　掃一趟多久</div>
+  </div>
+<aside class="notes">wipe 是擦過去一次就停；compare 是一直來回，兩邊同時看得到。</aside></section>
+
+<section class="slide fx" id="stack">
+  <div style="display:flex;justify-content:center"><div class="stack" data-fx="stack" data-delay="0.8" style="width:560px;height:300px">
+    <div class="card"><span class="tag">隨機推一個</span><b>LostSAR 無人機</b><p>用無人機與 beacon 協助登山搜救找人</p></div>
+    <div class="card"><span class="tag">隨機推一個</span><b>CC0 繁體中文句庫</b><p>蒐集無版權限制的繁體中文句子</p></div>
+    <div class="card"><span class="tag">隨機推一個</span><b>秒懂災害潛勢</b><p>從地名與文化素材認識災害潛勢</p></div>
+  </div></div>
+  <div class="info">
+    <p class="kicker">stack</p><h2>卡片疊</h2>
+    <p>一疊卡片，最上面那張每隔一陣子換到最底下，下一張浮上來。適合「隨機抽一個」「還有很多」。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「隨機推薦做成 stack，放三張專案卡」</p></div>
+    <div class="how">&lt;div class="stack" data-fx="stack"&gt;
+  &lt;div class="card"&gt;…&lt;/div&gt;…
+data-ms="1600"　多久換一張</div>
+  </div>
+</section>
+
 
 <!-- ===== spot ===== -->
 <section class="slide fx" id="spot">
