@@ -88,11 +88,21 @@ footer .sp{flex:1}
   .nav{gap:12px}
   .nav nav{gap:12px;font-size:14px}
   .nav nav a[href^="https://github"]{display:none}
+  /* narrow screens: one button that switches to the other language */
+  html[data-lang="zh"] .lang [data-l="zh"],html[data-lang="en"] .lang [data-l="en"]{display:none}
+  .lang{flex:none}
+  .lang button{padding:6px 10px;white-space:nowrap}
   .feat .grid,.feat.flip .grid{grid-template-columns:1fr;gap:28px}
   .feat.flip .text{order:0}
   .steps,.cards{grid-template-columns:1fr}
   section.feat,section.start,section.examples{padding:56px 0}
   .hero{padding:48px 0 24px}
+}
+@media (max-width:420px){
+  .logo{font-size:19px}
+  .nav{gap:8px}
+  .nav nav{gap:9px;font-size:13px}
+  .lang button{padding:5px 8px;font-size:12px}
 }
 
 /* dark pages (the workflow page): header, footer and text flip; the header can slide away */
