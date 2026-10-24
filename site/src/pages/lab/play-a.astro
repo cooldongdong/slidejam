@@ -1,0 +1,55 @@
+---
+// Cut A for the play page: a tilted wall where the four decks play side by side, effect
+// thumbnails above and below, the title over it. The chapters below are today's.
+import Base from "../../layouts/Base.astro";
+import Cases from "../../components/Cases.astro";
+import { decks, deckStats } from "../../data/decks";
+import { effects } from "../../data/effects";
+const B = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const list = decks.map((d) => ({ ...d, ...deckStats(d.file) }));
+const slides = list.reduce((n, d) => n + d.slides, 0);
+const ids = effects.map((e) => e.id);
+const rowA = ids.slice(0, 16), rowC = ids.slice(16, 32);
+---
+<Base title="範例 A：播放牆 — slidejam" description="試做：範例頁的開場改成一面播放中的簡報牆。">
+<section class="pa-hero">
+  <div class="pa-wall" aria-hidden="true">
+    <div class="pa-row thin">{[...rowA, ...rowA].map((id) => <img src={`${B}thumbs/${id}.jpg`} alt="" />)}</div>
+    <div class="pa-row live">
+      {list.map((d) => <div class="pa-deck"><iframe src={`${B}${d.file}?embed&tour=4`} tabindex="-1" loading="lazy" title=""></iframe></div>)}
+      {list.map((d) => <div class="pa-deck"><img src={`${B}posters/${d.id}.jpg`} alt="" /></div>)}
+    </div>
+    <div class="pa-row thin rev">{[...rowC, ...rowC].map((id) => <img src={`${B}thumbs/${id}.jpg`} alt="" />)}</div>
+  </div>
+  <div class="pa-text wrap">
+    <p class="kicker"><span lang="zh">範例</span><span lang="en">Examples</span></p>
+    <h1><span lang="zh">這些簡報，<br>都是 slidejam 做的</span><span lang="en">All made<br>with slidejam</span></h1>
+    <p class="pa-stats"><b>{list.length}</b><span lang="zh">份簡報</span><span lang="en">decks</span><i></i><b>{slides}</b><span lang="zh">頁</span><span lang="en">slides</span><i></i><b>{ids.length}</b><span lang="zh">種效果</span><span lang="en">effects</span></p>
+    <p class="pa-sub"><span lang="zh">背後這面牆，每一格都在真的播放。往下捲，一份一份看。</span><span lang="en">Every tile behind this is really playing. Scroll down to take them one at a time.</span></p>
+  </div>
+  <span class="pa-scroll" aria-hidden="true"></span>
+</section>
+<Cases head={false} />
+</Base>
+
+<style is:global>
+.pa-hero{position:relative;height:calc(100vh - 64px);min-height:640px;overflow:hidden;background:#07090a;display:flex;align-items:center}
+.pa-wall{position:absolute;inset:-25% -30%;display:grid;gap:26px;align-content:center;transform:perspective(1600px) rotateX(22deg) rotateZ(-9deg)}
+.pa-row{display:flex;gap:26px;width:max-content;animation:pa-drift 120s linear infinite}
+.pa-row.rev{animation-direction:reverse}
+.pa-row.live{animation-duration:160s;margin-left:-180px}
+.pa-row.thin img{width:300px;aspect-ratio:16/9;object-fit:cover;border-radius:10px;opacity:.35}
+.pa-deck{width:640px;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 0 0 1px rgb(255 255 255/.1),0 60px 120px -30px rgb(0 0 0/.9)}
+.pa-deck iframe,.pa-deck img{width:100%;height:100%;border:0;display:block;object-fit:cover;pointer-events:none}
+@keyframes pa-drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.pa-hero::after{content:"";position:absolute;inset:0;background:radial-gradient(60% 80% at 22% 55%,rgb(7 9 10/.95) 20%,rgb(7 9 10/.6) 55%,rgb(7 9 10/.1));pointer-events:none}
+.pa-text{position:relative;z-index:1}
+.pa-text h1{font-size:clamp(52px,7.4vw,112px);line-height:1.02;letter-spacing:-.035em;margin:10px 0 28px;color:#fff}
+.pa-stats{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;font-size:17px;color:#9fb1b7;margin:0 0 18px}
+.pa-stats b{font:600 44px var(--mono);color:#7fd1e2;letter-spacing:-.03em}
+.pa-stats i{width:1px;height:28px;background:#2a3a40;margin:0 14px}
+.pa-sub{color:#8a9ca3;font-size:17px;max-width:30em}
+.pa-scroll{position:absolute;left:50%;bottom:28px;z-index:1;width:1px;height:56px;background:linear-gradient(#7fd1e2,transparent);animation:pa-scroll 2s ease-in-out infinite}
+@keyframes pa-scroll{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+@media (prefers-reduced-motion:reduce){.pa-row,.pa-scroll{animation:none}}
+</style>

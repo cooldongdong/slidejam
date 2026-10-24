@@ -3,12 +3,12 @@
 // the left, who it was for and what it does on the right. "Play" opens a theater where you
 // drive the deck. Each chapter has its own address (/play/<id>/); scrolling keeps it in sync.
 import { decks, deckStats } from "../data/decks";
-interface Props { current?: string }
-const { current } = Astro.props;
+interface Props { current?: string; head?: boolean }
+const { current, head = true } = Astro.props;
 const B = import.meta.env.BASE_URL.replace(/\/?$/, "/");
 const list = decks.map((d, i) => ({ ...d, ...deckStats(d.file), n: String(i + 1).padStart(2, "0") }));
 ---
-<section class="cases-head wrap">
+{head && <section class="cases-head wrap">
   <p class="kicker"><span lang="zh">範例</span><span lang="en">Examples</span></p>
   <h1><span lang="zh">這些簡報，都是 slidejam 做的</span><span lang="en">All made with slidejam</span></h1>
   <p class="sub"><span lang="zh">每一份都會自動播放。想自己翻頁，按「播放」進到劇場。</span><span lang="en">Each one plays on its own. To turn the pages yourself, press Play.</span></p>
@@ -20,7 +20,7 @@ const list = decks.map((d, i) => ({ ...d, ...deckStats(d.file), n: String(i + 1)
       </a>
     ))}
   </nav>
-</section>
+</section>}
 
 <nav class="fx-mini play-mini" aria-label="decks">
   {list.map((d) => <a href={`${B}play/${d.id}/`} data-id={d.id}><i></i><span lang="zh">{d.zh[0]}</span><span lang="en">{d.en[0]}</span></a>)}
@@ -97,7 +97,9 @@ document.querySelectorAll(".case-index a, .play-mini a").forEach((a) => a.addEve
 
 // the thin-line outline on the right shows up once the poster index has scrolled away
 const mini = document.querySelector(".play-mini");
-new IntersectionObserver(([e]) => mini.classList.toggle("show", !e.isIntersecting)).observe(document.querySelector(".case-index"));
+const index = document.querySelector(".case-index");
+if (index) new IntersectionObserver(([e]) => mini.classList.toggle("show", !e.isIntersecting)).observe(index);
+else mini.classList.add("show");
 
 // theater: the real deck, big, yours to drive
 const theater = document.getElementById("theater"), tframe = document.getElementById("th-frame");
