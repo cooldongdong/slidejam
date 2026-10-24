@@ -1,5 +1,6 @@
 // orbit — children sit around an ellipse; a dot travels it and lights each one in turn.
 // <div class="orbit" data-fx="orbit" data-ms="14000" style="height:640px"><div>資料庫</div><div>API</div>…</div>
+// A child with class="center" stays in the middle instead of joining the ring.
 (() => {
   const { register, gen, ms, stop, loopRaf } = Deck.lib;
   Deck.lib.css(`
@@ -13,7 +14,7 @@
 
   register("orbit", {
     layout(e) {
-      const nodes = [...e.children].filter((c) => !("gen" in c.dataset));
+      const nodes = [...e.children].filter((c) => !("gen" in c.dataset) && !c.classList.contains("center"));
       const w = e.clientWidth, h = e.clientHeight, cx = w / 2, cy = h / 2, rx = w / 2 - 110, ry = h / 2 - 50;
       let svg = e.querySelector("svg");
       if (!svg) {
