@@ -49,9 +49,23 @@
 .tp-sample .card{padding:22px 26px}
 .tp-actions{display:flex;gap:12px}
 .tp-actions .tp-copy{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
-#theme-pick{position:fixed;right:14px;top:14px;z-index:15;display:flex;gap:6px;align-items:center;font:13px var(--sans);color:var(--ui-soft);background:rgb(10 14 17/.55);border-radius:999px;padding:5px 6px 5px 12px;opacity:.5;transition:opacity .2s}
-#theme-pick:hover{opacity:1}
-#theme-pick select{font:13px var(--sans);border:0;border-radius:999px;padding:3px 8px}
+/* corner theme picker: a small button that opens swatch cards */
+#theme-pick{position:fixed;right:14px;top:14px;z-index:15;font:13px var(--sans)}
+#theme-pick > button{display:flex;align-items:center;gap:8px;border:1px solid rgb(255 255 255/.18);background:rgb(10 14 17/.6);color:var(--ui-ink);border-radius:999px;padding:6px 12px 6px 8px;cursor:pointer;opacity:.55;transition:opacity .2s;font:inherit}
+#theme-pick > button:hover,#theme-pick.open > button{opacity:1}
+#theme-pick .dots{display:flex}
+#theme-pick .dots i{width:14px;height:14px;border-radius:50%;margin-left:-4px;border:2px solid rgb(10 14 17/.6)}
+#theme-pick .dots i:first-child{margin-left:0}
+#theme-pick .menu{position:absolute;right:0;top:calc(100% + 8px);display:none;grid-template-columns:repeat(2,150px);gap:10px;padding:12px;background:var(--ui-bg);border-radius:14px;box-shadow:0 20px 40px rgb(0 0 0/.45)}
+#theme-pick.open .menu{display:grid}
+#theme-pick .sw{display:grid;gap:8px;text-align:left;border:2px solid transparent;border-radius:10px;padding:8px;background:var(--ui-line);color:var(--ui-ink);cursor:pointer;font:inherit}
+#theme-pick .sw:hover{border-color:var(--ui-hi)}
+#theme-pick .sw.on{border-color:var(--ui-anno)}
+#theme-pick .sw .card{height:62px;border-radius:7px;padding:9px 10px;display:grid;grid-template-columns:1fr 26px;gap:4px 8px;align-content:start}
+#theme-pick .sw .card b{font-size:14px;line-height:1.1}
+#theme-pick .sw .card s{grid-column:1;display:block;height:6px;border-radius:3px;width:70%}
+#theme-pick .sw .card u{grid-row:1 / span 2;grid-column:2;border-radius:5px}
+#theme-pick .sw small{color:var(--ui-muted)}
 body.embed #theme-pick,body.wall #theme-pick{display:none}
 .demo-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:26px 30px;font-size:26px}
 </style>
@@ -834,14 +848,37 @@ data-mode="settle｜sway｜hold"</div>
     set("slidejam-gallery-theme", name);
     document.querySelectorAll(".tp-presets button").forEach((b) => b.classList.toggle("on", b.dataset.theme === name));
     picker.value = name;
+    drawButton(name);
     link.onload = readInputs;
   }
-  // a small picker in the corner, so any slide can be seen in any theme
-  const pick = document.createElement("label"); pick.id = "theme-pick"; pick.textContent = "主題";
-  const picker = document.createElement("select");
-  ["default", "warm", "night", "mono"].forEach((n) => picker.add(new Option(n, n)));
-  pick.appendChild(picker); document.body.appendChild(pick);
-  picker.onchange = () => useTheme(picker.value);
+  // a small picker in the corner, so any slide can be seen in any theme. Each card shows the
+  // theme's paper, ink, accent, second accent and dark block (values from deck/themes/*.css)
+  const THEMES = {
+    default: { zh: "石油藍", c: ["#f6f7f8", "#111a1f", "#0d5f74", "#b45309", "#0f1a1d"] },
+    warm: { zh: "暖紙張", c: ["#faf6f0", "#2a1f17", "#9a4a1f", "#3f6b4a", "#2a1f17"] },
+    night: { zh: "深色", c: ["#0e1417", "#eef4f6", "#4fd1c5", "#f4b860", "#071012"] },
+    mono: { zh: "黑白", c: ["#ffffff", "#000000", "#000000", "#d4380d", "#000000"] },
+  };
+  const pick = document.createElement("div"); pick.id = "theme-pick";
+  const btn = document.createElement("button"); btn.title = "換主題";
+  const menu = document.createElement("div"); menu.className = "menu";
+  pick.append(btn, menu); document.body.appendChild(pick);
+  const picker = { value: "default" };
+  Object.entries(THEMES).forEach(([name, t]) => {
+    const [paper, ink, accent, warn, dark] = t.c;
+    const sw = document.createElement("button"); sw.className = "sw"; sw.dataset.theme = name;
+    sw.innerHTML = `<span class="card" style="background:${paper};color:${ink}"><b>Aa 標題</b><s style="background:${accent}"></s><s style="background:${warn};width:40%"></s><u style="background:${dark}"></u></span><span>${name} <small>${t.zh}</small></span>`;
+    sw.onclick = (e) => { e.stopPropagation(); tweaks = {}; apply(); useTheme(name); pick.classList.remove("open"); };
+    menu.appendChild(sw);
+  });
+  const drawButton = (name) => {
+    const [paper, , accent, warn] = THEMES[name].c;
+    btn.innerHTML = `<span class="dots"><i style="background:${paper}"></i><i style="background:${accent}"></i><i style="background:${warn}"></i></span>主題：${name}`;
+    menu.querySelectorAll(".sw").forEach((x) => x.classList.toggle("on", x.dataset.theme === name));
+  };
+  btn.onclick = (e) => { e.stopPropagation(); pick.classList.toggle("open"); };
+  addEventListener("click", (e) => { if (!e.target.closest("#theme-pick")) pick.classList.remove("open"); });
+  pick.addEventListener("click", (e) => e.stopPropagation());
   document.querySelectorAll(".tp-presets button").forEach((b) => (b.onclick = () => { tweaks = {}; apply(); useTheme(b.dataset.theme); }));
   inputs.forEach((i) => (i.oninput = () => { tweaks[i.dataset.var] = i.value + (i.dataset.unit || ""); apply(); }));
   document.querySelector(".tp-reset").onclick = () => { tweaks = {}; apply(); readInputs(); };
