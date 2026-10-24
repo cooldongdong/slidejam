@@ -265,7 +265,13 @@
   // by tools/capture-morph.mjs. <div class="morph" data-fx="morph" data-src="media/morph-x"></div>
   // The folder holds the screenshots plus morph.js, which calls Deck.morph(src, data).
   const morphs = {};
-  Deck.morph = (src, data) => { morphs[src] = data; document.querySelectorAll(`[data-fx~="morph"][data-src="${src}"]`).forEach(buildMorph); };
+  // morph.js names its own folder, but a page elsewhere may reach it by another relative
+  // path (../media/x), so the data is filed under the path the page actually loaded it by
+  Deck.morph = (src, data) => {
+    src = document.currentScript?.dataset.morph || src;
+    morphs[src] = data;
+    document.querySelectorAll(`[data-fx~="morph"][data-src="${src}"]`).forEach(buildMorph);
+  };
   const eQuint = (x) => (x < 0.5 ? 16 * x ** 5 : 1 - Math.pow(-2 * x + 2, 5) / 2);
   const eCubic = (x) => (x < 0.5 ? 4 * x ** 3 : 1 - Math.pow(-2 * x + 2, 3) / 2);
   const eExpo = (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * x));

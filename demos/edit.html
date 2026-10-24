@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>edit demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../deck/deck.css">
+<style>
+/* A replay of edit mode: press E, type on the slide, ⌘S writes just that line back into index.html */
+html,body{background:var(--paper)}
+.ed{position:absolute;inset:0}
+.ed > *{position:absolute}
+.ed-slide{left:60px;top:110px;width:900px;height:506px;background:var(--surface);border-radius:14px;border:1px solid var(--line-strong);box-shadow:0 30px 60px -30px rgb(15 26 29/.35);padding:56px 64px}
+.ed-slide .kicker{font-size:18px;margin-bottom:18px}
+.ed-slide h2{font-size:56px;margin:0 0 30px}
+.ed-slide li{font-size:28px}
+.ed-slide ul.steps{gap:14px}
+.ed [data-e]{outline:2px dashed transparent;outline-offset:6px;transition:outline-color .3s}
+.ed.editing [data-e]{outline-color:rgb(227 179 65/.75)}
+.ed.editing [data-e].focus{outline:2.5px solid #e3b341;background:rgb(227 179 65/.08)}
+.ed.editing [data-e].dirty{outline-color:#e06c5f}
+.ed-caret{display:inline-block;width:3px;height:.9em;background:var(--ink);vertical-align:-.08em;margin-left:2px;animation:caret .8s steps(1) infinite;opacity:0}
+.ed-badge{left:28px;top:28px;font:600 18px var(--mono);letter-spacing:.06em;padding:8px 16px;border-radius:999px;background:#e3b341;color:#1d1a10;opacity:0;transition:opacity .4s}
+.ed-key{left:660px;top:660px;display:flex;gap:10px;opacity:0;transform:translateY(10px);transition:opacity .3s,transform .4s var(--ease)}
+.ed-key kbd{font:600 30px var(--mono);background:var(--surface);border:1px solid var(--line-strong);border-bottom-width:4px;border-radius:10px;padding:8px 18px;color:var(--ink)}
+.ed-code{left:1000px;top:110px;width:550px;background:#0f1719;color:#cfdde1;border-radius:14px;padding:22px 24px;font:17px/1.75 var(--mono);white-space:pre;box-shadow:0 30px 60px -30px rgb(0 0 0/.5)}
+.ed-code .file{display:block;color:#8a99a0;margin-bottom:10px}
+.ed-code .ln{display:block;border-radius:6px;transition:background .4s}
+.ed-code .ln.hit{background:rgb(227 179 65/.25)}
+.ed-code .t{color:#8fc8ff}.ed-code .s{color:#f2c27b}
+.ed-note{left:1000px;top:560px;width:550px;font-size:22px;line-height:1.6;color:var(--ink-2);opacity:0;transition:opacity .5s}
+.ed-toast{left:50%;top:28px;transform:translateX(-50%);background:#1d2a30;color:#fff;font-size:20px;padding:12px 22px;border-radius:12px;opacity:0;transition:opacity .3s}
+.ed .on{opacity:1;transform:none}
+.ed-cursor{left:0;top:0;width:40px;height:40px;z-index:10;transition:transform .9s var(--ease);filter:drop-shadow(0 3px 5px rgb(0 0 0/.3))}
+</style>
+</head>
+<body>
+<div id="stage">
+
+<section class="slide full">
+  <div class="ed" data-fx="editdemo">
+    <div class="ed-slide">
+      <p class="kicker" data-e>痛點一</p>
+      <h2><span data-e class="title">不知道從哪裡找</span></h2>
+      <ul class="steps"><li data-e>口耳相傳</li><li data-e>黑客松的共筆</li><li data-e>Google 搜不到</li></ul>
+    </div>
+    <div class="ed-badge">編輯 · ⌘S 存檔</div>
+    <div class="ed-key"><kbd>⌘</kbd><kbd>S</kbd></div>
+    <div class="ed-code"><span class="file">index.html</span><span class="ln">&lt;<span class="t">section</span> class=<span class="s">"slide"</span>&gt;</span><span class="ln">  &lt;<span class="t">p</span> class=<span class="s">"kicker"</span>&gt;痛點一&lt;/<span class="t">p</span>&gt;</span><span class="ln code-title">  &lt;<span class="t">h2</span>&gt;<span class="old">不知道從哪裡找</span>&lt;/<span class="t">h2</span>&gt;</span><span class="ln">  &lt;<span class="t">ul</span> class=<span class="s">"steps"</span>&gt;</span><span class="ln">    &lt;<span class="t">li</span>&gt;口耳相傳&lt;/<span class="t">li</span>&gt;</span><span class="ln">    …</span></div>
+    <div class="ed-note">檔案裡只有這一行被換掉，<br>其他地方一個字都不動。</div>
+    <div class="ed-toast">已存 1 處到 index.html</div>
+    <svg class="ed-cursor" viewBox="0 0 24 24"><path d="M4 2 L4 20 L9 15.5 L12.5 22.5 L15.5 21 L12 14 L19 14 Z" fill="#111" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg>
+  </div>
+</section>
+
+</div>
+<script src="../deck/deck.js"></script>
+<script src="../deck/fx.js"></script>
+<script>
+// one scripted run of edit mode; restarts every time the slide is shown
+const OLD = "不知道從哪裡找", NEW = "找不到想參與的專案";
+Deck.fx.register("editdemo", {
+  enter(e) {
+    this.leave(e);
+    const q = (s) => e.querySelector(s);
+    const cur = q(".ed-cursor"), title = q(".title"), old = q(".old");
+    const move = (x, y, fast) => { cur.style.transition = fast ? "none" : ""; cur.style.transform = `translate(${x}px, ${y}px)`; };
+    const at = (ms, fn) => e._t.push(setTimeout(fn, ms));
+    const caret = '<i class="ed-caret" style="opacity:1"></i>';
+    e._t = [];
+    e.classList.remove("editing");
+    title.className = "title"; title.textContent = OLD; old.textContent = OLD;
+    q(".code-title").classList.remove("hit");
+    [".ed-badge", ".ed-key", ".ed-note", ".ed-toast"].forEach((s) => q(s).classList.remove("on"));
+    move(1250, 820, true);
+
+    at(400, () => { e.classList.add("editing"); q(".ed-badge").classList.add("on"); });
+    at(900, () => move(470, 215));
+    at(1900, () => { title.classList.add("focus"); title.innerHTML = OLD + caret; });
+    [...OLD].forEach((_, i) => at(2300 + i * 55, () => (title.innerHTML = OLD.slice(0, OLD.length - i - 1) + caret)));
+    [...NEW].forEach((_, i) => at(2800 + i * 85, () => { title.innerHTML = NEW.slice(0, i + 1) + caret; title.classList.add("dirty"); }));
+    at(3800, () => { title.textContent = NEW; title.classList.remove("focus"); q(".ed-key").classList.add("on"); });
+    at(4500, () => {
+      q(".ed-toast").classList.add("on"); title.classList.remove("dirty");
+      q(".code-title").classList.add("hit"); old.textContent = NEW;
+    });
+    at(4900, () => q(".ed-note").classList.add("on"));
+    at(5600, () => q(".ed-key").classList.remove("on"));
+    at(6400, () => q(".ed-toast").classList.remove("on"));
+  },
+  leave(e) { (e._t || []).forEach(clearTimeout); },
+});
+</script>
+</body>
+</html>

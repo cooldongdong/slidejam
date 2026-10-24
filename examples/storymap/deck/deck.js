@@ -453,35 +453,46 @@
     setupPeek(); setupAnnotate();
     addEventListener("resize", fit); fit();
 
-    addEventListener("keydown", (e) => {
-      const typing = e.target.isContentEditable || /INPUT|TEXTAREA/.test(e.target.tagName);
-      if ((e.metaKey || e.ctrlKey) && e.key === "s") { e.preventDefault(); save(); return; }
-      if (e.key === "Escape") {
-        if (typing) return e.target.blur();
-        if (document.body.classList.contains("editing")) return setEditing(false);
-        if (document.body.classList.contains("annotating")) return setAnnotating(false);
-        return toggleOverview(false);
-      }
-      if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
-      const k = e.key.toLowerCase();
-      if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); next(); }
-      else if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); show(Deck.cur - 1); }
-      else if (k === "g" || k === "o") toggleOverview();
-      else if (k === "r") show(Deck.cur);
-      else if (e.key === "Home") show(0);
-      else if (e.key === "End") show(Deck.slides.length - 1);
-      else if (k === "n") notes.classList.toggle("show");
-      else if (k === "f") document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
-      else if (k === "e") setEditing(!document.body.classList.contains("editing"));
-      else if (k === "a") setAnnotating(!document.body.classList.contains("annotating"));
-    });
-    stage.addEventListener("click", (e) => {
-      if (document.body.classList.contains("editing") || document.body.classList.contains("annotating")) return;
-      if (e.target.closest("a, button, iframe, .leaflet-container")) return;
-      next();
-    });
-    addEventListener("hashchange", () => { const i = hashIndex(); if (i != null && i !== Deck.cur) show(i); });
-    addEventListener("beforeunload", (e) => { if (dirty.size) e.preventDefault(); });
+    // ?embed: a deck shown inside another page — no chrome, no keys, replays by itself
+    // (?embed&loop=8 replays every 8 s; default 9)
+    const q = new URLSearchParams(location.search);
+    const embed = q.has("embed");
+    if (embed) {
+      document.body.classList.add("embed");
+      const every = +(q.get("loop") || 9) * 1000;
+      setInterval(() => !document.hidden && show(Deck.cur), every);
+    }
+    if (!embed) {
+      addEventListener("keydown", (e) => {
+        const typing = e.target.isContentEditable || /INPUT|TEXTAREA/.test(e.target.tagName);
+        if ((e.metaKey || e.ctrlKey) && e.key === "s") { e.preventDefault(); save(); return; }
+        if (e.key === "Escape") {
+          if (typing) return e.target.blur();
+          if (document.body.classList.contains("editing")) return setEditing(false);
+          if (document.body.classList.contains("annotating")) return setAnnotating(false);
+          return toggleOverview(false);
+        }
+        if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
+        const k = e.key.toLowerCase();
+        if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); next(); }
+        else if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); show(Deck.cur - 1); }
+        else if (k === "g" || k === "o") toggleOverview();
+        else if (k === "r") show(Deck.cur);
+        else if (e.key === "Home") show(0);
+        else if (e.key === "End") show(Deck.slides.length - 1);
+        else if (k === "n") notes.classList.toggle("show");
+        else if (k === "f") document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+        else if (k === "e") setEditing(!document.body.classList.contains("editing"));
+        else if (k === "a") setAnnotating(!document.body.classList.contains("annotating"));
+      });
+      stage.addEventListener("click", (e) => {
+        if (document.body.classList.contains("editing") || document.body.classList.contains("annotating")) return;
+        if (e.target.closest("a, button, iframe, .leaflet-container")) return;
+        next();
+      });
+      addEventListener("hashchange", () => { const i = hashIndex(); if (i != null && i !== Deck.cur) show(i); });
+      addEventListener("beforeunload", (e) => { if (dirty.size) e.preventDefault(); });
+    }
 
     Deck.slides.forEach((s) => eachFx(s, (d, e) => d.setup?.(e)));
     Deck.cur = hashIndex() ?? 0;

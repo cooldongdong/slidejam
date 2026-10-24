@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>annotate demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../deck/deck.css">
+<style>
+/* A replay of annotate mode: box an area, say what you want, copy it for the AI, get it done */
+html,body{background:var(--paper)}
+.ad{position:absolute;inset:0}
+.ad > *{position:absolute}
+.ad-shot{left:60px;top:125px;width:1040px;border-radius:14px;overflow:hidden;border:1px solid var(--line-strong);box-shadow:0 30px 60px -30px rgb(15 26 29/.35)}
+.ad-shot img{display:block;width:100%}
+.ad-dim{left:60px;top:125px;width:1040px;height:650px;border-radius:14px;pointer-events:none;opacity:0;transition:opacity .7s;
+  background:rgb(10 16 19/.55);clip-path:polygon(0 0,100% 0,100% 100%,0 100%,0 0,92px 122px,92px 172px,342px 172px,342px 122px,92px 122px)}
+.ad-badge{left:28px;top:28px;font:600 18px var(--mono);letter-spacing:.06em;padding:8px 16px;border-radius:999px;background:#4fb3c9;color:#062028;opacity:0;transition:opacity .4s}
+.ad-band{border:3px dashed #4fb3c9;background:rgb(79 179 201/.12);opacity:0}
+.ad-band.done{border-style:solid}
+.ad-band.result{border:3px solid var(--warn);background:none}
+.ad-pin{width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;background:#4fb3c9;color:#062028;font:700 18px/36px var(--mono);text-align:center;opacity:0;transform:scale(.3);transition:opacity .3s,transform .4s var(--ease)}
+.ad-input{width:440px;background:#0f1a1f;border-radius:14px;padding:14px;box-shadow:0 20px 40px rgb(0 0 0/.45);opacity:0;transform:translateY(8px);transition:opacity .3s,transform .4s var(--ease)}
+.ad-input small{display:block;font:15px var(--mono);color:#9cc9d4;margin-bottom:8px}
+.ad-input div{background:#fff;border-radius:9px;padding:10px 12px;font-size:22px;min-height:48px;color:var(--ink)}
+.ad-panel{left:1140px;top:125px;width:410px;background:#0f1a1f;color:#e8eef5;border-radius:16px;padding:20px 22px;box-shadow:0 20px 40px rgb(0 0 0/.3);opacity:0;transition:opacity .4s}
+.ad-panel b{font-size:22px}
+.ad-panel ol{margin:12px 0 16px;padding-left:28px;min-height:70px}
+.ad-panel li{font-size:20px;color:#e8eef5;line-height:1.5;opacity:0;transition:opacity .4s}
+.ad-panel li small{display:block;color:#8a99a0;font:15px var(--mono)}
+.ad-panel button{font:18px var(--sans);border:0;border-radius:10px;padding:10px 16px;background:#4fb3c9;color:#062028;transition:transform .15s}
+.ad-panel button.press{transform:scale(.94)}
+.ad-chat{left:1140px;top:470px;width:410px;display:grid;gap:14px}
+.ad-chat p{margin:0;padding:14px 18px;border-radius:16px;font-size:20px;line-height:1.5;opacity:0;transform:translateY(10px);transition:opacity .4s,transform .5s var(--ease)}
+.ad-chat .me{background:var(--accent);color:#fff;border-radius:16px 16px 6px 16px;justify-self:end;font:15px/1.5 var(--mono)}
+.ad-chat .ai{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:16px 16px 16px 6px}
+.ad-chat .on,.ad .on{opacity:1;transform:none}
+.ad-toast{left:50%;top:28px;transform:translateX(-50%);background:#1d2a30;color:#fff;font-size:20px;padding:12px 22px;border-radius:12px;opacity:0;transition:opacity .3s}
+.ad-cursor{left:0;top:0;width:40px;height:40px;z-index:10;transition:transform .9s var(--ease);filter:drop-shadow(0 3px 5px rgb(0 0 0/.3))}
+</style>
+</head>
+<body>
+<div id="stage">
+
+<section class="slide full">
+  <div class="ad" data-fx="annodemo">
+    <div class="ad-shot"><img src="../examples/media/p-cofacts.png" alt=""></div>
+    <div class="ad-dim"></div>
+    <div class="ad-badge">標註</div>
+    <div class="ad-band"></div>
+    <div class="ad-pin">1</div>
+    <div class="ad-input"><small>第 12 頁 · img</small><div class="typed"></div></div>
+    <div class="ad-panel"><b>標註 1 則</b><ol><li>第 12 頁：聚光燈打在標題上<small>框：9.6 18.9 24 7.7（%）</small></li></ol><button>複製給 AI</button></div>
+    <div class="ad-chat"><p class="me">1. 第 12 頁〈找得到〉<br>框住：9.6 18.9 24 7.7<br>想要：聚光燈打在標題上</p><p class="ai">好，第 12 頁的截圖加上 spot，框在標題那一塊。</p></div>
+    <div class="ad-toast">已複製，貼給 AI 就好</div>
+    <svg class="ad-cursor" viewBox="0 0 24 24"><path d="M4 2 L4 20 L9 15.5 L12.5 22.5 L15.5 21 L12 14 L19 14 Z" fill="#111" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg>
+  </div>
+</section>
+
+</div>
+<script src="../deck/deck.js"></script>
+<script src="../deck/fx.js"></script>
+<script>
+// one scripted run of annotate mode; restarts every time the slide is shown
+const BOX = { x: 152, y: 247, w: 250, h: 50 };
+Deck.fx.register("annodemo", {
+  enter(e) {
+    this.leave(e);
+    const q = (s) => e.querySelector(s);
+    const cur = q(".ad-cursor"), band = q(".ad-band"), typed = q(".typed");
+    const on = (s, v = true) => q(s).classList.toggle("on", v);
+    const move = (x, y, fast) => { cur.style.transition = fast ? "none" : ""; cur.style.transform = `translate(${x}px, ${y}px)`; };
+    const at = (ms, fn) => e._t.push(setTimeout(fn, ms));
+    e._t = [];
+    move(1300, 820, true);
+    Object.assign(band.style, { left: BOX.x + "px", top: BOX.y + "px", width: "0px", height: "0px", opacity: 0 });
+    band.className = "ad-band"; typed.textContent = "";
+    q(".ad-badge").style.opacity = 0; q(".ad-panel").style.opacity = 0; q(".ad-dim").style.opacity = 0; q(".ad-toast").style.opacity = 0;
+    q(".ad-pin").style.cssText = `left:${BOX.x}px;top:${BOX.y}px`;
+    ["li", ".ad-pin", ".ad-input", ".me", ".ai"].forEach((s) => on(s, false));
+    q(".ad-input").style.cssText = `left:${BOX.x + BOX.w + 16}px;top:${BOX.y + BOX.h + 12}px`;
+
+    at(200, () => { q(".ad-badge").style.opacity = 1; q(".ad-panel").style.opacity = 1; });
+    at(500, () => move(BOX.x, BOX.y));
+    at(1500, () => {
+      band.style.opacity = 1;
+      band.animate([{ width: "0px", height: "0px" }, { width: BOX.w + "px", height: BOX.h + "px" }], { duration: 700, fill: "forwards", easing: "ease-in-out" });
+      cur.style.transition = "transform .7s ease-in-out"; cur.style.transform = `translate(${BOX.x + BOX.w}px, ${BOX.y + BOX.h}px)`;
+    });
+    at(2300, () => on(".ad-input"));
+    const text = "聚光燈打在標題上";
+    [...text].forEach((_, i) => at(2600 + i * 90, () => (typed.textContent = text.slice(0, i + 1))));
+    at(3500, () => { on(".ad-input", false); band.classList.add("done"); on(".ad-pin"); on("li"); });
+    at(3900, () => move(1205, 300));
+    at(4900, () => { q(".ad-panel button").classList.add("press"); q(".ad-toast").style.opacity = 1; });
+    at(5100, () => q(".ad-panel button").classList.remove("press"));
+    at(5300, () => { on(".me"); move(1400, 860); });
+    at(6000, () => { q(".ad-toast").style.opacity = 0; on(".ai"); });
+    at(6900, () => { band.style.opacity = 0; on(".ad-pin", false); q(".ad-dim").style.opacity = 1; band.className = "ad-band result"; band.style.opacity = 1; });
+  },
+  leave(e) { (e._t || []).forEach(clearTimeout); },
+});
+</script>
+</body>
+</html>

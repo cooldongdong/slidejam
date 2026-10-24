@@ -105,6 +105,7 @@ aside.notes{display:none}
 .thumb iframe{display:none}
 
 /* ---------- edit (E) and annotate (A) modes ---------- */
+body.embed #bar,body.embed #page,body.embed #hoverzone,body.embed #peek,body.embed #peek-tick{display:none}
 #toast{position:fixed;left:50%;top:20px;transform:translateX(-50%);background:#1d2a30;color:#fff;font:15px/1.5 var(--sans);padding:10px 18px;border-radius:10px;z-index:40;display:none;max-width:80vw;white-space:pre-line;box-shadow:0 10px 30px rgb(0 0 0/.35)}
 #toast.show{display:block}
 #modebadge{position:fixed;left:16px;top:16px;z-index:30;font:600 13px var(--mono);letter-spacing:.06em;padding:6px 12px;border-radius:999px;display:none}

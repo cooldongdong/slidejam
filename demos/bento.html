@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>bento demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../deck/deck.css">
+<style>html,body{background:var(--paper)}</style>
+</head>
+<body>
+<div id="stage">
+<section class="slide" style="padding:56px 72px">
+  <div class="bento" data-fx="bento" style="height:100%">
+    <div class="tile w2"><div class="head"><b>照議題找專案</b><span>17 個議題，挑你關心的那一個</span></div><div class="vis pan" data-fx="pan" data-delay="1.6"><img src="../examples/media/cat-budget.png" alt=""></div></div>
+    <div class="tile h2 dark"><div class="head"><b>資料庫裡</b><span>台灣公民科技專案</span></div><div class="big"><span data-fx="slot" data-delay="1.4">226</span><small>個專案</small></div></div>
+    <div class="tile"><div class="head"><b>17 個議題</b><span>照大家最想先看的排</span></div><div class="dots" data-fx="pop" data-delay="1.6"><i style="--c:#7c5632"></i><i style="--c:#715080"></i><i style="--c:#7b5720"></i><i style="--c:#864f33"></i><i style="--c:#7b5064"></i><i style="--c:#834e4d"></i><i style="--c:#5e6244"></i><i style="--c:#426b3d"></i><i style="--c:#2e6a6a"></i><i style="--c:#516171"></i><i style="--c:#356580"></i><i style="--c:#6a5d44"></i><i style="--c:#4d5c8e"></i><i style="--c:#626235"></i><i style="--c:#4d6934"></i><i style="--c:#834a65"></i><i style="--c:#576165"></i></div></div>
+    <div class="tile h2"><div class="head"><b>手機也能用</b><span>不用下載 App</span></div><div class="phone"><div class="pan" data-fx="pan" data-delay="1.5" data-ms="9000"><img src="../examples/media/mobile-tall.png" alt=""></div></div></div>
+    <div class="tile"><div class="compare fill" data-fx="compare"><img src="../examples/media/hero.png" alt=""><img src="../examples/media/hero-dark.png" alt=""></div><div class="head pill"><b>深色模式</b></div></div>
+    <div class="tile h2"><div class="head"><b>隨機推薦</b><span>不知道從哪開始，就抽一個</span></div>
+      <div class="stack" data-fx="stack" style="position:absolute;left:24px;right:24px;top:100px">
+        <div class="card"><span class="tag">隨機推一個</span><b>LostSAR 無人機</b><p>用無人機與 beacon 協助登山搜救找人</p></div>
+        <div class="card"><span class="tag">隨機推一個</span><b>CC0 繁體中文句庫</b><p>蒐集無版權限制的繁體中文句子</p></div>
+        <div class="card"><span class="tag">隨機推一個</span><b>秒懂災害潛勢</b><p>從地名與文化素材認識災害潛勢</p></div>
+      </div></div>
+    <div class="tile"><div class="head"><b>許願池</b><span>想做但沒人做的事</span></div><div class="wish"><span data-fx="type" data-delay="2.2">公車到站語音提醒</span></div></div>
+    <div class="tile dark"><div class="head"><b>開放資料 API</b><span>免 token</span></div>
+      <div class="terminal" data-fx="terminal" data-delay="2">
+        <div class="cmd">curl data.civictech.tw/v0/tech/projects.json</div>
+        <div>{</div>
+        <div>  <span class="k">"label"</span>: <span class="s">"公民科技專案資料庫"</span>,</div>
+        <div>  <span class="k">"recordCount"</span>: <span class="n">230</span>,</div>
+      </div></div>
+  </div>
+</section>
+</div>
+<script src="../deck/deck.js"></script>
+<script src="../deck/fx.js"></script>
+
+</body>
+</html>
