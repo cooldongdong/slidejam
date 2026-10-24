@@ -2,6 +2,8 @@
 
 Jam on a slide deck with an AI: slides that move, in one HTML file.
 
+![slidejam: slides that move, made with an AI](og.png)
+
 slidejam makes slide decks that are a single `index.html`. You double-click to
 open one: there's no build step, no server and no framework.
 
@@ -15,11 +17,18 @@ It was built for talks that **show a website**, and those talks have three needs
 - **Editing without hunting through HTML.** Press **E** and type on the slide. **⌘S**
   writes only the changed text back into the file.
 
-There's also a way to talk to an AI about the slides. Press **A**, click anything
-and write what you want there. The deck turns your notes into a list with
-selectors and coordinates that you can paste to an assistant.
+![A topic page on civictech.tw: a click, and the cards rebuild into the project's own page](docs/images/morph.gif)
 
-🌐 Site: https://slidejam.pages.dev/ · [Effects](https://slidejam.pages.dev/effects/) · [Workflow with an AI](https://slidejam.pages.dev/guide/)
+*A morph captured from civictech.tw: click a project card and the page rebuilds itself.*
+
+There's also a way to talk to an AI about the slides. Press **A**, click anything
+or drag a box, and write what you want there. Boxes can be moved and resized after
+you draw them. The deck turns your notes into a list with selectors and coordinates
+that you can paste to an assistant.
+
+![Annotating a map slide: a dashed box over three pins, with a note for the AI](docs/images/annotate.jpg)
+
+🌐 Site: https://slidejam.pages.dev/ · [Effects](https://slidejam.pages.dev/effects/) · [Examples](https://slidejam.pages.dev/play/) · [Workflow with an AI](https://slidejam.pages.dev/guide/)
 
 📖 中文使用說明：[docs/使用說明.md](docs/使用說明.md)
 
@@ -34,6 +43,9 @@ open ~/talks/my-talk/index.html
 ```
 
 Open `effects.html` to see every effect running next to the markup it needs.
+
+With the Claude Code skill installed (see [Layout](#layout)), type `/slidejam` in
+Claude Code and it walks you through a new deck in six steps.
 
 ## Keys
 
@@ -50,7 +62,17 @@ Open `effects.html` to see every effect running next to the markup it needs.
 | N | speaker notes |
 | F | fullscreen |
 | E, then ⌘S | edit text in place and save it to the file (Chrome) |
-| A | annotate: click a point or drag a box, describe what you want, then copy the list for an AI |
+| A | annotate: click a point or drag a box (move or resize it after), describe what you want, then copy the list for an AI |
+| swipe / tap (touch screens) | swipe sideways to turn the page; tap to go on, or tap the left third to go back |
+
+![The overview: every slide as a thumbnail, with Play all at the top](docs/images/overview.jpg)
+
+## On the site
+
+| [Effects](https://slidejam.pages.dev/effects/) | [Examples](https://slidejam.pages.dev/play/) | [Workflow](https://slidejam.pages.dev/guide/) |
+|---|---|---|
+| ![The effects page: one big stage runs through all 45](docs/images/effects.jpg) | ![The examples page: a wall where every example deck plays](docs/images/examples.jpg) | ![The workflow page: a Claude Code session beside the six steps](docs/images/workflow.jpg) |
+| 45 effects on one stage, each with the line to ask an AI with | Four decks made with slidejam, each playable in a theater | A replayed Claude Code session, step by step |
 
 ## Effects
 
@@ -101,12 +123,14 @@ node tools/shoot.mjs index.html 12 --at 0.5,2,4             # one slide at sever
 ## Layout
 
 ```
-deck/        the engine: deck.css, deck.js (core and modes), fx/ (one file per effect, loaded on demand)
+deck/        the engine: deck.css, deck.js (core and modes), fx/ (one file per effect, loaded on demand), themes/
 template/    the starting index.html
-tools/       new-deck, capture-morph, shoot
+tools/       new-deck, capture-morph, shoot, thumbs (site thumbnails and posters), shoot-og (og.png)
 effects.html gallery of every effect
-examples/    example decks (intro, taipei) and the gallery's media
+examples/    example decks (intro, civictech, taipei) and the gallery's media
 skill/       a Claude Code skill for building decks with an AI
+site/        the website (Astro, on Cloudflare Pages)
+docs/        使用說明 (a guide in Chinese) and the README's pictures
 ```
 
 To use the skill with Claude Code, run
