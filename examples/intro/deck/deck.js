@@ -403,18 +403,49 @@
     renderPanel(); renderPins();
     if (on) toast("標註模式：點一下標位置，拖拉可以框範圍，寫下想要怎樣。右上角可以複製給 AI。A 或 Esc 離開");
   }
+  // ---- boxes: eight handles resize, dragging inside moves. The box being written about and
+  // the saved ones both work this way; the numbers in the note follow.
+  const pct = (v) => Math.round(v * 10) / 10;
+  // a stage box as "x y w h" in % of the element it was drawn on (what data-rects wants)
+  function boxPct(t, [x, y, w, h]) {
+    const r = t.getBoundingClientRect(), s = stage.getBoundingClientRect();
+    const rx = (v) => ((s.left + (v / W) * s.width - r.left) / r.width) * 100, ry = (v) => ((s.top + (v / H) * s.height - r.top) / r.height) * 100;
+    return `${pct(rx(x))} ${pct(ry(y))} ${pct(rx(x + w) - rx(x))} ${pct(ry(y + h) - ry(y))}`;
+  }
+  const placeBox = (b, [x, y, w, h]) => Object.assign(b.style, { left: x + "px", top: y + "px", width: w + "px", height: h + "px" });
+  function makeEditable(b, get, set, done) {
+    const drag = (ev, h) => {
+      ev.preventDefault(); ev.stopPropagation();
+      const [x0, y0, w0, h0] = get(), [px, py] = stagePoint(ev);
+      const move = (e2) => {
+        const [qx, qy] = stagePoint(e2), dx = qx - px, dy = qy - py;
+        if (!h) return set([x0 + dx, y0 + dy, w0, h0]);
+        let l = x0, t = y0, r = x0 + w0, btm = y0 + h0;
+        if (h.includes("w")) l += dx; if (h.includes("e")) r += dx;
+        if (h.includes("n")) t += dy; if (h.includes("s")) btm += dy;
+        set([Math.min(l, r), Math.min(t, btm), Math.max(8, Math.abs(r - l)), Math.max(8, Math.abs(btm - t))]);
+      };
+      const up = () => { removeEventListener("pointermove", move); removeEventListener("pointerup", up); done?.(); };
+      addEventListener("pointermove", move); addEventListener("pointerup", up);
+    };
+    ["nw", "n", "ne", "e", "se", "s", "sw", "w"].forEach((h) => {
+      const k = el("i", { className: "anno-h" }, b);
+      k.dataset.h = h;
+      k.addEventListener("pointerdown", (ev) => drag(ev, h));
+    });
+    b.addEventListener("pointerdown", (ev) => { if (ev.target === b) drag(ev, null); });
+  }
+  const targetOf = (a) => { try { return document.querySelector(a.selector) || Deck.slides[a.slide]; } catch { return Deck.slides[a.slide]; } };
   function renderPins() {
     $$(".anno-pin, .anno-band.done", stage).forEach((p) => p.remove());
     if (!document.body.classList.contains("annotating")) return;
     annos.forEach((a, n) => {
       if (a.slide !== Deck.cur) return;
-      if (a.stageBox) {
-        const b = el("div", { className: "anno-band done" }, stage);
-        const [x, y, w, h] = a.stageBox;
-        Object.assign(b.style, { left: x + "px", top: y + "px", width: w + "px", height: h + "px" });
-      }
+      const b = a.stageBox && el("div", { className: "anno-band done" }, stage);
       const p = el("div", { className: "anno-pin", textContent: n + 1 }, stage);
-      p.style.left = a.x + "px"; p.style.top = a.y + "px";
+      const place = () => { p.style.left = a.x + "px"; p.style.top = a.y + "px"; if (b) placeBox(b, a.stageBox); };
+      place();
+      if (b) makeEditable(b, () => a.stageBox, (box) => { a.stageBox = box; a.box = boxPct(targetOf(a), box); [a.x, a.y] = box; place(); }, () => { store.set(annoKey, annos); renderPanel(); });
     });
   }
   function renderPanel() {
@@ -466,41 +497,20 @@
     });
     // click marks a point; drag draws a box (handy for spot / zoom / hotspots positions)
     let down = null, band = null, target = null;
-    const pct = (v) => Math.round(v * 10) / 10;
-    // a drawn box stays (dashed, with handles) until the note is sent; dragging a handle
-    // resizes it and the numbers follow
-    const setBox = ([x, y, w, h]) => {
-      const r = target.getBoundingClientRect(), s = stage.getBoundingClientRect();
-      const rx = (v) => ((s.left + (v / W) * s.width - r.left) / r.width) * 100, ry = (v) => ((s.top + (v / H) * s.height - r.top) / r.height) * 100;
-      pendingAnno.stageBox = [x, y, w, h];
-      pendingAnno.box = `${pct(rx(x))} ${pct(ry(y))} ${pct(rx(x + w) - rx(x))} ${pct(ry(y + h) - ry(y))}`;
-      Object.assign(liveBand.style, { left: x + "px", top: y + "px", width: w + "px", height: h + "px" });
+    // a drawn box stays dashed until the note is sent, and can be resized or moved meanwhile
+    const setBox = (b) => {
+      pendingAnno.stageBox = b; pendingAnno.box = boxPct(target, b); [pendingAnno.x, pendingAnno.y] = b;
+      placeBox(liveBand, b);
       $(".what", box).textContent = `第 ${Deck.cur + 1} 頁 · ${pendingAnno.what}\n框：${pendingAnno.box}（%）`;
     };
     const keepBand = (b) => {
-      liveBand = b;
-      ["nw", "n", "ne", "e", "se", "s", "sw", "w"].forEach((h) => {
-        const k = el("i", { className: "anno-h" }, b);
-        k.dataset.h = h;
-        k.addEventListener("pointerdown", (ev) => {
-          ev.preventDefault(); ev.stopPropagation();
-          const [x0, y0, w0, h0] = pendingAnno.stageBox, [px, py] = stagePoint(ev);
-          const move = (e2) => {
-            const [qx, qy] = stagePoint(e2), dx = qx - px, dy = qy - py;
-            let l = x0, t = y0, r = x0 + w0, btm = y0 + h0;
-            if (h.includes("w")) l += dx; if (h.includes("e")) r += dx;
-            if (h.includes("n")) t += dy; if (h.includes("s")) btm += dy;
-            setBox([Math.min(l, r), Math.min(t, btm), Math.max(8, Math.abs(r - l)), Math.max(8, Math.abs(btm - t))]);
-          };
-          const up = () => { removeEventListener("pointermove", move); removeEventListener("pointerup", up); ta.focus(); };
-          addEventListener("pointermove", move); addEventListener("pointerup", up);
-        });
-      });
+      liveBand = b; b.classList.add("live");
+      makeEditable(b, () => pendingAnno.stageBox, setBox, () => ta.focus());
     };
     // pointer events, not mouse events: a map (Leaflet) cancels pointerdown, and then the
     // browser never sends the mouse events
     stage.addEventListener("pointerdown", (ev) => {
-      if (!document.body.classList.contains("annotating") || pendingAnno || ev.button !== 0) return;
+      if (!document.body.classList.contains("annotating") || pendingAnno || ev.button !== 0 || ev.target.closest?.(".anno-band")) return;
       ev.preventDefault();
       down = { ev, t: pick(ev.target) || Deck.slides[Deck.cur], p: stagePoint(ev) };
     }, true);

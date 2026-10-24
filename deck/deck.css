@@ -140,7 +140,11 @@ body.annotating .leaflet-container *,body.annotating #stage iframe{pointer-event
 .anno-pin{position:absolute;z-index:2000;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:var(--ui-anno);color:var(--ui-anno-ink);font:700 15px/30px var(--mono);text-align:center;pointer-events:none;box-shadow:0 4px 10px rgb(0 0 0/.3)}
 .anno-band{position:absolute;z-index:2000;border:2px dashed var(--ui-anno);background:color-mix(in srgb,var(--ui-anno) 12%,transparent);pointer-events:none}
 .anno-band.done{border-style:solid}
-/* handles on a box that is still being written about: drag to resize */
+/* boxes can be moved (drag inside) and resized (handles); a saved box shows its handles on hover */
+.anno-band.live,.anno-band.done{pointer-events:auto}
+body.annotating #stage .anno-band.live,body.annotating #stage .anno-band.done{cursor:move}
+.anno-band.done .anno-h{opacity:0;transition:opacity .15s}
+.anno-band.done:hover .anno-h{opacity:1}
 .anno-h{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:4px;background:var(--ui-anno);border:2px solid #fff;box-shadow:0 1px 4px rgb(0 0 0/.35);pointer-events:auto}
 .anno-h[data-h*=n]{top:0}.anno-h[data-h*=s]{top:100%}.anno-h[data-h=e],.anno-h[data-h=w]{top:50%}
 .anno-h[data-h*=w]{left:0}.anno-h[data-h*=e]{left:100%}.anno-h[data-h=n],.anno-h[data-h=s]{left:50%}
