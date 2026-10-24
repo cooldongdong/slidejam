@@ -17,6 +17,8 @@ There's also a way to talk to an AI about the slides. Press **A**, click anythin
 and write what you want there. The deck turns your notes into a list with
 selectors and coordinates that you can paste to an assistant.
 
+📖 中文使用說明：[docs/使用說明.md](docs/使用說明.md)
+
 ## Quick start
 
 ```sh
