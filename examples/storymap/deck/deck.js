@@ -671,14 +671,23 @@
     setupPeek(); setupAnnotate();
     addEventListener("resize", () => { fit(); fitWall(); }); fit();
 
-    // ?embed: a deck shown inside another page — no chrome, no keys, replays by itself
-    // (?embed&loop=8 replays every 8 s; default 9)
+    // ?embed: a deck shown inside another page — no chrome, no keys, plays by itself
     const q = new URLSearchParams(location.search);
     const embed = q.has("embed");
     if (embed) {
       document.body.classList.add("embed");
-      const every = +(q.get("loop") || 9) * 1000;
-      setInterval(() => !document.hidden && show(Deck.cur), every);
+      // ?embed&tour=6 walks through the whole deck by itself (a step every 6 s, then starts
+      // over); otherwise ?embed&loop=8 just replays the one slide
+      if (q.has("tour")) {
+        const every = +(q.get("tour") || 6) * 1000;
+        setInterval(() => {
+          if (document.hidden) return;
+          Deck.cur === Deck.slides.length - 1 ? show(0) : next();
+        }, every);
+      } else {
+        const every = +(q.get("loop") || 9) * 1000;
+        setInterval(() => !document.hidden && show(Deck.cur), every);
+      }
     }
     if (!embed) {
       addEventListener("keydown", onKey);

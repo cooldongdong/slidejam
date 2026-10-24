@@ -3,27 +3,10 @@
 // get back. The deck itself is the untouched file copied into public/ (see copy-decks.mjs).
 import Base from "../../layouts/Base.astro";
 
+import { decks } from "../../data/decks";
+
 export function getStaticPaths() {
-  return [
-    {
-      params: { deck: "effects" },
-      props: {
-        file: "effects.html",
-        source: "effects.html",
-        zh: ["效果圖鑑", "44 種效果，每一頁都有示範和「跟 AI 這樣說」。"],
-        en: ["Effects gallery", "44 effects, each with a demo and a line to ask an AI with."],
-      },
-    },
-    {
-      params: { deck: "storymap" },
-      props: {
-        file: "examples/storymap/index.html",
-        source: "examples/storymap/index.html",
-        zh: ["範例：從車站出發", "樹林地圖故事的三頁簡報：真地圖插點飛行、嵌入真網站、從真網站拍下的頁面重組。用 warm 主題。"],
-        en: ["Example: a storymap talk", "Three slides about a Shulin story map: a live map tour, an embedded site, and a morph from the real site. Uses the warm theme."],
-      },
-    },
-  ];
+  return decks.map((d) => ({ params: { deck: d.id }, props: { file: d.file, source: d.file, zh: d.zh, en: d.en } }));
 }
 const { file, source, zh, en } = Astro.props;
 const B = import.meta.env.BASE_URL.replace(/\/?$/, "/");
