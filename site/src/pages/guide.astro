@@ -97,12 +97,12 @@ const KEYS = [
   <div class="wrap flowx-head">
     <p class="kicker"><span lang="zh">六個步驟</span><span lang="en">Six steps</span></p>
     <h2><span lang="zh">看一場真的對話</span><span lang="en">Watch a real session</span></h2>
-    <p class="g-lead"><span lang="zh">往下捲，右邊會重演一次：AI 每則訊息都標出走到第幾步，資料夾一步步長出來。第 2 步之後要你說「可以動工」，它才會開始建檔。</span><span lang="en">Scroll and it replays on the right: every message names its step and the folder grows. Nothing is created until you say go after step 2.</span></p>
+    <p class="g-lead"><span lang="zh">往下捲，左邊會重演一次：AI 每則訊息都標出走到第幾步，資料夾一步步長出來。第 2 步之後要你說「可以動工」，它才會開始建檔。</span><span lang="en">Scroll and it replays on the left: every message names its step and the folder grows. Nothing is created until you say go after step 2.</span></p>
   </div>
   <div class="fx-story">
     <ol class="fx-steps">
       {STEPS.map((st, i) => (
-        <li class="fx-step" data-k={i}>
+        <li class="fx-step" data-k={i} id={`step-${i}`}>
           <span class="no">{i}</span>
           <div class="body">
             <h3><span lang="zh">{st.zh}</span><span lang="en">{st.en}</span>{st.gate && <small><span lang="zh">要你說「可以動工」</span><span lang="en">needs your go</span></small>}</h3>
@@ -113,6 +113,9 @@ const KEYS = [
         </li>
       ))}
     </ol>
+    <nav class="fx-mini" aria-label="steps">
+      {STEPS.map((st, i) => <a href={`#step-${i}`} data-k={i}><i>{i}</i><span lang="zh">{st.zh}</span><span lang="en">{st.en}</span></a>)}
+    </nav>
     <div class="fx-sticky">
       <div class="term" id="term">
         <div class="term-bar"><i></i><i></i><i></i><span>~/talks — claude</span>
@@ -229,6 +232,7 @@ function play(k, animate) {
   typing.textContent = ""; log.innerHTML = "";
   for (let j = 0; j < k; j++) STEPS[j].cli.forEach((m) => line(m, true));
   steps.forEach((s, j) => { s.classList.toggle("on", j === k); s.classList.toggle("done", j < k); });
+  document.querySelectorAll(".fx-mini a").forEach((a, j) => { a.classList.toggle("on", j === k); a.classList.toggle("done", j < k); });
   drawTree(k);
   if (!animate) return STEPS[k].cli.forEach((m) => line(m));
   let t = 250;
@@ -257,6 +261,7 @@ steps.forEach((s) => io.observe(s));
 play(0, false); cur = 0;
 new MutationObserver(() => play(cur, false)).observe(document.documentElement, { attributes: true, attributeFilter: ["data-lang"] });
 steps.forEach((s) => s.querySelector(".no").addEventListener("click", () => s.scrollIntoView({ behavior: "smooth", block: "center" })));
+document.querySelectorAll(".fx-mini a").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); steps[+a.dataset.k].scrollIntoView({ behavior: "smooth", block: "center" }); }));
 
 // terminal or chat: same session, two looks; remembered
 const setMode = (m) => {
@@ -336,7 +341,17 @@ body.dark h2{color:#fff}
 .flowx{background:#07090a;padding:110px 0 60px;border-top:1px solid #141d21}
 .flowx-head{margin-bottom:40px}
 .flowx-head h2{font-size:clamp(32px,4.4vw,54px);margin:0 0 14px;letter-spacing:-.02em}
-.fx-story{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.6fr);gap:56px;align-items:start;max-width:1500px;margin:0 auto;padding:0 32px}
+/* session on the left, the steps in the middle, a tiny index on the right */
+.fx-story{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,.85fr) 150px;gap:48px;align-items:start;max-width:1600px;margin:0 auto;padding:0 32px}
+.fx-sticky{order:-1}
+.fx-mini{position:sticky;top:30vh;display:grid;gap:4px;font-size:13px}
+.fx-mini a{display:flex;gap:10px;align-items:center;color:#4a5a60;text-decoration:none;padding:5px 0;transition:color .25s}
+.fx-mini a i{display:grid;place-items:center;width:20px;height:20px;border-radius:50%;border:1px solid #22313a;font:600 11px var(--mono);font-style:normal;transition:all .25s}
+.fx-mini a:hover{color:#c7d6db}
+.fx-mini a.done{color:#7d9096}
+.fx-mini a.done i{border-color:#0d5f74;color:#7fd1e2}
+.fx-mini a.on{color:#fff}
+.fx-mini a.on i{background:#4fb3c9;border-color:#4fb3c9;color:#062028}
 .fx-sticky{position:sticky;top:20px}
 .fx-steps{list-style:none;margin:0;padding:0;position:relative}
 .fx-steps::before{content:"";position:absolute;left:21px;top:0;bottom:0;width:2px;background:#1b262b}
@@ -452,7 +467,7 @@ html[data-lang="en"] .term-tree .mod::after{content:"  edited"}
   .g-two,.g-keys{grid-template-columns:1fr;gap:40px}
   .g-block{padding:80px 0}
   .fx-story{grid-template-columns:1fr;padding:0 20px}
-  .fx-sticky{display:none}
+  .fx-sticky,.fx-mini{display:none}
   .fx-steps::before{left:17px}
   .fx-step{min-height:0;opacity:1;grid-template-columns:36px 1fr;padding:18px 0}
   .fx-step .no{width:36px;height:36px}

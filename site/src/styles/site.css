@@ -1,9 +1,10 @@
-/* shared styles for the slidejam site pages (index.html, guide.html) */
+/* shared styles for the slidejam site. The whole site is dark: decks are mostly light, and
+   they read best like screens in a dark room. */
 :root{
-  --paper:#f6f7f8; --surface:#fff; --surface-2:#eceff1;
-  --ink:#111a1f; --ink-2:#36444b; --ink-muted:#5b6a71;
-  --line:#dfe5e8; --line-strong:#c8d1d5;
-  --accent:#0d5f74; --accent-ink:#094656; --accent-soft:#e0eef1; --warm:#b45309;
+  --paper:#07090a; --surface:#10171a; --surface-2:#141d21;
+  --ink:#e8eef5; --ink-2:#c7d6db; --ink-muted:#8a9ca3;
+  --line:#1d2a30; --line-strong:#2a3a42;
+  --accent:#0d5f74; --accent-ink:#7fd1e2; --accent-soft:#12303a; --warm:#f4b860;
   --sans:'Geist','PingFang TC','Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;
   --mono:'Geist Mono','SF Mono',ui-monospace,monospace;
 }
@@ -16,21 +17,22 @@ a{color:var(--accent-ink)}
 /* language: <span lang="zh"> / <span lang="en">; html[data-lang] picks one */
 html[data-lang="zh"] [lang="en"],html[data-lang="en"] [lang="zh"]{display:none}
 
-header{position:sticky;top:0;z-index:5;background:rgb(246 247 248/.85);backdrop-filter:blur(10px);border-bottom:1px solid transparent;transition:border-color .2s}
+header{position:sticky;top:0;z-index:5;background:rgb(7 9 10/.8);backdrop-filter:blur(10px);border-bottom:1px solid transparent;transition:border-color .2s}
 header.scrolled{border-bottom-color:var(--line)}
 .nav{display:flex;align-items:center;gap:22px;height:64px}
 .logo{font:700 22px var(--mono);letter-spacing:-.02em;color:var(--ink);text-decoration:none}
-.logo span{color:var(--accent)}
+.logo span{color:#4fb3c9}
+.logo span{color:var(--accent-ink)}
 .nav nav{display:flex;gap:20px;margin-left:auto;font-size:15px}
 .nav nav a{color:var(--ink-2);text-decoration:none}
-.nav nav a:hover,.nav nav a.on{color:var(--accent)}
+.nav nav a:hover,.nav nav a.on{color:var(--accent-ink)}
 .lang{display:flex;border:1px solid var(--line-strong);border-radius:999px;overflow:hidden}
 .lang button{font:600 13px var(--mono);border:0;background:none;padding:6px 12px;cursor:pointer;color:var(--ink-muted)}
-html[data-lang="zh"] .lang [data-l="zh"],html[data-lang="en"] .lang [data-l="en"]{background:var(--ink);color:#fff}
+html[data-lang="zh"] .lang [data-l="zh"],html[data-lang="en"] .lang [data-l="en"]{background:var(--ink);color:#07090a}
 
 .hero{padding:72px 0 40px;text-align:center}
 .hero h1{font-size:clamp(40px,7vw,84px);line-height:1.08;letter-spacing:-.03em;margin:0;font-weight:800}
-.hero h1 em{font-style:normal;color:var(--accent)}
+.hero h1 em{font-style:normal;color:var(--accent-ink)}
 .hero .sub{font-size:clamp(17px,2.2vw,22px);color:var(--ink-2);max-width:720px;margin:22px auto 0}
 .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:32px}
 .btn{display:inline-flex;align-items:center;gap:8px;font-weight:650;font-size:16px;text-decoration:none;border-radius:12px;padding:12px 22px;border:1px solid var(--line-strong);color:var(--ink);background:var(--surface)}
@@ -48,7 +50,7 @@ section.feat{padding:84px 0;border-top:1px solid var(--line)}
 .feat .grid{display:grid;grid-template-columns:.9fr 1.3fr;gap:56px;align-items:center}
 .feat.flip .grid{grid-template-columns:1.3fr .9fr}
 .feat.flip .text{order:2}
-.kicker{font:600 14px var(--mono);letter-spacing:.08em;color:var(--accent);text-transform:uppercase;margin:0 0 12px}
+.kicker{font:600 14px var(--mono);letter-spacing:.08em;color:var(--accent-ink);text-transform:uppercase;margin:0 0 12px}
 .feat h2{font-size:clamp(28px,3.6vw,42px);line-height:1.2;margin:0 0 18px;letter-spacing:-.01em}
 .feat p{font-size:18px;color:var(--ink-2);margin:0 0 14px}
 .feat ul{margin:18px 0 0;padding:0;list-style:none;display:grid;gap:10px}
