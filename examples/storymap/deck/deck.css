@@ -90,7 +90,7 @@ ul.steps li::before{content:"";position:absolute;left:0;top:.62em;width:20px;hei
 #notes{position:fixed;left:0;right:0;bottom:0;max-height:34vh;overflow:auto;background:rgba(10,14,17,.94);color:#e8eef5;font:18px/1.7 var(--sans);padding:18px 28px;display:none;z-index:10;white-space:pre-line}
 #notes.show{display:block}
 aside.notes{display:none}
-#overview{position:fixed;inset:0;background:rgba(10,14,17,.96);z-index:20;overflow:auto;padding:36px 40px;display:none}
+#overview{position:fixed;inset:0;background:var(--chrome);z-index:20;overflow:auto;padding:36px 40px;display:none}
 #overview.show{display:block}
 #overview .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:22px}
 .ov-item{cursor:pointer;color:#c3ccd8;font:14px/1.4 var(--mono)}
@@ -100,7 +100,8 @@ aside.notes{display:none}
 .thumb{color:var(--ink);text-align:left;position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:6px;background:var(--paper)}
 .thumb > .slide{transform-origin:0 0;width:1600px;height:900px}
 .thumb .slide{opacity:1 !important;visibility:visible !important;transition:none !important}
-.thumb [data-i],.thumb [data-step],.thumb [data-fx] *{opacity:1 !important;transform:none !important;transition:none !important;animation:none !important}
+.thumb [data-i],.thumb [data-step]{opacity:1 !important;transform:none !important;transition:none !important}
+.thumb [data-fx] *{transition:none !important;animation:none !important}
 .thumb iframe{display:none}
 
 /* ---------- edit (E) and annotate (A) modes ---------- */

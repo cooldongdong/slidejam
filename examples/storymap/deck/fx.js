@@ -34,7 +34,7 @@
   //   <div class="bar" data-v="60"><span>label</span><em>60%</em></div> …
   register("bars", {
     setup(e) {
-      if (e.dataset.ready) return;
+      if ("ready" in e.dataset) return;
       e.dataset.ready = "";
       $$(".bar", e).forEach((b) => gen("i", "bar-fill", gen("div", "bar-track", b, b.children[1])));
     },
@@ -50,7 +50,7 @@
   // count — counts up to the number written inside. <span data-fx="count">1,165</span>
   register("count", {
     enter(e) {
-      const final = (e.dataset.final ??= e.textContent);
+      const final = (e.dataset.final = e.textContent); // leave() restores it, so this is the authored text
       const m = final.match(/-?[\d,]*\.?\d+/);
       if (!m) return;
       const target = parseFloat(m[0].replace(/,/g, "")), dp = (m[0].split(".")[1] || "").length, comma = m[0].includes(",");
@@ -68,7 +68,7 @@
   // type — types the text out letter by letter. <p data-fx="type" data-ms="45">…</p>
   register("type", {
     enter(e) {
-      const final = (e.dataset.final ??= e.textContent);
+      const final = (e.dataset.final = e.textContent); // leave() restores it, so this is the authored text
       const chars = [...final], per = ms(e, 55) / 1000, d = delay(e, 0.4);
       e.classList.add("typing");
       loopRaf(e, (t) => {
@@ -187,6 +187,7 @@
       });
       return { nodes, svg, cx, cy, rx, ry };
     },
+    setup(e) { this.layout(e); },
     enter(e) {
       const { nodes, svg, cx, cy, rx, ry } = this.layout(e), period = ms(e, 14000) / 1000;
       const dots = svg.querySelectorAll("circle");
@@ -198,7 +199,6 @@
       });
     },
     leave(e) { stop(e); },
-    thumb(e) { /* positions are inline styles already, nothing to do */ },
   });
 
   // assemble — children fly in from scattered spots and settle into the layout.

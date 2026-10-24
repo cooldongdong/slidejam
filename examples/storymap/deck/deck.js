@@ -21,7 +21,8 @@
   let stage, notes, toastTimer;
 
   // ---------- effects registry ----------
-  // An effect is { enter(el, slide), leave(el), step(el) -> bool, thumb(el) }.
+  // An effect is { setup(el), enter(el, slide), leave(el), step(el) -> bool, thumb(el) }.
+  // setup runs once at load for every element, so thumbnails of unvisited slides look right.
   // Elements opt in with data-fx="name" (several names separated by spaces).
   Deck.fx.register = (name, def) => (Deck.fx[name] = def);
   const fxOf = (e) => (e.dataset.fx || "").split(/\s+/).filter(Boolean).map((n) => [n, Deck.fx[n]]);
@@ -443,6 +444,7 @@
     addEventListener("hashchange", () => { const n = parseInt(location.hash.slice(1), 10); if (Number.isFinite(n) && n - 1 !== Deck.cur) show(n - 1); });
     addEventListener("beforeunload", (e) => { if (dirty.size) e.preventDefault(); });
 
+    Deck.slides.forEach((s) => eachFx(s, (d, e) => d.setup?.(e)));
     const start = parseInt(location.hash.slice(1), 10);
     Deck.cur = Number.isFinite(start) ? Math.max(0, start - 1) : 0;
     show(Deck.cur);
