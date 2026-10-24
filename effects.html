@@ -47,7 +47,7 @@
     <div><b>數字與資料</b><a href="#count">count<span>數字跳動</span></a><a href="#slot">slot<span>數字滾輪</span></a><a href="#bars">bars<span>長條圖</span></a><a href="#ring">ring<span>圓環進度</span></a><a href="#orbit">orbit<span>循環流程</span></a><a href="#network">network<span>議題星團</span></a><a href="#tunnel">tunnel<span>名稱隧道</span></a><a href="#swarm">swarm<span>蜂群飛入</span></a></div>
     <div><b>截圖</b><a href="#pan">pan<span>長截圖捲動</span></a><a href="#zoom">zoom<span>推近</span></a><a href="#cycle">cycle<span>輪播</span></a><a href="#spot">spot<span>聚光燈</span></a><a href="#hotspots">hotspots<span>熱點導覽</span></a><a href="#tilt">tilt<span>3D 斜放</span></a><a href="#explode">explode<span>拆層</span></a><a href="#parallax">parallax<span>景深</span></a><a href="#dive">dive<span>鑽進去</span></a><a href="#wipe">wipe<span>擦過去</span></a><a href="#morph">morph<span>頁面重組</span></a></div>
     <div><b>操作示範</b><a href="#clickpath">clickpath<span>游標示範</span></a><a href="#story">story<span>步驟配畫面</span></a><a href="#chat">chat<span>聊天對話</span></a><a href="#terminal">terminal<span>終端機</span></a><a href="#live">live<span>真網站</span></a><a href="#map">map<span>地圖</span></a></div>
-    <div><b>版面與外框</b><a href="#bento">bento<span>功能格狀總覽</span></a><a href="#assemble">assemble<span>飛進來組合</span></a><a href="#feature">feature<span>輪流當主角</span></a><a href="#collapse">collapse<span>收成網址</span></a><a href="#frames">frames<span>瀏覽器／手機框</span></a><a href="#devices">devices<span>多裝置</span></a></div>
+    <div><b>版面與外框</b><a href="#bento">bento<span>功能格狀總覽</span></a><a href="#bento">pop · compare · stack<span>格子裡的小效果</span></a><a href="#assemble">assemble<span>飛進來組合</span></a><a href="#feature">feature<span>輪流當主角</span></a><a href="#collapse">collapse<span>收成網址</span></a><a href="#frames">frames<span>瀏覽器／手機框</span></a><a href="#devices">devices<span>多裝置</span></a></div>
   </div>
 <aside class="notes">這份圖鑑本身就是用 web-deck 做的簡報。按 G 看全部縮圖。</aside></section>
 
@@ -243,25 +243,38 @@ frame N（換第幾張）· wait 毫秒</div>
 </section>
 
 <section class="slide fx wide" id="bento">
-  <div class="bento" data-fx="bento" style="grid-template-rows:repeat(2,300px);order:2">
-    <div class="tile"><div class="pan" data-fx="pan" data-delay="1.8"><img src="examples/media/tall-home.png" alt=""></div><div class="cap"><span class="tag">找不到</span><b>照議題找專案</b></div></div>
-    <div class="tile"><div class="pan" data-fx="pan" data-delay="1.8"><img src="examples/media/tall-cat.png" alt=""></div><div class="cap"><span class="tag">找不到</span><b>每個專案一頁</b></div></div>
-    <div class="tile"><div class="zoom" data-fx="zoom" data-at="22% 40%" data-delay="1.8"><img src="examples/media/p-cofacts.png" alt=""></div><div class="cap"><span class="tag">看不懂</span><b>四行講清楚</b></div></div>
-    <div class="tile"><div data-fx="cycle" data-ms="2500"><img src="examples/media/home.png" alt=""><img src="examples/media/c-budget.png" alt=""></div><div class="cap"><span class="tag">找不到人</span><b>一鍵到討論區</b></div></div>
-    <div class="tile"><div class="pan" data-fx="pan" data-delay="1.8"><img src="examples/media/tall-guides.png" alt=""></div><div class="cap"><span class="tag">找不到人</span><b>行動指引</b></div></div>
-    <div class="tile"><div class="pan" data-fx="pan" data-delay="1.8"><img src="examples/media/tall-edit.png" alt=""></div><div class="cap"><span class="tag">資料會舊</span><b>誰都能建議修改</b></div></div>
+  <div class="bento" data-fx="bento" style="height:610px;order:2">
+    <div class="tile w2"><div class="head"><b>照議題找專案</b><span>17 個議題，挑你關心的那一個</span></div><div class="vis pan" data-fx="pan" data-delay="1.6"><img src="examples/media/cat-budget.png" alt=""></div></div>
+    <div class="tile h2 dark"><div class="head"><b>資料庫裡</b><span>台灣公民科技專案</span></div><div class="big"><span data-fx="slot" data-delay="1.4">226</span><small>個專案</small></div></div>
+    <div class="tile"><div class="head"><b>17 個議題</b><span>照大家最想先看的排</span></div><div class="dots" data-fx="pop" data-delay="1.6"><i style="--c:#7c5632"></i><i style="--c:#715080"></i><i style="--c:#7b5720"></i><i style="--c:#864f33"></i><i style="--c:#7b5064"></i><i style="--c:#834e4d"></i><i style="--c:#5e6244"></i><i style="--c:#426b3d"></i><i style="--c:#2e6a6a"></i><i style="--c:#516171"></i><i style="--c:#356580"></i><i style="--c:#6a5d44"></i><i style="--c:#4d5c8e"></i><i style="--c:#626235"></i><i style="--c:#4d6934"></i><i style="--c:#834a65"></i><i style="--c:#576165"></i></div></div>
+    <div class="tile h2"><div class="head"><b>手機也能用</b><span>不用下載 App</span></div><div class="phone"><div class="pan" data-fx="pan" data-delay="1.5" data-ms="9000"><img src="examples/media/mobile-tall.png" alt=""></div></div></div>
+    <div class="tile"><div class="compare fill" data-fx="compare"><img src="examples/media/hero.png" alt=""><img src="examples/media/hero-dark.png" alt=""></div><div class="head pill"><b>深色模式</b></div></div>
+    <div class="tile h2"><div class="head"><b>隨機推薦</b><span>不知道從哪開始，就抽一個</span></div>
+      <div class="stack" data-fx="stack" style="position:absolute;left:24px;right:24px;top:100px">
+        <div class="card"><span class="tag">隨機推一個</span><b>LostSAR 無人機</b><p>用無人機與 beacon 協助登山搜救找人</p></div>
+        <div class="card"><span class="tag">隨機推一個</span><b>CC0 繁體中文句庫</b><p>蒐集無版權限制的繁體中文句子</p></div>
+        <div class="card"><span class="tag">隨機推一個</span><b>秒懂災害潛勢</b><p>從地名與文化素材認識災害潛勢</p></div>
+      </div></div>
+    <div class="tile"><div class="head"><b>許願池</b><span>想做但沒人做的事</span></div><div class="wish"><span data-fx="type" data-delay="2.2">公車到站語音提醒</span></div></div>
+    <div class="tile dark"><div class="head"><b>開放資料 API</b><span>免 token</span></div>
+      <div class="terminal" data-fx="terminal" data-delay="2">
+        <div class="cmd">curl data.civictech.tw/v0/tech/projects.json</div>
+        <div>{</div>
+        <div>  <span class="k">"label"</span>: <span class="s">"公民科技專案資料庫"</span>,</div>
+        <div>  <span class="k">"recordCount"</span>: <span class="n">230</span>,</div>
+      </div></div>
   </div>
   <div class="info">
     <p class="kicker">bento</p><h2>功能格狀總覽</h2>
-    <p>一格一個功能，從四周飛進來排好；每格裡的截圖還會自己捲、自己推近、自己換。適合「我們做了這些事」。</p>
-    <div class="ask"><b>跟 AI 說</b><p>「做一頁 bento：六格，各放一張截圖和一句話，上面標它解決哪個痛點」</p></div>
+    <p>格子從離它最近的畫面邊飛進來，卡位時微微回彈，整面再慢慢拉近。每格裡面放別的效果：pan、slot、pop、compare、stack、type、terminal。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「做一頁 bento：8 格，照議題找、226 個專案、手機版、深色模式、隨機推薦、許願池、API」</p></div>
     <div class="how">&lt;div class="bento" data-fx="bento"&gt;
-  &lt;div class="tile"&gt;
-    &lt;div class="pan" data-fx="pan"&gt;&lt;img&gt;
-    &lt;div class="cap"&gt;&lt;span class="tag"&gt;…
-      &lt;b&gt;一句話&lt;/b&gt;</div>
+  &lt;div class="tile w2"&gt;（兩格寬）
+    &lt;div class="head"&gt;&lt;b&gt;標題&lt;/b&gt;&lt;span&gt;…
+  &lt;div class="tile h2 dark"&gt;（兩格高）</div>
   </div>
-</section>
+<aside class="notes">照 civictech-video 的 28-bento-assemble 做的。格子大小用 w2（兩格寬）、h2（兩格高）調。
+格子底下放標籤加一句話的寫法（演講用的那種）也可以：&lt;div class="cap"&gt;&lt;span class="tag"&gt;找不到&lt;/span&gt;&lt;b&gt;照議題找專案&lt;/b&gt;&lt;/div&gt;</aside></section>
 
 <!-- ===== spot ===== -->
 <section class="slide fx" id="spot">
@@ -679,17 +692,17 @@ data-mode="settle｜sway｜hold"</div>
 
 <!-- ===== devices ===== -->
 <section class="slide fx" id="devices">
-  <div class="devices" data-fx="tilt" data-mode="sway" data-ms="7000">
-    <div class="laptop"><img src="examples/media/dev-desktop.png" alt=""></div>
+  <div class="devices">
+    <div class="monitor"><img src="examples/media/dev-desktop.png" alt=""></div>
     <div class="tablet"><img src="examples/media/dev-tablet.png" alt=""></div>
     <div class="phone"><img src="examples/media/dev-mobile.png" alt=""></div>
   </div>
   <div class="info">
     <p class="kicker">devices</p><h2>多裝置</h2>
-    <p>筆電、平板、手機排在一起，一看就知道「哪裡都能用」。可以再加 tilt 讓它轉。</p>
+    <p>桌機、平板、手機排在一起，一看就知道「哪裡都能用」。桌機也可以換成 laptop（筆電）。</p>
     <div class="ask"><b>跟 AI 說</b><p>「放一頁 devices，三種裝置的截圖」</p></div>
     <div class="how">&lt;div class="devices"&gt;
-  &lt;div class="laptop"&gt;&lt;img&gt;
+  &lt;div class="monitor"&gt;&lt;img&gt;
   &lt;div class="tablet"&gt;&lt;img&gt;
   &lt;div class="phone"&gt;&lt;img&gt;</div>
   </div>

@@ -2,7 +2,7 @@
 // Screenshot slides of a deck, so you (or an AI) can check them without opening a browser.
 //
 //   node tools/shoot.mjs path/to/index.html            every slide, 2.5 s after it opens
-//   node tools/shoot.mjs index.html 3 12 14            only these slides
+//   node tools/shoot.mjs index.html 3 12 bento         only these slides (number or id)
 //   node tools/shoot.mjs index.html 14 --at 0.5,2,4    several moments of one slide
 //   node tools/shoot.mjs index.html 24 --steps 2       press → twice before the shot
 //   node tools/shoot.mjs index.html --sheet            also save sheet.png, all shots on one page
@@ -31,7 +31,9 @@ page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
 await page.goto(pathToFileURL(file).href);
 await page.waitForFunction(() => window.Deck?.slides?.length);
 const total = await page.evaluate(() => Deck.slides.length);
-const which = args.length ? args.map(Number) : Array.from({ length: total }, (_, i) => i + 1);
+// slides can be given by number or by id (node tools/shoot.mjs effects.html bento 3)
+const ids = await page.evaluate(() => Deck.slides.map((s) => s.id));
+const which = args.length ? args.map((a) => (/^\d+$/.test(a) ? +a : ids.indexOf(a) + 1)).filter((n) => n > 0) : Array.from({ length: total }, (_, i) => i + 1);
 
 const shots = [];
 for (const n of which) {

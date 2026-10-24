@@ -959,22 +959,64 @@
     leave(e) { stop(e); kids(e).forEach(stop); },
   });
 
-  // bento — a grid of tiles flies in from around the edges and settles; tiles can hold
-  // their own effects (pan, zoom, cycle…) and a caption.
-  // <div class="bento" data-fx="bento"><div class="tile"><div class="pan" data-fx="pan"><img></div>
-  //   <div class="cap"><span class="tag">找不到</span><b>照議題找專案</b></div></div>…</div>
+  // bento — a feature grid. Tiles fly in from the nearest screen edge, overshoot a little
+  // as they lock into place, then the whole grid drifts closer. Tiles keep their own
+  // effects running inside (pan, slot, type, terminal, stack, compare…).
+  // Size tiles with class w2 / h2 (two columns wide / two rows tall).
+  // <div class="bento" data-fx="bento"><div class="tile w2"><div class="head"><b>標題</b><span>一句話</span></div>…</div>…</div>
   register("bento", {
     enter(e) {
-      const tiles = kids(e), st = num(e.dataset.stagger, 0.15), d = delay(e, 0.1);
-      const cx = e.offsetWidth / 2, cy = e.offsetHeight / 2;
+      const tiles = kids(e), slide = e.closest(".slide"), s = stageScale(slide), sr = slide.getBoundingClientRect();
       tiles.forEach((c, i) => {
-        const dx = (c.offsetLeft + c.offsetWidth / 2 - cx) * 0.9, dy = (c.offsetTop + c.offsetHeight / 2 - cy) * 1.4;
-        const r = (rnd(i, 4) - 0.5) * 18;
-        anim(c, [{ opacity: 0, transform: `translate(${dx}px, ${dy}px) rotate(${r}deg) scale(.7)` }, { opacity: 1, transform: "none" }],
-          { duration: 1000, delay: (d + i * st) * 1000, easing: EASE });
+        stop(c);
+        const r = c.getBoundingClientRect();
+        const cx = (r.left + r.width / 2 - sr.left) / s - Deck.W / 2, cy = (r.top + r.height / 2 - sr.top) / s - Deck.H / 2;
+        const [dx, dy] = Math.abs(cx) / Deck.W > Math.abs(cy) / Deck.H ? [Math.sign(cx) * 1300, cy * 0.3] : [cx * 0.3, Math.sign(cy || 1) * 900];
+        const rot = (rnd(i, 4) - 0.5) * 30, d = delay(e, 0.1) + rnd(i, 9) * num(e.dataset.spread, 0.7);
+        anim(c, [{ opacity: 0, transform: `translate(${dx}px, ${dy}px) rotate(${rot}deg)`, offset: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 1, transform: "none" }],
+          { duration: 1000, delay: d * 1000, easing: "cubic-bezier(.34,1.45,.64,1)" });
       });
+      if (e.dataset.drift !== "off") anim(e, [{ transform: "scale(1)" }, { transform: "scale(1.035)" }], { duration: 8000, delay: 1500, easing: "ease-in-out" });
+    },
+    leave(e) { stop(e); kids(e).forEach(stop); },
+  });
+
+  // pop — children pop in one by one with a little bounce (dots, badges, logos).
+  // <div data-fx="pop"><i></i><i></i>…</div>
+  register("pop", {
+    enter(e) {
+      const st = num(e.dataset.stagger, 0.05), d = delay(e, 0.8);
+      kids(e).forEach((c, i) => anim(c, [{ transform: "scale(0)", opacity: 0 }, { transform: "scale(1)", opacity: 1 }],
+        { duration: 500, delay: (d + i * st) * 1000, easing: "cubic-bezier(.34,1.56,.64,1)" }));
     },
     leave(e) { kids(e).forEach(stop); },
+  });
+
+  // compare — two pictures split by a line that sweeps back and forth (light/dark, before/after).
+  // <div class="compare" data-fx="compare"><img src="light.png"><img src="dark.png"></div>
+  register("compare", {
+    setup(e) { if (!e.querySelector(".cmp-line")) gen("i", "cmp-line", e); this.at(e, 50); },
+    at(e, x) { const [, b] = kids(e); if (b) b.style.clipPath = `inset(0 0 0 ${x}%)`; e.querySelector(".cmp-line").style.left = x + "%"; },
+    enter(e) { this.setup(e); const per = ms(e, 3200) / 1000; loopRaf(e, (t) => this.at(e, 50 + 38 * Math.sin((t / per) * Math.PI * 2))); },
+    leave(e) { stop(e); },
+  });
+
+  // stack — a pile of cards; the front one moves to the back every few seconds.
+  // <div class="stack" data-fx="stack"><div class="card">…</div><div class="card">…</div>…</div>
+  register("stack", {
+    place(e, t) {
+      const cards = kids(e), n = cards.length, every = ms(e, 1600) / 1000;
+      cards.forEach((c, i) => {
+        const phase = ((t / every + (n - i)) % n + n) % n, depth = Math.floor(phase);
+        const enter = depth === 0 ? 1 - Math.pow(2, -10 * clamp((phase % 1) / 0.35)) : 1;
+        c.style.zIndex = n - depth;
+        c.style.transform = `translateY(${depth * 16}px) scale(${1 - depth * 0.05}) rotate(${(1 - enter) * -7}deg)`;
+        c.style.opacity = 1 - depth * 0.3;
+      });
+    },
+    setup(e) { this.place(e, 0); },
+    enter(e) { const d = delay(e, 1.2); loopRaf(e, (t) => this.place(e, Math.max(0, t - d))); },
+    leave(e) { stop(e); },
   });
 
   // preload every morph on the page so thumbnails have something to show
