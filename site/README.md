@@ -15,6 +15,6 @@ npm run build      # → dist/
   to `master` (built with `BASE=/slidejam`).
 - **Previews:** Cloudflare Pages builds every branch at
   `https://<branch>.slidejam.pages.dev`. Settings: root directory `site`, build command
-  `npm run build`, output `dist`, env `NODE_VERSION=22`.
+  `npm run build`, output `dist`. Node comes from `site/.node-version` (Astro needs ≥ 22.23).
 - **Effect thumbnails** in `public/thumbs/` come from `node tools/thumbs.mjs` (run it from
   the repo root after changing an effect).
