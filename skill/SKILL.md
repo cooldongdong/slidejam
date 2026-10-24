@@ -11,21 +11,73 @@ The repo root is the parent folder of this skill (resolve the symlink:
 **`effects.html` is the source of truth for effects.** Before writing markup for an
 effect, open that slide in `effects.html` and copy its pattern. Don't work from memory.
 
-## Starting a deck
+## The flow: walk the user through it
 
-1. **Talk before you build.** Agree on the audience, length, the 3–5 sections, and
-   which real pages or screens should show up. Ask how many hours they have. Get a
-   clear go-ahead before you create files.
-2. `node tools/new-deck.mjs <folder>` creates `index.html`, `deck/` (a copy of the
-   engine) and `media/`. Use `--update` later to refresh only `deck/`.
-3. Put screenshots in `media/`. For live sites, use Playwright at 1600×900 and
-   `deviceScaleFactor: 2`, the same as `tools/capture-morph.mjs`.
-4. Write the slides. Use one `<section class="slide">` per page, `data-i` for the
-   entrance order, and `<aside class="notes">` for the speaker notes.
-5. **Check your work.** Run `node tools/shoot.mjs <deck>/index.html --sheet`, then
-   Read `<deck>/.shots/sheet.png`. For motion, use
-   `--at 0.5,2,4 <slide>`; for steps, use `--steps N`. Fix any page errors it prints.
-6. Commit early and in small pieces.
+Follow these steps in order, and tell the user which step you are on, e.g.「（步驟 2／6：大綱）」.
+They are the same steps as the site's 使用流程 page (`guide.html`). Keep the two in sync.
+
+### Step 0: which deck?
+- If the user named a folder, or pasted an annotation list (its first lines give
+  the file path), that is the deck. Read its `index.html` and go to step 5.
+- Otherwise ask one question: 開一份新的，還是繼續做某個資料夾的簡報？
+- To find existing decks, look for folders that contain both `index.html` and
+  `deck/deck.js` (for example `~/talks/*`). List them and let the user pick.
+
+### Step 1: opening questions (new deck only)
+Ask these five in one message, then wait:
+1. 講什麼：主題和你最想讓台下記住的一句話
+2. 講給誰：聽眾是誰、對這個主題熟不熟
+3. 講多久：幾分鐘
+4. 要秀哪些網站或畫面：網址也一起給
+5. 你有幾小時可以做：這決定第一版做多細
+
+### Step 2: outline (needs a go-ahead)
+Give one line per slide: the point it makes, the effect from `effects.html` by
+name, and any screenshot or morph it needs. Mark the slides that need real
+screenshots. **Wait for 「可以動工」 or an equivalent go-ahead.** Do not create files
+before that.
+
+### Step 3: set up
+- `node tools/new-deck.mjs <folder>`. Use the folder the user chose; the default is
+  `~/talks/<short-name>`.
+- Take screenshots into `media/` with Playwright at 1600×900 and
+  `deviceScaleFactor: 2`. Capture morphs (see below).
+- If the folder is a git repo, commit.
+
+### Step 4: first version
+- Write every slide, with speaker notes.
+- Check your work: run `node tools/shoot.mjs <deck>/index.html --sheet`, Read the
+  sheet, and fix what looks wrong. For motion, use `--at 0.5,2,4 <slide>`.
+- Then hand it over in one message:
+  - the path to open in Chrome;
+  - a one-line summary per slide;
+  - what you are unsure about;
+  - how to give feedback: press E to fix wording themselves; for effects or
+    layout, press A to mark spots and paste the list back.
+
+### Step 5: rounds of changes
+- Treat each message or pasted annotation list as one round.
+- Handle every item.
+- Re-shoot only the slides you touched.
+- Report back item by item.
+- Commit after each round.
+
+### Step 6: before the talk
+Run through this with the user:
+- **Network:** `map` and `live` need it. Offer screenshot fallbacks.
+- **Fonts:** Google Fonts fall back to system fonts offline.
+- **Presenter view:** P opens notes on their own screen. Share or project the main
+  window only.
+- **Full screen:** F.
+- **Blank slides:** look for any in the G overview.
+
+## More than one deck
+- Every deck is its own folder with its own copy of the engine. Decks never
+  affect each other.
+- In a new conversation, the user can say「繼續做 ~/talks/xxx」or just paste an
+  annotation list. Go to step 5.
+- When the engine gains effects, run `node tools/new-deck.mjs <deck> --update`.
+  It replaces only that deck's `deck/` folder.
 
 ## Reading an annotation list
 
@@ -77,15 +129,22 @@ replaces only that. Write markup it can find:
 - Map pages need `wait: "map"`. Popups go in `init` (localStorage flags) or `hide`.
 - Re-shoot at 2.2–3.5 s to check the moment the box grows.
 
-## Adding a new effect
+## Where effects live, and adding one
 
-1. Register it in `deck/fx.js` with `register("name", { enter, leave, step?, thumb? })`.
-   - `leave` must restore the authored state. Edit mode relies on this.
-   - Mark generated nodes with the `gen()` helper so edit mode and annotation skip them.
-2. Add its CSS under `/* effects */` in `deck/deck.css`.
-3. Add a slide to `effects.html`: a demo, a sentence for 「跟 AI 說」, and the markup.
-   Also add it to the index on slide 1.
-4. Run `tools/new-deck.mjs <deck> --update` for decks that need it.
+Each effect is one file, `deck/fx/<name>.js`, holding its JS and its CSS
+(`Deck.lib.css(...)`). `deck.js` reads every `data-fx` name on the page and loads
+only those files, so a deck never lists scripts by hand. Shared helpers are in
+`deck/fx/_lib.js` (`Deck.lib`). To change an effect, read just its file.
+
+1. Create `deck/fx/<name>.js`. Start from a similar effect. It should:
+   - take what it needs from `Deck.lib`;
+   - put its styles in `Deck.lib.css(`…`)`;
+   - call `register("<name>", { setup?, enter, leave, step?, thumb? })`.
+2. `leave` must restore the authored state. Edit mode relies on this.
+3. Mark generated nodes with `gen()`, so edit mode and annotation skip them.
+4. Add a slide to `effects.html` with `id="<name>"`. It needs a demo, a line for
+   「跟 AI 說」 and the markup. Then add it to the index on slide 1.
+5. Run `tools/new-deck.mjs <deck> --update` for any deck that needs the effect.
 
 ## Writing the talk
 

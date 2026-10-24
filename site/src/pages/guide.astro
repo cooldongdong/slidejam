@@ -1,0 +1,478 @@
+---
+// The workflow page: a dark, cinematic walk from typing /slidejam to standing on stage.
+import Base from "../layouts/Base.astro";
+const B = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+// The six steps (plus step 0). cli is the Claude Code transcript for that step:
+// ["you", zh, en] typed by you · ["ai", zh, en] Claude's reply · ["tool", zh, en, output] a tool call.
+// tree: the folder after this step; "+" just appeared, "*" just changed.
+const STEPS = [
+  { zh: "呼叫 /slidejam", en: "Call /slidejam",
+    ai: ["先問你要開新的，還是繼續某個資料夾。貼了標註清單，就直接從清單裡的路徑接著做。", "Asks: a new deck or an existing folder? A pasted annotation list carries its own path."],
+    you: ["在 Claude Code 輸入 /slidejam，或直接說「做簡報」。", "Type /slidejam in Claude Code, or just say \"make me a deck\"."],
+    cli: [["you", "/slidejam", "/slidejam"], ["ai", "（步驟 0）開一份新的，還是繼續某個資料夾的簡報？", "(step 0) A new deck, or carry on with a folder?"], ["you", "新的，介紹 civictech.tw 的建置成果", "New — what we built on civictech.tw"]],
+    tree: [] },
+  { zh: "開場五問", en: "Five questions",
+    ai: ["一次問完：講什麼、講給誰、講多久、要秀哪些網站、你有幾小時。", "Asks all five at once: topic, audience, length, sites to show, hours you have."],
+    you: ["回答。時間少，第一版就做精簡一點。", "Answer. Little time means a leaner first version."],
+    cli: [["ai", "（步驟 1／6）先問五件事：\n1. 最想讓台下記住哪一句？\n2. 聽眾是誰？ 3. 講幾分鐘？\n4. 要秀哪些網站？ 5. 你有幾小時？", "(step 1/6) Five questions first:\n1. The one line they should remember?\n2. Audience? 3. Minutes?\n4. Sites to show? 5. Hours you have?"], ["you", "活動參與者，20 分鐘，秀 civictech.tw，我有一個半小時", "Event attendees, 20 min, civictech.tw, I have 90 minutes"]],
+    tree: [] },
+  { zh: "大綱", en: "Outline", gate: true,
+    ai: ["每頁一句話，標出用哪個效果、需要哪些截圖。", "One line per slide, with the effect by name and the screenshots it needs."],
+    you: ["刪、改、換順序，滿意了說「可以動工」。", "Cut, reword, reorder; say go when it's right."],
+    cli: [["ai", "（步驟 2／6）大綱，12 頁：\n 1  開場　　　　letters\n 2  四個痛點　　bento\n 3  找得到　　　morph（拍 civictech.tw）\n …\n可以動工嗎？", "(step 2/6) Outline, 12 slides:\n 1  opening     letters\n 2  four pains  bento\n 3  findable    morph (capture civictech.tw)\n …\nGo?"], ["you", "第 5 頁拿掉，可以動工", "Drop slide 5 — go"]],
+    tree: [] },
+  { zh: "建檔", en: "Set up",
+    ai: ["開資料夾、截圖、拍頁面重組動畫。", "Makes the folder, takes screenshots, captures morphs."],
+    you: ["等。網站要登入的話，AI 會請你幫忙。", "Wait. If a site needs a login, the AI asks."],
+    cli: [["tool", "Bash(node tools/new-deck.mjs ~/talks/civictech)", "Bash(node tools/new-deck.mjs ~/talks/civictech)", "✓ new deck at ~/talks/civictech"], ["tool", "Bash(node tools/capture-morph.mjs morph.config.mjs)", "Bash(node tools/capture-morph.mjs morph.config.mjs)", "✓ media/morph-project  (2 pairs, 3 rows)"], ["ai", "（步驟 3／6）資料夾開好了，拍了 6 張截圖、1 段 morph。", "(step 3/6) Folder ready: 6 screenshots and 1 morph."]],
+    tree: ["+civictech/", "+  index.html", "+  deck/", "+  media/", "+    home.png …", "+    morph-project/"] },
+  { zh: "第一版", en: "First version",
+    ai: ["做完全部頁面和講稿，自己截圖檢查，告訴你哪裡不確定。", "Writes every slide and the notes, checks its own screenshots, says what it's unsure of."],
+    you: ["用 Chrome 打開，從頭播一次。", "Open it in Chrome and play it through."],
+    cli: [["tool", "Bash(node tools/shoot.mjs ~/talks/civictech/index.html --sheet)", "Bash(node tools/shoot.mjs ~/talks/civictech/index.html --sheet)", "✓ 12 slide(s) → .shots"], ["tool", "Read(.shots/sheet.png)", "Read(.shots/sheet.png)", "Read image"], ["ai", "（步驟 4／6）12 頁做好了，打開 ~/talks/civictech/index.html。\n不確定：第 7 頁的數字是去年的。\n字按 E 自己改；效果按 A 標起來貼給我。", "(step 4/6) 12 slides done — open ~/talks/civictech/index.html.\nUnsure: slide 7's numbers are last year's.\nFix words with E; mark effects with A and paste."]],
+    tree: ["civictech/", "  index.html", "  deck/", "  media/", "    home.png …", "    morph-project/", "+  .shots/sheet.png"] },
+  { zh: "來回修", en: "Rounds of changes",
+    ai: ["一則一則處理，只重拍改到的頁，逐項回報。", "Handles each item, re-shoots only what changed, reports item by item."],
+    you: ["字按 E 自己改；效果、版面按 A 點或框，貼清單。", "Words: E. Effects and layout: A, then paste the list."],
+    cli: [["you", "1. 第 12 頁〈找得到〉\n   框住：元素內 9.6 18.9 24 7.7\n   想要：聚光燈打在標題上", "1. slide 12 (findable)\n   box: 9.6 18.9 24 7.7\n   want: spotlight on the title"], ["tool", "Edit(index.html)", "Edit(index.html)", "Updated with 1 change"], ["ai", "（步驟 5／6）第 12 頁加了 spot，框在標題。截圖如下。", "(step 5/6) Slide 12 now has a spot on the title. Screenshot below."]],
+    tree: ["civictech/", "*  index.html", "  deck/", "  media/", "    home.png …", "    morph-project/", "  .shots/sheet.png"] },
+  { zh: "上台前", en: "Before the talk",
+    ai: ["陪你跑檢查清單：網路、字型、講者視窗、全螢幕、空白頁。", "Runs the checklist: network, fonts, presenter view, full screen, blank slides."],
+    you: ["按 P 開講者視窗，排練一次。", "Press P for the presenter view and rehearse."],
+    cli: [["ai", "（步驟 6／6）第 4 頁的地圖要網路。場地沒 Wi-Fi 的話，先換成截圖？", "(step 6/6) Slide 4's map needs a network. Swap in a screenshot in case there's no Wi-Fi?"], ["you", "好，換", "Yes, swap it"], ["tool", "Bash(node tools/shoot.mjs index.html 4)", "Bash(node tools/shoot.mjs index.html 4)", "✓ media/map.png"]],
+    tree: ["civictech/", "  index.html", "  deck/", "  media/", "    home.png …", "+    map.png", "    morph-project/", "  .shots/sheet.png"] },
+];
+// keys you can press on the page; [key, label, 中文說明, English]
+const KEYS = [
+  ["←", "←", "上一頁", "Previous slide"],
+  ["→", "→", "下一步、下一頁", "Next step or slide"],
+  ["g", "G", "總覽：所有頁的縮圖，點一下跳過去；「▶ 播放全部」讓每頁一起動", "Overview: every slide as a thumbnail; ▶ Play all runs them together"],
+  ["p", "P", "講者視窗：講稿、下一頁、計時器，只在你的螢幕", "Presenter view: notes, next slide and a clock, on your screen only"],
+  ["n", "N", "在同一個視窗看講稿", "Notes in the same window"],
+  ["e", "E", "直接在投影片上改字，⌘S 存回檔案", "Edit text on the slide, ⌘S writes it back"],
+  ["a", "A", "標註給 AI：點一下或拖拉框選，複製清單貼給它", "Annotate for the AI: click or box, copy the list"],
+  ["r", "R", "重播這一頁的動畫", "Replay this slide"],
+  ["f", "F", "全螢幕", "Full screen"],
+  ["t", "T", "換主題：即時預覽，喜歡就按 ⌘S 存進檔案", "Themes: preview live, ⌘S saves the choice"],
+  ["?", "?", "所有快捷鍵；點右邊的鍵可以換成別的鍵", "Every key; click one to change it"],
+];
+---
+<Base title="使用流程 — slidejam" description="跟 AI 用 slidejam 做簡報的完整流程：從輸入 /slidejam，到上台。" dark>
+
+<!-- ───── hero: the prompt itself ───── -->
+<section class="g-hero">
+  <div class="wrap">
+    <div class="g-prompt" aria-label="/slidejam"><span>&gt;</span><em id="hero-type"></em><i class="caret"></i></div>
+    <h1 class="g-hero-title"><span lang="zh">從一句話，到上台。</span><span lang="en">From one line to the stage.</span></h1>
+    <p class="g-hero-sub"><span lang="zh">在 Claude Code 打 /slidejam，接下來的路它會帶著你走：問你、列大綱、等你說可以、做出來、陪你改到上台。</span><span lang="en">Type /slidejam in Claude Code and it walks you the rest of the way: asks, outlines, waits for your go, builds, and revises with you until you present.</span></p>
+    <a class="g-cue" href="#setup"><span lang="zh">往下捲</span><span lang="en">Scroll</span> ↓</a>
+  </div>
+</section>
+
+<!-- ───── setup: three lines ───── -->
+<section class="g-block" id="setup"><div class="wrap g-two">
+  <div>
+    <p class="kicker"><span lang="zh">準備，只要一次</span><span lang="en">Setup, once</span></p>
+    <h2><span lang="zh">三行指令</span><span lang="en">Three lines</span></h2>
+    <p class="g-lead"><span lang="zh">拿到 slidejam、裝好拍網站用的瀏覽器、把 skill 接進 Claude Code。之後在任何資料夾都能叫它。</span><span lang="en">Get slidejam, install the browser it captures sites with, and plug the skill into Claude Code. Then call it from any folder.</span></p>
+    <p class="g-note"><span lang="zh">沒有 Claude Code？打開<a href={B + "effects/"}>效果圖鑑</a>挑效果，把按 A 標好的清單貼給任何 AI 也行。需要 Chrome 和 Node.js 22.23 以上。</span><span lang="en">No Claude Code? Pick from the <a href={B + "effects/"}>effects</a> and paste lists marked with A into any AI. Needs Chrome and Node.js 22.23+.</span></p>
+  </div>
+  <div class="g-cmds reveal">
+    {[
+      ["git clone https://github.com/cooldongdong/slidejam && cd slidejam", "拿到 slidejam", "get slidejam"],
+      ["npm install && npx playwright install chromium-headless-shell", "拍真網站用的瀏覽器", "a browser for capturing sites"],
+      ["ln -s \"$PWD/skill\" ~/.claude/skills/slidejam", "接進 Claude Code", "plug into Claude Code"],
+    ].map(([cmd, zh, en], i) => (
+      <div class="g-cmd" style={`--i:${i}`}>
+        <span class="n">{i + 1}</span>
+        <div><small><span lang="zh">{zh}</span><span lang="en">{en}</span></small><code>{cmd}</code></div>
+        <button class="copy" data-copy={cmd}><span lang="zh">複製</span><span lang="en">Copy</span></button>
+      </div>
+    ))}
+  </div>
+</div></section>
+
+<!-- ───── the six steps: outline on the left, the session on the right ───── -->
+<section class="flowx" id="flow">
+  <div class="wrap flowx-head">
+    <p class="kicker"><span lang="zh">六個步驟</span><span lang="en">Six steps</span></p>
+    <h2><span lang="zh">看一場真的對話</span><span lang="en">Watch a real session</span></h2>
+    <p class="g-lead"><span lang="zh">往下捲，左邊會重演一次：AI 每則訊息都標出走到第幾步，資料夾一步步長出來。第 2 步之後要你說「可以動工」，它才會開始建檔。</span><span lang="en">Scroll and it replays on the left: every message names its step and the folder grows. Nothing is created until you say go after step 2.</span></p>
+  </div>
+  <div class="fx-story">
+    <ol class="fx-steps">
+      {STEPS.map((st, i) => (
+        <li class="fx-step" data-k={i} id={`step-${i}`}>
+          <span class="no">{i}</span>
+          <div class="body">
+            <h3><span lang="zh">{st.zh}</span><span lang="en">{st.en}</span>{st.gate && <small><span lang="zh">要你說「可以動工」</span><span lang="en">needs your go</span></small>}</h3>
+            <div class="who"><b>AI</b><p><span lang="zh">{st.ai[0]}</span><span lang="en">{st.ai[1]}</span></p></div>
+            <div class="who"><b><span lang="zh">你</span><span lang="en">You</span></b><p><span lang="zh">{st.you[0]}</span><span lang="en">{st.you[1]}</span></p></div>
+            <div class="inline-cli">{st.cli.map(([kind, zh, en, out]) => <p class={kind}><span lang="zh">{zh}</span><span lang="en">{en}</span>{out && <em>⎿ {out}</em>}</p>)}</div>
+          </div>
+        </li>
+      ))}
+    </ol>
+    <nav class="fx-mini" aria-label="steps">
+      {STEPS.map((st, i) => <a href={`#step-${i}`} data-k={i}><i>{i}</i><span lang="zh">{st.zh}</span><span lang="en">{st.en}</span></a>)}
+    </nav>
+    <div class="fx-sticky">
+      <div class="term" id="term">
+        <div class="term-bar"><i></i><i></i><i></i><span>~/talks — claude</span>
+          <div class="mode" role="group" aria-label="view">
+            <button data-mode="cli" class="on"><span lang="zh">終端機</span><span lang="en">Terminal</span></button>
+            <button data-mode="chat"><span lang="zh">聊天</span><span lang="en">Chat</span></button>
+          </div>
+        </div>
+        <div class="term-body">
+          <div class="term-log" id="log"></div>
+          <aside class="term-tree"><b>~/talks/</b><div id="tree"></div></aside>
+        </div>
+        <div class="term-input"><span class="ps">&gt;</span><em id="typing"></em><i class="caret"></i><span class="hint"><span lang="zh">輸入訊息…</span><span lang="en">Message…</span></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───── more than one deck ───── -->
+<section class="g-block" id="decks"><div class="wrap g-two">
+  <div class="folders reveal" aria-hidden="true">
+    {[["civictech", "#0d5f74", "default"], ["misheng", "#7c3aed", "night"], ["taipei-trip", "#9a4a1f", "warm"]].map(([name, c, theme], i) => (
+      <div class="folder" style={`--c:${c};--i:${i}`}>
+        <span class="tab">~/talks/{name}/</span>
+        <span class="files">index.html<br>deck/<br>media/<br><small>theme: {theme}</small></span>
+      </div>
+    ))}
+  </div>
+  <div>
+    <p class="kicker"><span lang="zh">不只一份</span><span lang="en">More than one</span></p>
+    <h2><span lang="zh">每份簡報，一個資料夾</span><span lang="en">One folder per deck</span></h2>
+    <div class="g-cases">
+      <div><b><span lang="zh">開第二份</span><span lang="en">A second deck</span></b><p><span lang="zh">再打一次 /slidejam，選「開新的」。各自有一份引擎，互不影響。</span><span lang="en">Type /slidejam again and choose new. Each has its own engine; they never touch.</span></p></div>
+      <div><b><span lang="zh">隔天接著做</span><span lang="en">Tomorrow</span></b><p><span lang="zh">說「繼續做 ~/talks/misheng」，或直接貼標註清單，清單裡有路徑，它會自己找到。</span><span lang="en">Say "carry on with ~/talks/misheng", or paste an annotation list; its path says which deck.</span></p></div>
+      <div><b><span lang="zh">有新效果了</span><span lang="en">New effects</span></b><p><span lang="zh"><code>git pull</code> 之後跑一次 <code>new-deck.mjs ~/talks/x --update</code>，只換引擎，投影片不動。</span><span lang="en"><code>git pull</code>, then <code>new-deck.mjs ~/talks/x --update</code>: only the engine changes.</span></p></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ───── keys you can press ───── -->
+<section class="g-block" id="keys"><div class="wrap">
+  <p class="kicker"><span lang="zh">在簡報裡</span><span lang="en">Inside a deck</span></p>
+  <h2><span lang="zh">按按看</span><span lang="en">Press one</span></h2>
+  <p class="g-lead"><span lang="zh">點下面的鍵，或直接按鍵盤。跟其他工具撞鍵的話，在簡報裡按 ? 就能換。</span><span lang="en">Click a key below or press it on your keyboard. If one clashes with another tool, press ? in a deck to change it.</span></p>
+  <div class="g-keys">
+    <div class="keyboard">
+      {KEYS.map(([k, label]) => <button class="cap" data-k={k}>{label}</button>)}
+    </div>
+    <div class="key-screen" id="key-screen">
+      <kbd id="ks-key">G</kbd>
+      {KEYS.map(([k, , zh, en]) => <p data-k={k} hidden><span lang="zh">{zh}</span><span lang="en">{en}</span></p>)}
+    </div>
+  </div>
+</div></section>
+
+<!-- ───── where effects live ───── -->
+<section class="g-block" id="effects-dir"><div class="wrap g-two">
+  <div>
+    <p class="kicker"><span lang="zh">效果放在哪</span><span lang="en">Where effects live</span></p>
+    <h2><span lang="zh">一個效果，一個檔案</span><span lang="en">One effect, one file</span></h2>
+    <p class="g-lead"><span lang="zh">JS 和樣式都在同一個檔。簡報只載入自己用到的效果。圖鑑裡沒有你要的？描述給 AI，它會加一個新檔、在圖鑑加一頁示範，下次就能叫名字。</span><span lang="en">Script and styles in one file, and a deck loads only what it uses. Missing one? Describe it; the AI adds a file and a gallery slide, and next time you call it by name.</span></p>
+    <a class="btn primary" href={B + "effects/"}><span lang="zh">看全部效果 →</span><span lang="en">See every effect →</span></a>
+  </div>
+  <pre class="g-tree reveal">{["deck/", "  deck.js      # 翻頁、總覽、E、A、P", "  deck.css", "  themes/      # default · warm · night · mono", "  fx/", "    _lib.js    # 共用小工具", "    bento.js", "    morph.js", "    map.js", "    particles.js", "    …          # 每種效果一個檔"].map((l, i) => <span style={`--i:${i}`}>{l}{"\n"}</span>)}</pre>
+</div></section>
+
+<!-- ───── end ───── -->
+<section class="g-end"><div class="wrap">
+  <h2><span lang="zh">準備好了就打</span><span lang="en">Ready? Type</span></h2>
+  <button class="g-big copy" data-copy="/slidejam"><span>&gt;</span> /slidejam <small><span lang="zh">點一下複製</span><span lang="en">click to copy</span></small></button>
+</div></section>
+</Base>
+
+<script is:inline define:vars={{ STEPS }}>
+const L = () => (document.documentElement.dataset.lang === "en" ? 2 : 1);
+
+// hero: the prompt types itself, then the title arrives
+(() => {
+  const el = document.getElementById("hero-type"), text = "/slidejam";
+  [...text].forEach((_, i) => setTimeout(() => (el.textContent = text.slice(0, i + 1)), 500 + i * 110));
+  setTimeout(() => document.body.classList.add("hero-done"), 500 + text.length * 110 + 300);
+})();
+
+// copy buttons
+document.querySelectorAll(".copy").forEach((b) => b.addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(b.dataset.copy); b.classList.add("copied"); setTimeout(() => b.classList.remove("copied"), 1400); } catch {}
+}));
+
+// things that reveal when scrolled into view
+const rio = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && e.target.classList.add("in")), { threshold: 0.3 });
+document.querySelectorAll(".reveal").forEach((r) => rio.observe(r));
+
+// ── the session ──
+const log = document.getElementById("log"), tree = document.getElementById("tree"), typing = document.getElementById("typing");
+const term = document.getElementById("term"), steps = [...document.querySelectorAll(".fx-step")];
+let cur = -1, timers = [];
+const line = (m, old) => {
+  const d = document.createElement("div");
+  d.className = m[0] + (old ? " old" : "");
+  if (m[0] === "tool") {
+    const t = m[L()], k = t.indexOf("(");
+    d.innerHTML = "<b></b><span></span><em></em>";
+    d.children[0].textContent = t.slice(0, k); d.children[1].textContent = t.slice(k); d.children[2].textContent = "⎿  " + m[3];
+  } else d.textContent = m[L()];
+  log.appendChild(d);
+};
+function drawTree(k) {
+  const st = STEPS[k];
+  tree.innerHTML = st.tree.length ? "" : `<span class="empty">${L() === 2 ? "(empty)" : "（還是空的）"}</span>`;
+  st.tree.forEach((t) => { const d = document.createElement("div"); const m = t[0]; d.textContent = m === "+" || m === "*" ? t.slice(1) : t; if (m === "+") d.className = "new"; if (m === "*") d.className = "mod"; tree.appendChild(d); });
+}
+function play(k, animate) {
+  timers.forEach(clearTimeout); timers = [];
+  typing.textContent = ""; log.innerHTML = "";
+  for (let j = 0; j < k; j++) STEPS[j].cli.forEach((m) => line(m, true));
+  steps.forEach((s, j) => { s.classList.toggle("on", j === k); s.classList.toggle("done", j < k); });
+  document.querySelectorAll(".fx-mini a").forEach((a, j) => { a.classList.toggle("on", j === k); a.classList.toggle("done", j < k); });
+  drawTree(k);
+  if (!animate) return STEPS[k].cli.forEach((m) => line(m));
+  let t = 250;
+  const at = (ms, f) => timers.push(setTimeout(f, ms));
+  STEPS[k].cli.forEach((m) => {
+    if (m[0] === "you") {
+      const text = m[L()], per = Math.min(45, 900 / text.length);
+      [...text].forEach((_, i) => at(t + i * per, () => (typing.textContent = text.slice(0, i + 1))));
+      t += text.length * per + 250;
+      at(t, () => { typing.textContent = ""; line(m); });
+      t += 400;
+    } else {
+      at(t, () => { const d = document.createElement("div"); d.className = "think"; d.innerHTML = `<span>${L() === 2 ? "Thinking…" : "思考中…"}</span><i></i><i></i><i></i>`; log.appendChild(d); });
+      t += 700;
+      at(t, () => { log.querySelector(".think")?.remove(); line(m); });
+      t += m[0] === "tool" ? 500 : 650;
+    }
+  });
+}
+const io = new IntersectionObserver((es) => es.forEach((e) => {
+  if (!e.isIntersecting) return;
+  const k = +e.target.dataset.k;
+  if (k !== cur) { cur = k; play(k, true); }
+}), { rootMargin: "-45% 0px -45% 0px" });
+steps.forEach((s) => io.observe(s));
+play(0, false); cur = 0;
+new MutationObserver(() => play(cur, false)).observe(document.documentElement, { attributes: true, attributeFilter: ["data-lang"] });
+steps.forEach((s) => s.querySelector(".no").addEventListener("click", () => s.scrollIntoView({ behavior: "smooth", block: "center" })));
+document.querySelectorAll(".fx-mini a").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); steps[+a.dataset.k].scrollIntoView({ behavior: "smooth", block: "center" }); }));
+
+// terminal or chat: same session, two looks; remembered
+const setMode = (m) => {
+  term.classList.toggle("chat", m === "chat");
+  term.querySelectorAll(".mode button").forEach((b) => b.classList.toggle("on", b.dataset.mode === m));
+  try { localStorage.setItem("slidejam-guide-mode", m); } catch {}
+};
+term.querySelectorAll(".mode button").forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
+try { setMode(localStorage.getItem("slidejam-guide-mode") || "cli"); } catch { setMode("cli"); }
+
+// while the session fills the screen, the site header steps aside
+const flow = document.getElementById("flow");
+const immerse = () => { const r = flow.getBoundingClientRect(); document.body.classList.toggle("immersive", r.top < 70 && r.bottom > innerHeight * 0.55); };
+addEventListener("scroll", immerse, { passive: true }); immerse();
+
+// ── keys you can press ──
+const caps = [...document.querySelectorAll(".cap")], screenKey = document.getElementById("ks-key");
+const notes = [...document.querySelectorAll("#key-screen p")];
+function press(k) {
+  const cap = caps.find((c) => c.dataset.k === k);
+  if (!cap) return false;
+  caps.forEach((c) => c.classList.toggle("on", c === cap));
+  cap.classList.remove("down"); void cap.offsetWidth; cap.classList.add("down");
+  screenKey.textContent = cap.textContent;
+  notes.forEach((n) => (n.hidden = n.dataset.k !== k));
+  return true;
+}
+caps.forEach((c) => c.addEventListener("click", () => press(c.dataset.k)));
+const keysSec = document.getElementById("keys");
+addEventListener("keydown", (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const r = keysSec.getBoundingClientRect();
+  if (r.bottom < 0 || r.top > innerHeight) return; // only while the keys are on screen
+  const k = e.key === "ArrowLeft" ? "←" : e.key === "ArrowRight" ? "→" : e.key.toLowerCase();
+  if (press(k)) e.preventDefault();
+});
+press("g");
+</script>
+
+<style is:global>
+.kicker{font:600 14px var(--mono);letter-spacing:.08em;color:#7fd1e2;text-transform:uppercase;margin:0 0 12px}
+body.dark h2{color:#fff}
+.g-lead{font-size:18px;color:#a9bac0;max-width:640px;margin:0 0 24px}
+.g-note{font-size:15px;color:#7d9096}
+.g-note a{color:#7fd1e2}
+.g-block{padding:120px 0;border-top:1px solid #141d21}
+.g-block h2{font-size:clamp(32px,4.4vw,54px);line-height:1.1;margin:0 0 18px;letter-spacing:-.02em}
+.g-two{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.g-two > *{min-width:0}
+
+/* hero */
+.g-hero{min-height:calc(100vh - 64px);display:flex;align-items:center;background:radial-gradient(80% 60% at 30% 40%,#0f2a31 0%,#07090a 65%)}
+.g-prompt{display:flex;align-items:center;gap:.4em;font:600 clamp(48px,10vw,128px)/1 var(--mono);color:#fff;letter-spacing:-.03em}
+.g-prompt span{color:#4fb3c9}
+.g-prompt em{font-style:normal}
+.g-prompt .caret{width:.08em;height:.9em;background:#fff;animation:blink 1s steps(1) infinite}
+.g-hero-title{font-size:clamp(30px,4.5vw,56px);margin:36px 0 0;color:#fff;opacity:0;transform:translateY(20px);transition:opacity .8s,transform .8s cubic-bezier(.16,1,.3,1)}
+.g-hero-sub{font-size:clamp(17px,2vw,21px);color:#a9bac0;max-width:680px;margin:18px 0 0;opacity:0;transform:translateY(20px);transition:opacity .8s .15s,transform .8s .15s cubic-bezier(.16,1,.3,1)}
+.g-cue{display:inline-block;margin-top:48px;color:#7d9096;text-decoration:none;font:14px var(--mono);opacity:0;transition:opacity .8s .4s;animation:bob 2s ease-in-out infinite}
+.hero-done .g-hero-title,.hero-done .g-hero-sub{opacity:1;transform:none}
+.hero-done .g-cue{opacity:1}
+@keyframes bob{50%{transform:translateY(6px)}}
+@keyframes blink{50%{opacity:0}}
+
+/* setup commands */
+.g-cmds{display:grid;gap:14px}
+.g-cmd{display:grid;grid-template-columns:36px 1fr auto;gap:14px;align-items:center;background:#0f1719;border:1px solid #1d2a30;border-radius:14px;padding:16px 18px;opacity:0;transform:translateX(30px);transition:opacity .7s calc(var(--i) * .18s),transform .7s cubic-bezier(.16,1,.3,1) calc(var(--i) * .18s)}
+.g-cmds.in .g-cmd{opacity:1;transform:none}
+.g-cmd .n{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#0d5f74;color:#fff;font:600 15px var(--mono)}
+.g-cmd small{display:block;color:#7d9096;font-size:13px;margin-bottom:4px}
+.g-cmd code{display:block;font:14px/1.5 var(--mono);color:#e8eef5;white-space:pre-wrap;word-break:break-all}
+.copy{font:13px var(--sans);border:1px solid #33444c;background:none;color:#a9bac0;border-radius:8px;padding:6px 10px;cursor:pointer}
+.copy:hover{border-color:#7fd1e2;color:#7fd1e2}
+.copy.copied{border-color:#7ddc8a;color:#7ddc8a}
+
+/* six steps: outline left, session right */
+.flowx{background:#07090a;padding:110px 0 60px;border-top:1px solid #141d21}
+.flowx-head{margin-bottom:40px}
+.flowx-head h2{font-size:clamp(32px,4.4vw,54px);margin:0 0 14px;letter-spacing:-.02em}
+/* session on the left, the steps in the middle, a tiny index on the right */
+.fx-story{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,.85fr) 28px;gap:48px;align-items:start;max-width:1600px;margin:0 auto;padding:0 32px}
+.fx-sticky{order:-1}
+/* just dots; hovering the column brings the names out to the left */
+.fx-mini{position:sticky;top:30vh;display:grid;gap:2px;font-size:13px;width:28px}
+.fx-sticky{--th:min(860px,calc(100vh - 64px));position:sticky;top:calc((100vh - var(--th)) / 2)}
+.fx-steps{list-style:none;margin:0;padding:0 0 30vh;position:relative}
+.fx-steps::before{content:"";position:absolute;left:21px;top:0;bottom:0;width:2px;background:#1b262b}
+.fx-step{position:relative;display:grid;grid-template-columns:44px 1fr;gap:18px;min-height:78vh;align-items:center;opacity:.32;transition:opacity .4s}
+.fx-step.on{opacity:1}
+.fx-step.done{opacity:.55}
+.fx-step .no{position:relative;z-index:1;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:#11181b;border:2px solid #22313a;color:#7d9096;font:600 16px var(--mono);cursor:pointer;transition:all .3s}
+.fx-step.on .no{background:#0d5f74;border-color:#4fb3c9;color:#fff;box-shadow:0 0 0 6px rgb(79 179 201/.15)}
+.fx-step.done .no{border-color:#0d5f74;color:#7fd1e2}
+.fx-step h3{font-size:clamp(24px,2.4vw,32px);margin:0 0 16px;color:#fff}
+.fx-step h3 small{display:block;font:500 13px var(--mono);color:#f4b860;margin-top:6px}
+.fx-step .who{margin-bottom:12px}
+.fx-step .who b{display:block;font:600 12px var(--mono);letter-spacing:.08em;color:#7d9096;margin-bottom:3px}
+.fx-step .who p{margin:0;font-size:16px;color:#c7d6db}
+.term{display:flex;flex-direction:column;height:var(--th);background:#11181b;border:1px solid #22313a;border-radius:16px;overflow:hidden;box-shadow:0 60px 120px -40px rgb(0 0 0/.85),0 0 100px -20px rgb(79 179 201/.12);font:15.5px/1.65 var(--mono)}
+.term-bar{display:flex;align-items:center;gap:7px;padding:10px 14px;background:#172126;color:#7d9096;font-size:13px;flex:none}
+.term-bar > i{width:11px;height:11px;border-radius:50%;background:#e06c5f}.term-bar > i:nth-child(2){background:#e3b341}.term-bar > i:nth-child(3){background:#5fb15f}
+.term-bar > span{margin-left:12px}
+.mode{margin-left:auto;display:flex;background:#0f1719;border:1px solid #22313a;border-radius:999px;padding:2px}
+.mode button{font:600 12px var(--sans);border:0;background:none;color:#7d9096;border-radius:999px;padding:4px 12px;cursor:pointer}
+.mode button.on{background:#0d5f74;color:#fff}
+.term-body{flex:1;display:grid;grid-template-columns:1fr 240px;min-height:0}
+.term-log{overflow:hidden;padding:22px 24px;display:flex;flex-direction:column;gap:14px;justify-content:flex-end}
+.term-log > div{white-space:pre-wrap;animation:msg .4s cubic-bezier(.16,1,.3,1)}
+.term-log .you{color:#e8eef5;background:#1b262b;border-left:3px solid #7d9096;padding:6px 12px;border-radius:4px}
+.term-log .you::before{content:"> ";color:#7d9096}
+.term-log .ai,.term-log .tool,.term-log .think{padding-left:20px;position:relative;color:#e8eef5}
+.term-log .ai::before{content:"⏺";position:absolute;left:0}
+.term-log .tool::before{content:"⏺";position:absolute;left:0;color:#7ddc8a}
+.term-log .tool b{font-weight:600}
+.term-log .tool em{display:block;font-style:normal;color:#7d9096}
+.term-log .think{color:#d97757}
+.term-log .think::before{content:"✻";position:absolute;left:0;animation:spin 1.2s linear infinite}
+.term-log .think i{display:none}
+.term-log .old{opacity:.45}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes msg{from{opacity:0;transform:translateY(8px)}}
+.term-tree{border-left:1px solid #22313a;padding:22px 16px;font-size:13.5px;line-height:1.9;color:#7d9096;white-space:pre;overflow:hidden}
+.term-tree b{color:#e8eef5;font-weight:600}
+.term-tree .new{color:#7ddc8a;animation:msg .5s cubic-bezier(.16,1,.3,1) both}
+.term-tree .new::after{content:"  新";font-size:11px}
+.term-tree .mod{color:#f4b860}
+.term-tree .mod::after{content:"  改";font-size:11px}
+html[data-lang="en"] .term-tree .new::after{content:"  new"}
+html[data-lang="en"] .term-tree .mod::after{content:"  edited"}
+.term-tree .empty{color:#4a5a60;font-style:italic}
+.term-input{flex:none;display:flex;align-items:center;gap:10px;margin:0 16px 16px;padding:11px 14px;border:1px solid #33444c;border-radius:8px;color:#e8eef5;min-height:46px}
+.term-input .ps{color:#7d9096}
+.term-input em{font-style:normal;white-space:pre}
+.term-input .caret{width:8px;height:18px;background:#e8eef5;animation:blink 1s steps(1) infinite}
+.term-input .hint{display:none}
+/* chat look: same session as bubbles; tool calls shrink to one grey line */
+.term.chat{font-family:var(--sans);font-size:15.5px}
+.term.chat .term-log{gap:10px}
+.term.chat .term-log .you{align-self:flex-end;max-width:80%;background:#0d5f74;border:0;border-radius:16px 16px 4px 16px;padding:10px 14px;color:#fff}
+.term.chat .term-log .you::before{content:none}
+.term.chat .term-log .ai{align-self:flex-start;max-width:85%;background:#1f2b31;border-radius:16px 16px 16px 4px;padding:10px 14px}
+.term.chat .term-log .ai::before{content:none}
+.term.chat .term-log .tool{align-self:center;padding:3px 12px;border-radius:999px;background:#141d21;color:#7d9096;font-size:12.5px}
+.term.chat .term-log .tool::before{content:"⚙ ";position:static;color:#7d9096}
+.term.chat .term-log .tool b{font-weight:500}
+.term.chat .term-log .tool span,.term.chat .term-log .tool em{display:none}
+.term.chat .term-log .think{align-self:flex-start;background:#1f2b31;border-radius:16px;padding:12px 14px;display:flex;gap:5px}
+.term.chat .term-log .think::before,.term.chat .term-log .think span{display:none}
+.term.chat .term-log .think i{display:block;width:7px;height:7px;border-radius:50%;background:#7d9096;animation:dot 1s infinite}
+.term.chat .term-log .think i:nth-child(3){animation-delay:.15s}.term.chat .term-log .think i:nth-child(4){animation-delay:.3s}
+@keyframes dot{30%{transform:translateY(-4px);opacity:1}0%,60%,100%{opacity:.4}}
+.term.chat .term-input{border-radius:999px;font-family:var(--sans)}
+.term.chat .term-input .ps{display:none}
+.term.chat .term-input .hint{display:inline;color:#4a5a60}
+.term.chat .term-input em:not(:empty) ~ .hint{display:none}
+.inline-cli{display:none}
+
+/* more than one deck: folders fan out */
+.folders{position:relative;height:340px}
+.folder{position:absolute;left:calc(var(--i) * 70px);top:calc(var(--i) * 40px);width:300px;padding:0 0 18px;background:#10171a;border:1px solid #22313a;border-top:3px solid var(--c);border-radius:6px 14px 14px 14px;box-shadow:0 30px 60px -30px rgb(0 0 0/.8);transform:rotate(calc((var(--i) - 1) * -4deg)) translateY(30px);opacity:0;transition:transform .8s cubic-bezier(.16,1,.3,1) calc(var(--i) * .15s),opacity .6s calc(var(--i) * .15s)}
+.folders.in .folder{opacity:1;transform:rotate(calc((var(--i) - 1) * -4deg))}
+.folders.in:hover .folder{transform:rotate(0) translateX(calc(var(--i) * 40px))}
+.folder .tab{display:inline-block;margin:-3px 0 0 -1px;padding:6px 14px;background:var(--c);color:#fff;font:600 13px var(--mono);border-radius:0 0 10px 0}
+.folder .files{display:block;padding:14px 18px 0;font:14px/1.8 var(--mono);color:#a9bac0}
+.folder small{color:var(--c);filter:brightness(1.6)}
+.g-cases{display:grid;gap:18px}
+.g-cases b{display:block;font-size:18px;color:#fff;margin-bottom:4px}
+.g-cases p{margin:0;color:#a9bac0;font-size:16px}
+.g-cases code{font:13px var(--mono);background:#141d21;border-radius:5px;padding:1px 6px;color:#c7d6db}
+
+/* keys you can press */
+.g-keys{display:grid;grid-template-columns:1.3fr 1fr;gap:48px;align-items:center;margin-top:20px}
+.keyboard{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.cap{aspect-ratio:1;font:600 clamp(20px,2.4vw,30px) var(--mono);color:#e8eef5;background:linear-gradient(#1f2b31,#141d21);border:1px solid #33444c;border-radius:14px;box-shadow:0 7px 0 #0b1013,0 12px 24px rgb(0 0 0/.5);cursor:pointer;transition:transform .08s,box-shadow .08s,color .2s,border-color .2s}
+.cap:hover{border-color:#7d9096}
+.cap.on{color:#7fd1e2;border-color:#4fb3c9}
+.cap.down{animation:press .22s}
+@keyframes press{40%{transform:translateY(6px);box-shadow:0 1px 0 #0b1013,0 4px 10px rgb(0 0 0/.5)}}
+.key-screen{min-height:220px;background:#0f1719;border:1px solid #1d2a30;border-radius:18px;padding:28px 30px;box-shadow:inset 0 0 60px rgb(79 179 201/.06)}
+.key-screen kbd{display:block;font:700 72px/1 var(--mono);color:#7fd1e2;margin-bottom:16px}
+.key-screen p{margin:0;font-size:20px;color:#e8eef5;line-height:1.5}
+
+/* effects tree */
+.g-tree{margin:0;background:#0f1719;border:1px solid #1d2a30;border-radius:16px;padding:24px 26px;font:15px/1.9 var(--mono);color:#c7d6db;overflow-x:auto}
+.g-tree span{opacity:.15;transition:opacity .5s calc(var(--i) * .09s)}
+.g-tree.in span{opacity:1}
+
+/* end */
+.g-end{padding:140px 0;text-align:center;background:radial-gradient(60% 70% at 50% 60%,#0f2a31 0%,#07090a 70%);border-top:1px solid #141d21}
+.g-end h2{font-size:clamp(26px,3vw,36px);color:#a9bac0;font-weight:500;margin:0 0 22px}
+.g-big{font:600 clamp(40px,8vw,96px)/1 var(--mono);color:#fff;background:none;border:0;cursor:pointer;padding:10px 20px}
+.g-big > span{color:#4fb3c9}
+.g-big small{display:block;font:14px var(--sans);color:#7d9096;margin-top:16px}
+.g-big.copied small{color:#7ddc8a}
+
+@media (max-width:960px){
+  .g-two,.g-keys{grid-template-columns:1fr;gap:40px}
+  .g-block{padding:80px 0}
+  .fx-story{grid-template-columns:1fr;padding:0 20px}
+  .fx-sticky,.fx-mini{display:none}
+  .fx-steps::before{left:17px}
+  .fx-step{min-height:0;opacity:1;grid-template-columns:36px 1fr;padding:18px 0}
+  .fx-step .no{width:36px;height:36px}
+  .inline-cli{display:grid;gap:8px;margin-top:6px;font:13px/1.6 var(--mono);background:#11181b;border:1px solid #22313a;border-radius:10px;padding:12px}
+  .inline-cli p{margin:0;white-space:pre-wrap;color:#e8eef5}
+  .inline-cli .you::before{content:"> ";color:#7d9096}
+  .inline-cli .ai::before,.inline-cli .tool::before{content:"⏺ "}
+  .inline-cli .tool::before{color:#7ddc8a}
+  .inline-cli em{display:block;font-style:normal;color:#7d9096}
+  .folders{height:300px}.folder{width:230px;left:calc(var(--i) * 34px);top:calc(var(--i) * 34px)}
+  .folders.in:hover .folder{transform:none}
+}
+@media (prefers-reduced-motion:reduce){.term-log > div,.term-tree .new,.g-cue{animation:none}}
+</style>

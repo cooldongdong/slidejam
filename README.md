@@ -19,6 +19,8 @@ There's also a way to talk to an AI about the slides. Press **A**, click anythin
 and write what you want there. The deck turns your notes into a list with
 selectors and coordinates that you can paste to an assistant.
 
+🌐 Site: https://slidejam.pages.dev/ · [Effects](https://slidejam.pages.dev/effects/) · [Workflow with an AI](https://slidejam.pages.dev/guide/)
+
 📖 中文使用說明：[docs/使用說明.md](docs/使用說明.md)
 
 ## Quick start
@@ -39,7 +41,10 @@ Open `effects.html` to see every effect running next to the markup it needs.
 |---|---|
 | → / Space | next step or slide |
 | ← | previous slide |
-| G or click the page number | overview |
+| G or click the page number | overview; its ▶ Play all button runs every slide at once |
+| P | presenter window: notes, next slide and a clock, on your screen only |
+| T | themes: preview any theme live; ⌘S writes the choice into the file |
+| ? or the small button bottom-left | list the keys; click a row to run it, click a key to change it |
 | hover the progress bar | peek at a slide; click to jump |
 | R | replay this slide |
 | N | speaker notes |
@@ -96,11 +101,11 @@ node tools/shoot.mjs index.html 12 --at 0.5,2,4             # one slide at sever
 ## Layout
 
 ```
-deck/        the engine: deck.css, deck.js (core and modes), fx.js (effects)
+deck/        the engine: deck.css, deck.js (core and modes), fx/ (one file per effect, loaded on demand)
 template/    the starting index.html
 tools/       new-deck, capture-morph, shoot
 effects.html gallery of every effect
-examples/    an example deck (storymap) and the gallery's media
+examples/    example decks (intro, taipei) and the gallery's media
 skill/       a Claude Code skill for building decks with an AI
 ```
 

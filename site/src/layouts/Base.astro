@@ -1,0 +1,79 @@
+---
+// Every site page: head, header with language switch, footer.
+// Text in two languages is written as <span lang="zh">…</span><span lang="en">…</span>
+// (or with the <T> component); html[data-lang] shows one of them.
+import "../styles/site.css";
+
+interface Props {
+  title: string;
+  description: string;
+  /** pages that are mostly a deck want the footer out of the way */
+  compact?: boolean;
+  /** a dark page: header and footer switch to dark too */
+  dark?: boolean;
+}
+const { title, description, compact = false, dark = true } = Astro.props; // the whole site is dark now
+const B = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const here = Astro.url.pathname;
+const on = (p: string) => (here.startsWith(B + p) ? "on" : undefined);
+const og = new URL(B + "og.png", Astro.site).href;
+---
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{title}</title>
+<meta name="description" content={description}>
+<meta property="og:type" content="website">
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+<meta property="og:url" content={new URL(Astro.url.pathname, Astro.site).href}>
+<meta property="og:image" content={og}>
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content={og}>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+<script is:inline>
+// language, remembered per visitor; set before paint so only one language ever shows
+function pickLang(l) {
+  document.documentElement.dataset.lang = l;
+  document.documentElement.lang = l === "zh" ? "zh-Hant-TW" : "en";
+  try { localStorage.setItem("slidejam-lang", l); } catch {}
+}
+(() => { let saved = null; try { saved = localStorage.getItem("slidejam-lang"); } catch {} pickLang(saved || (navigator.language.startsWith("zh") ? "zh" : "en")); })();
+</script>
+</head>
+<body class:list={{ compact, dark }}>
+<header id="top"><div class="wrap nav">
+  <a class="logo" href={B}>slide<span>jam</span></a>
+  <nav>
+    <a href={B + "effects/"} class={on("effects")}><span lang="zh">效果圖鑑</span><span lang="en">Effects</span></a>
+    <a href={B + "play/"} class={on("play")}><span lang="zh">範例</span><span lang="en">Examples</span></a>
+    <a href={B + "guide/"} class={on("guide")}><span lang="zh">使用流程</span><span lang="en">Workflow</span></a>
+    <a href="https://github.com/cooldongdong/slidejam">GitHub</a>
+  </nav>
+  <div class="lang"><button data-l="zh">中文</button><button data-l="en">EN</button></div>
+</div></header>
+
+<main><slot /></main>
+
+<footer><div class="wrap">
+  <a class="logo" href={B} style="font-size:18px">slide<span>jam</span></a>
+  <span class="sp"></span>
+  <a href={B + "effects/"}><span lang="zh">效果圖鑑</span><span lang="en">Effects</span></a>
+  <a href={B + "play/"}><span lang="zh">範例</span><span lang="en">Examples</span></a>
+  <a href={B + "guide/"}><span lang="zh">使用流程</span><span lang="en">Workflow</span></a>
+  <a href="https://github.com/cooldongdong/slidejam/blob/master/docs/%E4%BD%BF%E7%94%A8%E8%AA%AA%E6%98%8E.md"><span lang="zh">使用說明</span><span lang="en">User guide (zh)</span></a>
+  <a href="https://github.com/cooldongdong/slidejam">GitHub</a>
+  <span>MIT</span>
+</div></footer>
+
+<script is:inline>
+document.querySelectorAll(".lang button").forEach((b) => b.addEventListener("click", () => pickLang(b.dataset.l)));
+addEventListener("scroll", () => document.getElementById("top").classList.toggle("scrolled", scrollY > 8), { passive: true });
+</script>
+</body>
+</html>

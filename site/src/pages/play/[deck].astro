@@ -1,0 +1,15 @@
+---
+// /play/<deck>/: the same page, opened at that deck's chapter — its own address, to share.
+// ?slide=<id|n> opens the deck in the theater at that slide.
+import Base from "../../layouts/Base.astro";
+import Cases from "../../components/Cases.astro";
+import { decks } from "../../data/decks";
+
+export function getStaticPaths() {
+  return decks.map((d) => ({ params: { deck: d.id }, props: { d } }));
+}
+const { d } = Astro.props;
+---
+<Base title={`${d.zh[0]} — slidejam`} description={`${d.zh[1]}${d.goal[0]}`}>
+  <Cases current={d.id} />
+</Base>

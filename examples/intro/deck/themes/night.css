@@ -1,0 +1,15 @@
+/* slidejam 主題：night（深色）。深色背景、亮青強調，適合晚上的場地、科技主題。 */
+:root{
+  --paper:#0e1417; --surface:#172126; --surface-2:#1f2b31;
+  --ink:#eef4f6; --ink-2:#c5d2d7; --ink-muted:#8a9ca3;
+  --line:#25333a; --line-strong:#33444c;
+  --accent:#4fd1c5; --accent-ink:#8ee6dc; --accent-soft:#16333a; --on-accent:#062a27;
+  --warn:#f4b860; --warn-soft:#3a2c14; --bad:#f0857a; --bad-soft:#3a1d1a;
+  --section-bg:#071012; --section-ink:#eef4f6; --section-muted:#9fb4bb; --section-num:#4fd1c5;
+  --dark:#071012; --dark-line:#1b282d; --on-dark:#eef4f6; --on-dark-muted:#8a9ca3;
+  --c1:#4fd1c5; --c2:#f4b860; --c3:#a78bfa; --c4:#7ddc8a; --c5:#f472b6; --c6:#60a5fa; --c7:#facc15; --c8:#2dd4bf;
+  --device:#05090a; --device-metal:#5a6a70; --chat-bg:#121b1f;
+  --shadow-rgb:0 0 0;
+  --shadow:0 30px 60px -30px rgb(0 0 0/.7);
+  --chrome:#030607;
+}

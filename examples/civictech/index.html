@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>civictech.tw 建置成果</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="deck/deck.css">
+<link rel="stylesheet" href="deck/themes/default.css">
+<style>
+/* only what this talk needs beyond the engine */
+.gap{color:var(--warn)}
+.clip{width:100%;border-radius:var(--radius);display:block;box-shadow:var(--shadow);background:#000}
+.vs{display:grid;grid-template-columns:1fr 90px 1fr;align-items:center;gap:20px}
+.vs .arrow,.arr{font-size:52px;color:var(--ink-muted)}
+.bars-head{display:grid;grid-template-columns:330px 1fr 200px;column-gap:24px;font-family:var(--mono);font-size:18px;color:var(--ink-muted);margin-bottom:14px}
+code.url{font-family:var(--mono);font-size:30px;background:var(--surface);border:1px solid var(--line);padding:18px 26px;border-radius:12px;display:inline-block;color:var(--accent-ink)}
+ol.flow-steps{margin:0;padding:0;list-style:none;counter-reset:f;display:grid;gap:16px}
+ol.flow-steps li{counter-increment:f;font-size:29px;display:grid;grid-template-columns:52px 1fr;align-items:baseline}
+ol.flow-steps li::before{content:counter(f);font-family:var(--mono);font-size:22px;color:var(--on-accent);background:var(--accent);width:36px;height:36px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;transform:translateY(4px)}
+/* messy intros → four lines */
+.insight{position:relative;height:520px}
+.mess{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.mess .card{font-size:22px;color:var(--ink-muted);line-height:1.6;padding:24px}
+.mess .card b{display:block;color:var(--ink);font-size:24px;margin-bottom:8px}
+.mess .empty{border-style:dashed;color:var(--line-strong)}
+.four{position:absolute;inset:0;display:grid;align-content:center;gap:26px}
+.four .ln{display:grid;grid-template-columns:260px 1fr;gap:32px;align-items:baseline}
+.four .ln .lb{font-size:26px;color:var(--ink-muted);text-align:right}
+.four .ln .tx{font-size:38px;color:var(--ink)}
+.four .ln:nth-child(2){transition-delay:.25s}.four .ln:nth-child(3){transition-delay:.5s}.four .ln:nth-child(4){transition-delay:.75s}
+/* two screenshots overlapping */
+.duo{position:relative;height:560px}
+.duo img{position:absolute;width:82%}
+.duo img:first-child{left:0;top:0}
+.duo img:last-child{right:0;bottom:0}
+/* AI fairness */
+.fair-n{font-family:var(--mono);font-size:110px;font-weight:600;line-height:1;margin-bottom:12px}
+.spark{display:flex;align-items:flex-end;gap:1px;height:200px;margin-top:22px;border-bottom:1px solid var(--line-strong)}
+.spark i{flex:1;display:block;min-width:1px}
+/* the AI step in the middle of the data loop */
+.orbit > .ai{border:2px dashed var(--warn);background:var(--surface);border-radius:var(--radius);padding:12px 20px;font-size:24px;font-weight:600;color:var(--warn);text-align:center;width:360px}
+.orbit > .ai small{display:block;font-size:17px;font-weight:400;color:var(--ink-2);margin-top:4px}
+</style>
+</head>
+<body>
+<!-- An example deck: the civictech.tw talk (2026-10), ported to slidejam. Theme: default. -->
+<div id="stage">
+
+<!-- ========== 開場 ========== -->
+<section class="slide video" data-auto><video src="media/02-title.mp4" muted playsinline preload="auto"></video>
+<aside class="notes">（影片自己跑：「想改變的事，已經有人在做」）</aside></section>
+
+<section class="slide">
+  <p class="kicker" data-i="1">CIVICTECH.TW · 建置成果分享</p>
+  <h1 data-i="2">想改變的事，<br><span class="acc">已經有人在做</span></h1>
+  <p class="lede" style="margin-top:40px" data-i="3">台灣公民科技資料庫，這一年做了什麼</p>
+<aside class="notes">大家好，我是 Dong。
+今天跟大家分享 civictech.tw，台灣公民科技資料庫：它想解決什麼問題，做了哪些事。
+分三段講：網站為什麼長這樣、為什麼要 AI 摘要、資料還能怎麼用。</aside></section>
+
+<section class="slide center">
+  <p class="big-q" data-i="1">你有沒有想過，<br>政府預算花到哪裡去了？</p>
+<aside class="notes">先問大家一個問題。
+（停兩秒）
+有人真的去查過嗎？大部分人應該沒有，因為預算書幾百頁，看不懂。</aside></section>
+
+<section class="slide">
+  <div class="grid2" style="grid-template-columns:.85fr 1.3fr">
+    <div>
+      <p class="kicker" data-i="1">2012 年，一個預算網站</p>
+      <h2 data-i="2">把幾千億，<br>變成看得懂的泡泡</h2>
+      <ul class="steps">
+        <li data-i="3">每個泡泡是一筆預算</li>
+        <li data-i="4">金額換算成便當、珍奶</li>
+        <li data-i="5">看不懂？按一下「表示不懂」</li>
+      </ul>
+    </div>
+    <img class="shot" data-i="4" src="media/x-twbudget.png" alt="g0v 中央政府總預算視覺化">
+  </div>
+<aside class="notes">2012 年，有一群工程師做了這個網站：中央政府總預算視覺化。
+每個泡泡是一筆預算，越大越多錢，顏色代表比去年多還是少。
+金額可以換算成便當、珍奶。
+看不懂的項目，還可以按「表示不懂」。
+這是 g0v 最早的專案之一。
+（g0v 起源的說法請揪松團校稿）</aside></section>
+
+<section class="slide">
+  <div class="grid2" style="grid-template-columns:.85fr 1.3fr">
+    <div>
+      <p class="kicker" data-i="1">專案沒有停在 2012</p>
+      <h2 data-i="2">從中央，<br>擴散到地方</h2>
+      <ul class="steps">
+        <li data-i="3">預算視覺化產生器：一套工具，做出好幾個縣市的版本</li>
+        <li data-i="4">政府預算查詢平台：各縣市預算、互相比較、下載資料</li>
+        <li data-i="5">資料不齊，就邀議員一起補</li>
+      </ul>
+    </div>
+    <img class="shot" data-i="4" src="media/x-localbudget.png" alt="政府預算查詢平台：116 年臺北市公務預算">
+  </div>
+<aside class="notes">而且這個專案沒有停在 2012 年。
+有人把它做成「預算視覺化產生器」，一套工具，就能做出好幾個縣市的版本。
+後來也有人做了政府預算查詢平台，可以看各縣市的預算，互相比較，還能下載資料。
+這是 116 年的臺北市預算。
+你看上面那段藍色的字：臺北市的單位預算書沒有公開，所以平台直接邀請議員、議員助理一起提供資料。
+資料不齊，就找人一起補。</aside></section>
+
+<section class="slide">
+  <p class="kicker" data-i="1">資料打開之後，一路長出來的</p>
+  <h2 data-i="2" style="margin-bottom:30px">一個問題，接著下一個問題</h2>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px">
+    <div data-i="3"><img class="shot" src="media/x-watchmoney.png" alt=""><h3 style="margin-top:18px;font-size:28px">預算怎麼被審？</h3><p style="font-size:22px">總預算案審查監督平台</p></div>
+    <div data-i="4"><img class="shot" src="media/x-pcc.png" alt=""><h3 style="margin-top:18px;font-size:28px">錢發給了誰？</h3><p style="font-size:22px">標案資料瀏覽</p></div>
+    <div data-i="5"><img class="shot" src="media/x-campaign.png" alt=""><h3 style="margin-top:18px;font-size:28px">誰捐錢給誰？</h3><p style="font-size:22px">政治獻金數位化</p></div>
+    <div data-i="6"><img class="shot" src="media/x-ivod.png" alt=""><h3 style="margin-top:18px;font-size:28px">國會在說什麼？</h3><p style="font-size:22px">立法院 AI 逐字稿</p></div>
+  </div>
+<aside class="notes">預算看得懂之後，下一個問題就來了。
+預算在立法院怎麼被審？有人做了審查監督平台，看每個立委刪了什麼、凍結什麼。
+錢最後發給了誰？有人把政府採購網的標案整理成好查的網站。
+誰捐錢給立委？政治獻金是掃描檔，大家一起一筆一筆打字數位化，已經打了三十幾萬筆。
+國會在說什麼？現在甚至有 AI 把立法院會議影片自動轉成逐字稿。
+一個問題接著一個問題，一份資料打開，就有人能接著做下一件事。
+這些專案，在 civictech.tw 上都找得到。</aside></section>
+
+<section class="slide">
+  <p class="kicker" data-i="1">公民科技是什麼</p>
+  <h2 data-i="2">用科技，讓公共的事<br>看得懂、參與得到</h2>
+  <div class="grid3">
+    <div class="card" data-i="3"><span class="tag">環境</span><h3>Disfactory</h3><p>看到農地上的違章工廠，拍照回報</p></div>
+    <div class="card" data-i="4"><span class="tag">假訊息</span><h3>Cofacts 真的假的</h3><p>LINE 收到可疑訊息，轉給機器人查</p></div>
+    <div class="card" data-i="5"><span class="tag">語言</span><h3>萌典</h3><p>國語、台語、客語的線上辭典</p></div>
+  </div>
+<aside class="notes">這就是公民科技：用科技，讓公共的事看得懂、參與得到。
+預算只是其中一個議題，再舉三個不同領域的例子。
+Disfactory：看到農地上蓋了疑似違章工廠，在網站上回報位置，跟合作的 NGO 一起追。
+Cofacts：長輩群組傳來的訊息，轉給 LINE 機器人就知道真假。
+萌典：國台客語都查得到。
+大家可能都用過，只是不知道它叫公民科技。</aside></section>
+
+<section class="slide">
+  <p class="kicker" data-i="1">誰在做</p>
+  <h2 data-i="2">g0v 零時政府</h2>
+  <ul class="steps">
+    <li data-i="3">一群志工組成的公民科技社群</li>
+    <li data-i="4">定期辦黑客松，大家叫它「大松」</li>
+    <li data-i="5">揪松團：幫大家揪人、辦活動、整理資料</li>
+  </ul>
+<aside class="notes">這些專案大多來自 g0v 零時政府。
+它不是公司，是一群志工。
+定期辦黑客松，大家叫大松，有人上台提案，有人揪團一起做。
+揪松團是幫忙組織的那群人，civictech.tw 就是揪松團在維護的。
+（g0v 事實陳述請揪松團校稿）</aside></section>
+
+<section class="slide">
+  <p class="kicker" data-i="1">想參與的人，會卡在哪裡？</p>
+  <div style="display:grid;grid-template-columns:1fr 70px 1fr;row-gap:22px;align-items:center;margin-top:6px">
+    <div class="card" data-i="2" style="padding:22px 30px"><span class="tag">痛點 ①　找不到</span><p style="font-size:30px;color:var(--ink)">某個議題，以前有人做過什麼？</p></div>
+    <span class="arr" data-i="2" style="text-align:center">→</span>
+    <div class="card" data-i="2" style="padding:22px 30px;border-color:var(--accent)"><span class="tag">01</span><p style="font-size:30px" class="acc">議題分類，每個專案一頁</p></div>
+    <div class="card" data-i="3" style="padding:22px 30px"><span class="tag">痛點 ②　看不懂</span><p style="font-size:30px;color:var(--ink)">知道名字，不知道它在幹嘛</p></div>
+    <span class="arr" data-i="3" style="text-align:center">→</span>
+    <div class="card" data-i="3" style="padding:22px 30px;border-color:var(--accent)"><span class="tag">02</span><p style="font-size:30px" class="acc">AI insight：四行講清楚</p></div>
+    <div class="card" data-i="4" style="padding:22px 30px"><span class="tag">痛點 ③　找不到人</span><p style="font-size:30px;color:var(--ink)">有什麼資源？去哪裡討論？</p></div>
+    <span class="arr" data-i="4" style="text-align:center">→</span>
+    <div class="card" data-i="4" style="padding:22px 30px;border-color:var(--accent)"><span class="tag">01・02</span><p style="font-size:30px" class="acc">「討論在哪裡」＋行動指引</p></div>
+    <div class="card" data-i="5" style="padding:22px 30px"><span class="tag">痛點 ④　資料會舊</span><p style="font-size:30px;color:var(--ink)">寫了沒人更新，錯了沒人改</p></div>
+    <span class="arr" data-i="5" style="text-align:center">→</span>
+    <div class="card" data-i="5" style="padding:22px 30px;border-color:var(--accent)"><span class="tag">03</span><p style="font-size:30px" class="acc">資料自動流動，誰都能修</p></div>
+  </div>
+<aside class="notes">整理一下，想參與的人會卡在四個地方。
+第一，找不到：我關心某個議題，以前有沒有人做過？
+第二，看不懂：就算知道專案名字，也不知道它在幹嘛。
+第三，找不到人：它有什麼資源可以用？要去哪裡討論？
+第四，資料會舊：寫了沒人更新，錯了也沒人改。
+今天的三段，就是在回答這四個問題。</aside></section>
+
+<section class="slide" style="padding:70px 120px 60px">
+  <p class="kicker" data-i="1" style="margin-bottom:22px">所以 civictech.tw 做了這些事</p>
+  <div class="bento" data-fx="bento" style="--cols:3;height:690px">
+    <div class="tile"><div class="pan" data-fx="pan" data-delay="1.8"><img src="media/tall-home.png" alt=""></div><div class="cap"><span class="tag">找不到</span><b>照議題找專案</b></div></div>
+    <div class="tile"><div class="pan" data-fx="pan" data-delay="1.8"><img src="media/tall-cat.png" alt=""></div><div class="cap"><span class="tag">找不到</span><b>每個專案一頁</b></div></div>
+    <div class="tile"><div class="zoom" data-fx="zoom" data-at="22% 34%" data-delay="1.8" data-scale="1.9"><img src="media/p-cofacts.png" alt=""></div><div class="cap"><span class="tag">看不懂</span><b>AI 四行講清楚</b></div></div>
+    <div class="tile"><div class="zoom" data-fx="zoom" data-at="18% 50%" data-delay="1.8" data-scale="2.2"><img src="media/p-cofacts.png" alt=""></div><div class="cap"><span class="tag">找不到人</span><b>點一下就到討論區</b></div></div>
+    <div class="tile"><div class="pan" data-fx="pan" data-delay="1.8"><img src="media/tall-guides.png" alt=""></div><div class="cap"><span class="tag">找不到人</span><b>行動指引全文</b></div></div>
+    <div class="tile"><div class="pan" data-fx="pan" data-delay="1.8"><img src="media/tall-edit.png" alt=""></div><div class="cap"><span class="tag">資料會舊</span><b>誰都能建議修改</b></div></div>
+  </div>
+<aside class="notes">四個痛點，網站做了六件事回答。
+找不到：照議題找專案，每個專案都有自己一頁。
+看不懂：AI 把每個專案寫成四行。
+找不到人：點一下就到討論區；想自己做，有行動指引。
+資料會舊：每個人都能建議修改。
+接下來一段一段講。</aside></section>
+
+<section class="slide section">
+  <div class="num" data-i="1">01</div>
+  <h1 data-i="2">為什麼網頁<br>長這樣？</h1>
+  <p data-i="3">痛點 ①　找不到：某個議題，以前有人做過什麼？</p>
+<aside class="notes">第一段，網頁為什麼長這樣。
+每個設計背後都有一個問題，我們一個一個看。</aside></section>
+
+<section class="slide">
+  <div class="grid2" style="grid-template-columns:1fr 1.1fr;align-items:start">
+    <div>
+      <p class="kicker" data-i="1">以前怎麼找</p>
+      <ul class="steps" style="margin-top:10px">
+        <li data-i="2">聽朋友說</li>
+        <li data-i="3">去黑客松現場聽提案</li>
+        <li data-i="4">翻共筆、翻 Slack 舊訊息</li>
+      </ul>
+      <p class="kicker" data-i="5" style="margin-top:56px">現在怎麼找</p>
+      <h2 data-i="6" style="font-size:56px">直接問 Google、問 AI</h2>
+      <p data-i="7">那 AI 的答案，<span class="acc">是從哪裡讀來的？</span></p>
+    </div>
+    <div data-i="6" id="google-ai-box" class="card" style="min-height:560px;display:flex;align-items:center;justify-content:center;padding:16px">
+      <img class="shot" src="media/google-ai.png" alt="">
+    </div>
+  </div>
+<aside class="notes">以前要找專案，靠的是口耳相傳。
+聽朋友說、去黑客松現場聽人提案、或在共筆和 Slack 裡翻舊訊息。
+認識對的人，才找得到。
+現在大家會直接問 Google、問 AI。
+（指截圖）我今天搜「預算 公民科技」，Google 的 AI 摘要第三點寫：以 g0v 為首的社群推動「中央政府總預算視覺化」與「台灣公民科技資料庫」，引用的來源就是 civictech.tw。右邊的來源卡片，是我們的「預算視覺化產生器」專案頁。
+但 AI 只能讀到網路上寫清楚的東西。資料散在共筆、Slack、別人的腦袋裡，AI 就讀不到。</aside></section>
+
+<section class="slide">
+  <div class="grid2" style="grid-template-columns:1fr 1.2fr">
+    <div>
+      <p class="kicker" data-i="1">找得到：兩步就到</p>
+      <h2 data-i="2">選議題，<br>就看到專案</h2>
+      <ul class="steps">
+        <li data-i="3">首頁：17 個議題，照大家最想看的排</li>
+        <li data-i="4">議題頁：這一類所有的專案</li>
+        <li data-i="5">每個專案都有自己一頁、自己的網址</li>
+      </ul>
+    </div>
+    <div class="duo" data-i="3">
+      <img class="shot" src="media/home-cats.png" alt="首頁議題分類">
+      <img class="shot" src="media/c-budget.png" alt="政府預算分類頁">
+    </div>
+  </div>
+<aside class="notes">先回答第一個痛點：找不到。
+現在打開首頁，第一個問題就是：你關心的是哪一件事？
+17 個議題，挑一個點進去，這一類的專案全部列出來。
+剛剛講的預算專案，都在「政府預算、決算與標案」這一類。
+每個專案都有自己一頁、自己的網址。
+那為什麼這樣設計？我們拆開來看。</aside></section>
+
+<section class="slide full">
+  <div class="morph" data-fx="morph" data-src="media/morph-project"></div>
+<aside class="notes">（動畫：在「政府預算」議題頁，點「中央政府預算視覺化」，卡片直接展開成專案頁）
+挑一個專案點下去，卡片就展開成它自己的一頁。
+標題、一句話介紹，還有它怎麼運作、去哪裡討論，都在這一頁。
+（按 → 之前想重播，按 R）</aside></section>
+
+<section class="slide video" data-auto><video src="media/06-explode.mp4" muted playsinline preload="auto"></video>
+<aside class="notes">（影片：首頁拆成一層一層）
+先把首頁拆開來看。</aside></section>
+
+<section class="slide">
+  <div class="grid2">
+    <div>
+      <p class="kicker" data-i="1">設計 ①　這是給誰用的？</p>
+      <h2 data-i="2">給「要去揪新手的那個人」</h2>
+      <p data-i="3">不是新手本人。<br>他需要的是：<span class="acc">一個連結，丟給朋友就好</span></p>
+    </div>
+    <video class="clip" data-i="4" src="media/24-share.mp4" muted playsinline loop preload="auto"></video>
+  </div>
+<aside class="notes">第一個問題：這網站給誰用？
+我們的答案是：要去揪新手的那個人。
+新手不會自己來逛資料庫。
+會來的，是想拉朋友入坑的人。
+他需要的，是一個連結，丟到群組裡，朋友點開就看得懂。
+所以每個專案、每個議題，都有自己的網址。</aside></section>
+
+<section class="slide">
+  <p class="kicker" data-i="1">設計 ②　分類要怎麼分？</p>
+  <h2 data-i="2">照「人想知道什麼」來分</h2>
+  <div class="vs" style="grid-template-columns:1fr 90px 1fr">
+    <div class="card" data-i="3"><span class="tag">以前</span><h3>專案在做什麼</h3><p>照 SDGs 影響力類別<br>「終結貧窮」「消除不平等」…</p></div>
+    <div class="arrow" data-i="4">→</div>
+    <div class="card" data-i="5" style="border-color:var(--accent)"><span class="tag">現在</span><h3 class="acc">人想先看什麼</h3><p>照 2026-07 需求問卷<br>127 人填答的 12 個議題</p></div>
+  </div>
+<aside class="notes">第二個問題：分類怎麼分？
+以前照聯合國永續目標分，像是「終結貧窮」。
+那是在說專案做什麼，不是一般人會想找的方式。
+這次我們改用 7 月的需求問卷，127 個人回答他們最想先看哪些議題。
+問卷上的 12 個選項，名稱照抄，一個選項就是一類。
+問卷沒問到的，再補 5 類，總共 17 類。</aside></section>
+
+<section class="slide">
+  <p class="kicker" data-i="1">想先看的人 vs 實際有的專案</p>
+  <div class="bars-head" data-i="1"><span></span><span>還沒做過專案的人，有多少 % 想先看</span><span>專案數</span></div>
+  <div data-fx="bars" data-max="65" data-i="2">
+    <div class="bar hot" data-v="60"><span>政府預算、決算與標案</span><em>60% · 9 個</em></div>
+    <div class="bar" data-v="45"><span>假訊息與詐騙防治</span><em>45% · 7 個</em></div>
+    <div class="bar hot" data-v="39"><span>地方發展與地方創生</span><em>39% · 3 個</em></div>
+    <div class="bar" data-v="37"><span>防災與災害應變</span><em>37% · 12 個</em></div>
+    <div class="bar" data-v="36"><span>法律、立法歷程</span><em>36% · 12 個</em></div>
+    <div class="bar" data-v="34"><span>居住與租屋</span><em>34% · 3 個</em></div>
+    <div class="bar" data-v="32"><span>環境汙染與公害</span><em>32% · 3 個</em></div>
+    <div class="bar" data-v="28"><span>生態與生物多樣性</span><em>28% · 7 個</em></div>
+    <div class="bar" data-v="24"><span>健康與醫療</span><em>24% · 23 個</em></div>
+    <div class="bar" data-v="23"><span>交通與道路安全</span><em>23% · 5 個</em></div>
+    <div class="bar hot" data-v="20"><span>水環境（河川、海洋）</span><em>20% · 2 個</em></div>
+    <div class="bar" data-v="18"><span>土地使用與違章建築</span><em>18% · 8 個</em></div>
+  </div>
+  <p style="margin-top:28px;font-size:26px" class="muted" data-i="3">首頁就照這個順序排。只算「還沒做過專案」的 80 人。</p>
+<aside class="notes">把問卷結果和專案數擺在一起，就看到有趣的事。
+預算：六成的人想先看，只有 9 個專案。
+地方創生：將近四成想看，只有 3 個。
+水環境：五分之一想看，只有 2 個。
+首頁的議題就照這個順序排。
+而且只算還沒做過專案的人，因為首頁是給他們的。</aside></section>
+
+<section class="slide">
+  <div class="grid2" style="grid-template-columns:1fr 1.15fr">
+    <div>
+      <p class="kicker" data-i="1">分類空著，不是 bug</p>
+      <h2 data-i="2">是「需求高、<br>做的人少」的訊號</h2>
+      <p data-i="3" class="gap" style="font-weight:600">→ 這就是在座各位的機會</p>
+    </div>
+    <img class="shot" data-i="4" src="media/c-water.png" alt="水環境分類頁，只有兩個專案">
+  </div>
+<aside class="notes">有些分類幾乎是空的，像水環境只有兩個專案。
+我們沒有把它併掉。
+空著本身就是訊號：大家想看，但沒人在做。
+如果你在找題目，這就是機會。</aside></section>
+
+<section class="slide">
+  <div class="grid2" style="grid-template-columns:1fr 1.15fr">
+    <div>
+      <p class="kicker" data-i="1">設計 ③　想自己動手呢？</p>
+      <h2 data-i="2">行動指引，<br>搬回站內</h2>
+      <ul class="steps">
+        <li data-i="3">11 篇全文，照用途分組</li>
+        <li data-i="4">以前全是外連共筆，人讀到一半就跑了</li>
+        <li data-i="5">搜尋引擎和 AI 也讀不到</li>
+      </ul>
+    </div>
+    <img class="shot" data-i="4" src="media/guides.png" alt="行動指引列表頁">
+  </div>
+<aside class="notes">第三個問題：看完專案頁，想自己動手的人呢？
+以前行動指引全部是外連的 HackMD 共筆。
+點過去就離開網站了，而且搜尋引擎、AI 都讀不到。
+現在 11 篇全文搬回站內，分成：從這幾篇開始、找工具、做專案的方法、查領域資料。
+原文還是在共筆上改，每次同步進來。</aside></section>
+
+<section class="slide">
+  <p class="kicker" data-i="1">設計 ④　怎麼讓人想多逛一下？</p>
+  <h2 data-i="2">幾個小設計</h2>
+  <div class="grid3" style="align-items:start">
+    <div data-i="3"><video class="clip" src="media/08-typing.mp4" muted playsinline loop preload="auto"></video><h3 style="margin-top:22px">許願池</h3><p style="font-size:26px">說出你希望有人做的工具</p></div>
+    <div data-i="4"><video class="clip" src="media/16-flap.mp4" muted playsinline loop preload="auto"></video><h3 style="margin-top:22px">隨機挑一個</h3><p style="font-size:26px">每次打開，推薦不一樣的專案</p></div>
+    <div data-i="5"><video class="clip" src="media/07-dark.mp4" muted playsinline loop preload="auto"></video><h3 style="margin-top:22px">深色模式</h3><p style="font-size:26px">晚上滑手機也不刺眼</p></div>
+  </div>
+<aside class="notes">第四個問題：怎麼讓人想多逛一下？
+許願池：你希望有人做什麼工具，寫下來，可能就有人接。
+隨機挑一個：每次打開推薦不同專案，有點像抽卡。
+還有深色模式。</aside></section>
+
+<section class="slide section">
+  <div class="num" data-i="1">02</div>
+  <h1 data-i="2">為什麼需要<br>AI insight？</h1>
+  <p data-i="3">痛點 ②③　看不懂、找不到人</p>
+<aside class="notes">第二段，AI insight，也就是每個專案的 AI 摘要。</aside></section>
+
+<section class="slide">
+  <p class="kicker" data-i="1">先看看原本的專案簡介</p>
+  <div class="row" style="gap:80px;margin-top:10px">
+    <div class="stat" data-i="2"><div class="n gap" style="color:var(--warn)"><span data-fx="count">76</span></div><div class="l">個專案，簡介是空的</div></div>
+    <div class="stat" data-i="3"><div class="n" style="color:var(--warn)"><span data-fx="count">26</span></div><div class="l">個不到 30 個字</div></div>
+    <div class="stat" data-i="4"><div class="n"><span data-fx="count">1554</span></div><div class="l">最長的一篇（字）</div></div>
+  </div>
+  <p class="lede" style="margin-top:70px" data-i="5">230 筆資料裡，<span class="gap">將近一半</span>讀不出它在做什麼</p>
+<aside class="notes">先看原本的簡介。
+230 筆資料，76 筆是空的，26 筆不到 30 個字。
+還有 9 筆只貼了一個網址。
+最長的一篇 1554 個字。
+有的空白、有的太長，加起來將近一半，看了還是不知道它在做什麼。
+簡介是坑主自己填的，大家寫法本來就不一樣，這很正常。</aside></section>
+
+<section class="slide">
+  <p class="kicker" data-i="1">四行，每個專案都一樣</p>
+  <div class="insight" data-i="2">
+    <div class="mess" data-step-out="1">
+      <div class="card"><b>專案 A</b>本專案源於 2014 年之黑客松，旨在透過開放資料與社群協作之方式，建構一個跨域整合之平台，期望能促進公民參與並……（後略 1400 字）</div>
+      <div class="card empty"><b>專案 B</b>（空白）</div>
+      <div class="card"><b>專案 C</b>https://xxx.github.io/</div>
+      <div class="card empty"><b>專案 D</b>（空白）</div>
+      <div class="card"><b>專案 E</b>好用的小工具！歡迎大家使用～</div>
+      <div class="card"><b>專案 F</b>Lorem dataset for visualization, see README, WIP, TODO: write intro</div>
+    </div>
+    <div class="four">
+      <div class="ln" data-step="1"><span class="lb">做什麼</span><span class="tx">在 LINE 上查證可疑轉傳訊息的機器人與社群</span></div>
+      <div class="ln" data-step="1"><span class="lb">給誰、解決什麼</span><span class="tx">在 LINE 群組收到可疑訊息、想知道真假的人</span></div>
+      <div class="ln" data-step="1"><span class="lb">怎麼運作</span><span class="tx">把訊息轉給 LINE 機器人，查得到別人寫的查證回應；任何人都能加入回應</span></div>
+      <div class="ln" data-step="1"><span class="lb">討論在哪裡</span><span class="tx acc">g0v Slack #cofacts</span></div>
+    </div>
+  </div>
+<aside class="notes">（翻到這頁後再按一次 →，讓左邊的亂簡介變成四行）
+原本的簡介長這樣：有的長、有的空、有的只有網址、有的只寫「好用的小工具」。
+（按）
+AI insight 把每個專案都整理成同樣的四行：
+做什麼、給誰解決什麼、怎麼運作、討論在哪裡。
+這是 Cofacts 的四行。看完十秒就知道它是什麼。</aside></section>
+
+<section class="slide">
+  <div class="grid2" style="grid-template-columns:.8fr 1.3fr">
+    <div>
+      <p class="kicker" data-i="1">放在專案頁上</p>
+      <h2 data-i="2">第一眼<br>就看得懂</h2>
+      <p data-i="3">原本的自述還在，<br>收在下面</p>
+    </div>
+    <img class="shot" data-i="4" src="media/p-homeless.png" alt="無家者小幫手的專案頁">
+  </div>
+<aside class="notes">實際放在網站上是這樣，這是「無家者小幫手」。
+最上面一句話說它做什麼：協調街頭發放物資的登錄平台。
+下面三行：給誰、怎麼運作、去哪討論。
+你看「給誰」這行：物資常集中在某幾天，平時卻一餐沒一餐。這就是它要解決的問題。
+坑主原本寫的自述沒有消失，收在下面可以展開。</aside></section>
+
+<section class="slide">
+  <div class="grid2" style="grid-template-columns:.75fr 1.4fr;gap:48px">
+    <div>
+      <p class="kicker" data-i="1">痛點 ③　找不到人</p>
+      <h2 data-i="2" style="font-size:58px">看完，<br><span class="acc">知道去哪裡找人</span></h2>
+      <ul class="steps">
+        <li data-i="3">點「討論在哪裡」</li>
+        <li data-i="4">看過去的討論：免登入</li>
+        <li data-i="5">或直接加入 g0v Slack</li>
+      </ul>
+    </div>
+    <div class="spot shot" data-fx="spot" data-rects="8 46 24 6" data-i="3"><img src="media/p-cofacts.png" alt="Cofacts 的專案頁"></div>
+  </div>
+<aside class="notes">四行裡我最在意最後一行：討論在哪裡。
+資料庫的目的不是讓你讀完，是讓你找到人。
+（右邊亮起來的那一行）以 Cofacts 為例，點「g0v Slack #cofacts」，會跳出兩個選項。
+第一個，看過去的討論：這是 Slack 的公開封存，不用登入，就看得到他們最近在討論什麼、開會記錄在哪。
+第二個，加入 g0v Slack，直接去打招呼。</aside></section>
+
+<section class="slide">
+  <p class="kicker" data-i="1">寫一次，三種讀者</p>
+  <h2 data-i="2">一份內容，三個用途</h2>
+  <div class="grid3">
+    <div class="card" data-i="3"><span class="tag">人</span><h3>逛網站的你</h3><p>十秒看懂一個專案</p></div>
+    <div class="card" data-i="4"><span class="tag">搜尋引擎</span><h3>Google 讀得到</h3><p>有人搜「預算視覺化」就找得到</p></div>
+    <div class="card" data-i="5"><span class="tag">AI</span><h3>丟給 NotebookLM</h3><p>直接問「我關心居住，有哪些專案？」</p></div>
+  </div>
+  <p class="lede" style="margin-top:44px" data-i="6">所以品質要照<span class="acc">最嚴格的那個</span>來</p>
+<aside class="notes">這四行寫一次，有三種讀者。
+人：逛網站十秒看懂。
+搜尋引擎：Google 讀得到，搜得到。
+AI：整包丟給 NotebookLM，就能直接問問題。
+因為三種讀者共用一份，品質門檻就要照最嚴格的那一種。</aside></section>
+
+<section class="slide">
+  <p class="kicker" data-i="1">AI 不偏心</p>
+  <h2 data-i="2">每個專案，篇幅都差不多</h2>
+  <div class="grid2" style="gap:64px;align-items:end">
+    <div data-i="3">
+      <div class="fair-n"><span class="gap">48%</span></div>
+      <p style="font-size:26px">原本的簡介：最長的 10% 專案，佔掉一半篇幅</p>
+      <div class="spark"><i style="height:100.0%;background:var(--warn)"></i><i style="height:61.6%;background:var(--warn)"></i><i style="height:43.6%;background:var(--warn)"></i><i style="height:40.2%;background:var(--warn)"></i><i style="height:33.2%;background:var(--warn)"></i><i style="height:31.3%;background:var(--warn)"></i><i style="height:31.0%;background:var(--warn)"></i><i style="height:27.9%;background:var(--warn)"></i><i style="height:25.8%;background:var(--warn)"></i><i style="height:24.6%;background:var(--warn)"></i><i style="height:22.1%;background:var(--warn)"></i><i style="height:22.1%;background:var(--warn)"></i><i style="height:21.3%;background:var(--warn)"></i><i style="height:20.8%;background:var(--warn)"></i><i style="height:20.5%;background:var(--warn)"></i><i style="height:19.9%;background:var(--warn)"></i><i style="height:19.2%;background:var(--warn)"></i><i style="height:18.4%;background:var(--warn)"></i><i style="height:17.2%;background:var(--warn)"></i><i style="height:16.8%;background:var(--warn)"></i><i style="height:16.5%;background:var(--warn)"></i><i style="height:16.4%;background:var(--warn)"></i><i style="height:15.8%;background:var(--warn)"></i><i style="height:15.4%;background:var(--warn)"></i><i style="height:15.3%;background:var(--warn)"></i><i style="height:15.1%;background:var(--warn)"></i><i style="height:14.8%;background:var(--warn)"></i><i style="height:14.6%;background:var(--warn)"></i><i style="height:14.6%;background:var(--warn)"></i><i style="height:14.3%;background:var(--warn)"></i><i style="height:14.2%;background:var(--warn)"></i><i style="height:13.4%;background:var(--warn)"></i><i style="height:13.1%;background:var(--warn)"></i><i style="height:13.1%;background:var(--warn)"></i><i style="height:12.9%;background:var(--warn)"></i><i style="height:12.7%;background:var(--warn)"></i><i style="height:12.4%;background:var(--warn)"></i><i style="height:12.2%;background:var(--warn)"></i><i style="height:10.6%;background:var(--warn)"></i><i style="height:10.5%;background:var(--warn)"></i><i style="height:10.4%;background:var(--warn)"></i><i style="height:10.2%;background:var(--warn)"></i><i style="height:10.0%;background:var(--warn)"></i><i style="height:10.0%;background:var(--warn)"></i><i style="height:9.9%;background:var(--warn)"></i><i style="height:9.6%;background:var(--warn)"></i><i style="height:9.4%;background:var(--warn)"></i><i style="height:9.1%;background:var(--warn)"></i><i style="height:8.6%;background:var(--warn)"></i><i style="height:8.4%;background:var(--warn)"></i><i style="height:8.3%;background:var(--warn)"></i><i style="height:8.2%;background:var(--warn)"></i><i style="height:8.2%;background:var(--warn)"></i><i style="height:8.2%;background:var(--warn)"></i><i style="height:7.9%;background:var(--warn)"></i><i style="height:7.5%;background:var(--warn)"></i><i style="height:7.4%;background:var(--warn)"></i><i style="height:7.4%;background:var(--warn)"></i><i style="height:7.3%;background:var(--warn)"></i><i style="height:7.3%;background:var(--warn)"></i><i style="height:6.9%;background:var(--warn)"></i><i style="height:6.8%;background:var(--warn)"></i><i style="height:6.8%;background:var(--warn)"></i><i style="height:6.7%;background:var(--warn)"></i><i style="height:6.6%;background:var(--warn)"></i><i style="height:6.5%;background:var(--warn)"></i><i style="height:6.4%;background:var(--warn)"></i><i style="height:6.3%;background:var(--warn)"></i><i style="height:6.3%;background:var(--warn)"></i><i style="height:6.3%;background:var(--warn)"></i><i style="height:6.2%;background:var(--warn)"></i><i style="height:6.1%;background:var(--warn)"></i><i style="height:6.0%;background:var(--warn)"></i><i style="height:5.9%;background:var(--warn)"></i><i style="height:5.9%;background:var(--warn)"></i><i style="height:5.9%;background:var(--warn)"></i><i style="height:5.9%;background:var(--warn)"></i><i style="height:5.9%;background:var(--warn)"></i><i style="height:5.7%;background:var(--warn)"></i><i style="height:5.6%;background:var(--warn)"></i><i style="height:5.3%;background:var(--warn)"></i><i style="height:5.3%;background:var(--warn)"></i><i style="height:5.1%;background:var(--warn)"></i><i style="height:5.0%;background:var(--warn)"></i><i style="height:5.0%;background:var(--warn)"></i><i style="height:4.7%;background:var(--warn)"></i><i style="height:4.6%;background:var(--warn)"></i><i style="height:4.6%;background:var(--warn)"></i><i style="height:4.6%;background:var(--warn)"></i><i style="height:4.2%;background:var(--warn)"></i><i style="height:4.2%;background:var(--warn)"></i><i style="height:4.1%;background:var(--warn)"></i><i style="height:4.0%;background:var(--warn)"></i><i style="height:3.9%;background:var(--warn)"></i><i style="height:3.9%;background:var(--warn)"></i><i style="height:3.9%;background:var(--warn)"></i><i style="height:3.7%;background:var(--warn)"></i><i style="height:3.7%;background:var(--warn)"></i><i style="height:3.6%;background:var(--warn)"></i><i style="height:3.6%;background:var(--warn)"></i><i style="height:3.5%;background:var(--warn)"></i><i style="height:3.5%;background:var(--warn)"></i><i style="height:3.3%;background:var(--warn)"></i><i style="height:3.3%;background:var(--warn)"></i><i style="height:3.2%;background:var(--warn)"></i><i style="height:3.2%;background:var(--warn)"></i><i style="height:3.1%;background:var(--warn)"></i><i style="height:3.1%;background:var(--warn)"></i><i style="height:2.8%;background:var(--warn)"></i><i style="height:2.8%;background:var(--warn)"></i><i style="height:2.8%;background:var(--warn)"></i><i style="height:2.8%;background:var(--warn)"></i><i style="height:2.8%;background:var(--warn)"></i><i style="height:2.8%;background:var(--warn)"></i><i style="height:2.8%;background:var(--warn)"></i><i style="height:2.7%;background:var(--warn)"></i><i style="height:2.7%;background:var(--warn)"></i><i style="height:2.7%;background:var(--warn)"></i><i style="height:2.7%;background:var(--warn)"></i><i style="height:2.7%;background:var(--warn)"></i><i style="height:2.6%;background:var(--warn)"></i><i style="height:2.4%;background:var(--warn)"></i><i style="height:2.3%;background:var(--warn)"></i><i style="height:2.3%;background:var(--warn)"></i><i style="height:2.3%;background:var(--warn)"></i><i style="height:2.2%;background:var(--warn)"></i><i style="height:2.2%;background:var(--warn)"></i><i style="height:2.1%;background:var(--warn)"></i><i style="height:1.9%;background:var(--warn)"></i><i style="height:1.9%;background:var(--warn)"></i><i style="height:1.8%;background:var(--warn)"></i><i style="height:1.7%;background:var(--warn)"></i><i style="height:1.7%;background:var(--warn)"></i><i style="height:1.7%;background:var(--warn)"></i><i style="height:1.5%;background:var(--warn)"></i><i style="height:1.5%;background:var(--warn)"></i><i style="height:1.5%;background:var(--warn)"></i><i style="height:1.4%;background:var(--warn)"></i><i style="height:1.4%;background:var(--warn)"></i><i style="height:1.4%;background:var(--warn)"></i><i style="height:1.4%;background:var(--warn)"></i><i style="height:1.2%;background:var(--warn)"></i><i style="height:1.0%;background:var(--warn)"></i><i style="height:1.0%;background:var(--warn)"></i><i style="height:1.0%;background:var(--warn)"></i><i style="height:0.9%;background:var(--warn)"></i><i style="height:0.9%;background:var(--warn)"></i><i style="height:0.9%;background:var(--warn)"></i><i style="height:0.8%;background:var(--warn)"></i><i style="height:0.7%;background:var(--warn)"></i><i style="height:0.7%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i><i style="height:0.6%;background:var(--warn)"></i></div>
+    </div>
+    <div data-i="4">
+      <div class="fair-n"><span class="acc">14%</span></div>
+      <p style="font-size:26px">AI insight：每行限字數，前 10% 只佔 14%</p>
+      <div class="spark"><i style="height:100.0%;background:var(--accent)"></i><i style="height:92.1%;background:var(--accent)"></i><i style="height:88.9%;background:var(--accent)"></i><i style="height:84.9%;background:var(--accent)"></i><i style="height:82.5%;background:var(--accent)"></i><i style="height:81.7%;background:var(--accent)"></i><i style="height:81.0%;background:var(--accent)"></i><i style="height:80.2%;background:var(--accent)"></i><i style="height:80.2%;background:var(--accent)"></i><i style="height:79.4%;background:var(--accent)"></i><i style="height:79.4%;background:var(--accent)"></i><i style="height:78.6%;background:var(--accent)"></i><i style="height:78.6%;background:var(--accent)"></i><i style="height:77.8%;background:var(--accent)"></i><i style="height:77.8%;background:var(--accent)"></i><i style="height:76.2%;background:var(--accent)"></i><i style="height:75.4%;background:var(--accent)"></i><i style="height:75.4%;background:var(--accent)"></i><i style="height:74.6%;background:var(--accent)"></i><i style="height:74.6%;background:var(--accent)"></i><i style="height:73.8%;background:var(--accent)"></i><i style="height:73.8%;background:var(--accent)"></i><i style="height:73.0%;background:var(--accent)"></i><i style="height:73.0%;background:var(--accent)"></i><i style="height:72.2%;background:var(--accent)"></i><i style="height:72.2%;background:var(--accent)"></i><i style="height:71.4%;background:var(--accent)"></i><i style="height:71.4%;background:var(--accent)"></i><i style="height:71.4%;background:var(--accent)"></i><i style="height:70.6%;background:var(--accent)"></i><i style="height:70.6%;background:var(--accent)"></i><i style="height:70.6%;background:var(--accent)"></i><i style="height:70.6%;background:var(--accent)"></i><i style="height:69.8%;background:var(--accent)"></i><i style="height:69.8%;background:var(--accent)"></i><i style="height:69.8%;background:var(--accent)"></i><i style="height:69.0%;background:var(--accent)"></i><i style="height:69.0%;background:var(--accent)"></i><i style="height:69.0%;background:var(--accent)"></i><i style="height:69.0%;background:var(--accent)"></i><i style="height:69.0%;background:var(--accent)"></i><i style="height:68.3%;background:var(--accent)"></i><i style="height:68.3%;background:var(--accent)"></i><i style="height:66.7%;background:var(--accent)"></i><i style="height:66.7%;background:var(--accent)"></i><i style="height:66.7%;background:var(--accent)"></i><i style="height:66.7%;background:var(--accent)"></i><i style="height:65.9%;background:var(--accent)"></i><i style="height:65.9%;background:var(--accent)"></i><i style="height:65.9%;background:var(--accent)"></i><i style="height:65.1%;background:var(--accent)"></i><i style="height:65.1%;background:var(--accent)"></i><i style="height:64.3%;background:var(--accent)"></i><i style="height:64.3%;background:var(--accent)"></i><i style="height:64.3%;background:var(--accent)"></i><i style="height:64.3%;background:var(--accent)"></i><i style="height:64.3%;background:var(--accent)"></i><i style="height:64.3%;background:var(--accent)"></i><i style="height:63.5%;background:var(--accent)"></i><i style="height:63.5%;background:var(--accent)"></i><i style="height:63.5%;background:var(--accent)"></i><i style="height:63.5%;background:var(--accent)"></i><i style="height:63.5%;background:var(--accent)"></i><i style="height:63.5%;background:var(--accent)"></i><i style="height:63.5%;background:var(--accent)"></i><i style="height:63.5%;background:var(--accent)"></i><i style="height:62.7%;background:var(--accent)"></i><i style="height:62.7%;background:var(--accent)"></i><i style="height:62.7%;background:var(--accent)"></i><i style="height:62.7%;background:var(--accent)"></i><i style="height:62.7%;background:var(--accent)"></i><i style="height:61.9%;background:var(--accent)"></i><i style="height:61.9%;background:var(--accent)"></i><i style="height:61.9%;background:var(--accent)"></i><i style="height:61.9%;background:var(--accent)"></i><i style="height:61.9%;background:var(--accent)"></i><i style="height:61.9%;background:var(--accent)"></i><i style="height:61.9%;background:var(--accent)"></i><i style="height:61.9%;background:var(--accent)"></i><i style="height:61.9%;background:var(--accent)"></i><i style="height:61.9%;background:var(--accent)"></i><i style="height:61.1%;background:var(--accent)"></i><i style="height:61.1%;background:var(--accent)"></i><i style="height:61.1%;background:var(--accent)"></i><i style="height:61.1%;background:var(--accent)"></i><i style="height:60.3%;background:var(--accent)"></i><i style="height:60.3%;background:var(--accent)"></i><i style="height:60.3%;background:var(--accent)"></i><i style="height:60.3%;background:var(--accent)"></i><i style="height:59.5%;background:var(--accent)"></i><i style="height:59.5%;background:var(--accent)"></i><i style="height:59.5%;background:var(--accent)"></i><i style="height:59.5%;background:var(--accent)"></i><i style="height:59.5%;background:var(--accent)"></i><i style="height:58.7%;background:var(--accent)"></i><i style="height:58.7%;background:var(--accent)"></i><i style="height:58.7%;background:var(--accent)"></i><i style="height:58.7%;background:var(--accent)"></i><i style="height:58.7%;background:var(--accent)"></i><i style="height:57.9%;background:var(--accent)"></i><i style="height:57.9%;background:var(--accent)"></i><i style="height:57.9%;background:var(--accent)"></i><i style="height:57.9%;background:var(--accent)"></i><i style="height:57.9%;background:var(--accent)"></i><i style="height:57.9%;background:var(--accent)"></i><i style="height:57.1%;background:var(--accent)"></i><i style="height:57.1%;background:var(--accent)"></i><i style="height:57.1%;background:var(--accent)"></i><i style="height:57.1%;background:var(--accent)"></i><i style="height:56.3%;background:var(--accent)"></i><i style="height:56.3%;background:var(--accent)"></i><i style="height:56.3%;background:var(--accent)"></i><i style="height:56.3%;background:var(--accent)"></i><i style="height:56.3%;background:var(--accent)"></i><i style="height:56.3%;background:var(--accent)"></i><i style="height:55.6%;background:var(--accent)"></i><i style="height:55.6%;background:var(--accent)"></i><i style="height:55.6%;background:var(--accent)"></i><i style="height:55.6%;background:var(--accent)"></i><i style="height:55.6%;background:var(--accent)"></i><i style="height:55.6%;background:var(--accent)"></i><i style="height:54.8%;background:var(--accent)"></i><i style="height:54.8%;background:var(--accent)"></i><i style="height:54.8%;background:var(--accent)"></i><i style="height:54.8%;background:var(--accent)"></i><i style="height:54.0%;background:var(--accent)"></i><i style="height:54.0%;background:var(--accent)"></i><i style="height:54.0%;background:var(--accent)"></i><i style="height:54.0%;background:var(--accent)"></i><i style="height:54.0%;background:var(--accent)"></i><i style="height:53.2%;background:var(--accent)"></i><i style="height:53.2%;background:var(--accent)"></i><i style="height:53.2%;background:var(--accent)"></i><i style="height:53.2%;background:var(--accent)"></i><i style="height:53.2%;background:var(--accent)"></i><i style="height:52.4%;background:var(--accent)"></i><i style="height:52.4%;background:var(--accent)"></i><i style="height:52.4%;background:var(--accent)"></i><i style="height:52.4%;background:var(--accent)"></i><i style="height:52.4%;background:var(--accent)"></i><i style="height:52.4%;background:var(--accent)"></i><i style="height:52.4%;background:var(--accent)"></i><i style="height:52.4%;background:var(--accent)"></i><i style="height:52.4%;background:var(--accent)"></i><i style="height:52.4%;background:var(--accent)"></i><i style="height:52.4%;background:var(--accent)"></i><i style="height:51.6%;background:var(--accent)"></i><i style="height:51.6%;background:var(--accent)"></i><i style="height:51.6%;background:var(--accent)"></i><i style="height:51.6%;background:var(--accent)"></i><i style="height:51.6%;background:var(--accent)"></i><i style="height:51.6%;background:var(--accent)"></i><i style="height:51.6%;background:var(--accent)"></i><i style="height:51.6%;background:var(--accent)"></i><i style="height:51.6%;background:var(--accent)"></i><i style="height:50.8%;background:var(--accent)"></i><i style="height:50.8%;background:var(--accent)"></i><i style="height:50.8%;background:var(--accent)"></i><i style="height:50.8%;background:var(--accent)"></i><i style="height:50.0%;background:var(--accent)"></i><i style="height:50.0%;background:var(--accent)"></i><i style="height:50.0%;background:var(--accent)"></i><i style="height:50.0%;background:var(--accent)"></i><i style="height:50.0%;background:var(--accent)"></i><i style="height:50.0%;background:var(--accent)"></i><i style="height:50.0%;background:var(--accent)"></i><i style="height:49.2%;background:var(--accent)"></i><i style="height:49.2%;background:var(--accent)"></i><i style="height:49.2%;background:var(--accent)"></i><i style="height:49.2%;background:var(--accent)"></i><i style="height:48.4%;background:var(--accent)"></i><i style="height:48.4%;background:var(--accent)"></i><i style="height:48.4%;background:var(--accent)"></i><i style="height:48.4%;background:var(--accent)"></i><i style="height:48.4%;background:var(--accent)"></i><i style="height:48.4%;background:var(--accent)"></i><i style="height:48.4%;background:var(--accent)"></i><i style="height:48.4%;background:var(--accent)"></i><i style="height:47.6%;background:var(--accent)"></i><i style="height:47.6%;background:var(--accent)"></i><i style="height:47.6%;background:var(--accent)"></i><i style="height:47.6%;background:var(--accent)"></i><i style="height:47.6%;background:var(--accent)"></i><i style="height:46.8%;background:var(--accent)"></i><i style="height:46.8%;background:var(--accent)"></i><i style="height:46.0%;background:var(--accent)"></i><i style="height:46.0%;background:var(--accent)"></i><i style="height:46.0%;background:var(--accent)"></i><i style="height:46.0%;background:var(--accent)"></i><i style="height:45.2%;background:var(--accent)"></i><i style="height:45.2%;background:var(--accent)"></i><i style="height:45.2%;background:var(--accent)"></i><i style="height:45.2%;background:var(--accent)"></i><i style="height:45.2%;background:var(--accent)"></i><i style="height:45.2%;background:var(--accent)"></i><i style="height:44.4%;background:var(--accent)"></i><i style="height:44.4%;background:var(--accent)"></i><i style="height:44.4%;background:var(--accent)"></i><i style="height:44.4%;background:var(--accent)"></i><i style="height:44.4%;background:var(--accent)"></i><i style="height:44.4%;background:var(--accent)"></i><i style="height:44.4%;background:var(--accent)"></i><i style="height:43.7%;background:var(--accent)"></i><i style="height:42.9%;background:var(--accent)"></i><i style="height:42.9%;background:var(--accent)"></i><i style="height:42.9%;background:var(--accent)"></i><i style="height:42.1%;background:var(--accent)"></i><i style="height:42.1%;background:var(--accent)"></i><i style="height:42.1%;background:var(--accent)"></i><i style="height:42.1%;background:var(--accent)"></i><i style="height:42.1%;background:var(--accent)"></i><i style="height:40.5%;background:var(--accent)"></i><i style="height:40.5%;background:var(--accent)"></i><i style="height:39.7%;background:var(--accent)"></i><i style="height:39.7%;background:var(--accent)"></i><i style="height:38.9%;background:var(--accent)"></i><i style="height:38.9%;background:var(--accent)"></i><i style="height:38.1%;background:var(--accent)"></i><i style="height:38.1%;background:var(--accent)"></i><i style="height:36.5%;background:var(--accent)"></i><i style="height:36.5%;background:var(--accent)"></i><i style="height:34.1%;background:var(--accent)"></i><i style="height:31.0%;background:var(--accent)"></i><i style="height:31.0%;background:var(--accent)"></i><i style="height:29.4%;background:var(--accent)"></i><i style="height:29.4%;background:var(--accent)"></i><i style="height:29.4%;background:var(--accent)"></i><i style="height:19.0%;background:var(--accent)"></i><i style="height:18.3%;background:var(--accent)"></i><i style="height:15.9%;background:var(--accent)"></i></div>
+    </div>
+  </div>
+  <p class="muted" style="font-size:22px;margin-top:22px" data-i="5">230 個專案由長到短排列，各自用自己的比例尺。每行上限：做什麼 25 字，其他三行各 40 字</p>
+<aside class="notes">其中一個門檻，是 AI 不能偏心：每個專案的篇幅要差不多。
+左邊是原本的簡介，230 個專案由長到短排。字數最多的 10% 專案，佔了全部文字的將近一半。
+這有什麼問題？把整份資料丟給 AI 問問題，寫得長的專案，在 AI 眼中份量就重，比較容易被推薦。寫得短、或根本沒寫的，就被冷落。
+右邊是 AI insight。每一行都有字數上限：做什麼 25 字，其他三行各 40 字。
+字數不靠 AI 自律，由程式逐行數，超過就退回重寫。
+結果前 10% 只佔 14%，很接近平均。
+上限是天花板不是目標：素材少就寫短，不硬湊。</aside></section>
+
+<section class="slide">
+  <p class="kicker" data-i="1">AI 寫，人可以查</p>
+  <h2 data-i="2">每一筆都記下來源</h2>
+  <ul class="steps">
+    <li data-i="3">記下參考的網址，優先用網頁封存版</li>
+    <li data-i="4">記下哪天、用哪個模型產生</li>
+    <li data-i="5">寫不出來就寫「不明」，不硬掰</li>
+    <li data-i="6">看到錯了，專案頁上可以<span class="acc">建議修改</span></li>
+  </ul>
+<aside class="notes">AI 寫的東西一定會錯，所以每一筆都記下來源，放在資料裡，從 API 就拿得到。
+參考了哪些網址，優先用網頁封存版，網站倒了也查得到。
+哪天、哪個模型產生的，都寫明。
+找不到資料，就寫「不明」，不硬掰。你會在網站上看到很多「不明」，那是刻意的。
+看到錯，專案頁上有建議修改。</aside></section>
+
+<!-- ========== 第三段 ========== -->
+<section class="slide section">
+  <div class="num" data-i="1">03</div>
+  <h1 data-i="2">資料可以<br>怎麼加值？</h1>
+  <p data-i="3">痛點 ④　資料會舊：寫了沒人更新，錯了沒人改</p>
+<aside class="notes">第三段，資料可以怎麼加值。
+網站只是這份資料的其中一種用法。</aside></section>
+
+<section class="slide" style="padding:60px 120px 40px">
+  <p class="kicker" data-i="1" style="margin-bottom:6px">一份資料，一直在流動</p>
+  <div class="orbit" data-fx="orbit" data-ms="16000" data-i="2" style="height:720px">
+    <div data-link>後台資料表<small>揪松團維護・正本</small></div>
+    <div data-link>開放資料 API<small>每天 04:00 自動同步</small></div>
+    <div>civictech.tw<small>網站讀 API，220 個專案頁</small></div>
+    <div>你<small>發現資料錯了、舊了</small></div>
+    <div>修改申請<small>按「建議修改」，自動開成 PR</small></div>
+    <div>管理員審核<small>寫回前先比對</small></div>
+    <div class="center ai">AI insight<small>讀資料和來源，寫成四行，存回後台</small></div>
+  </div>
+<aside class="notes">這一段先看全貌。整個資料庫是一個會流動的循環。
+（跟著亮起來的點講）
+最上面是後台資料表，揪松團在維護，這是正本。
+每天凌晨四點自動同步到開放資料 API，任何人都拿得到。
+網站從 API 讀資料，長出 220 個專案頁。
+你在網站上逛，發現某筆資料錯了、舊了。
+按「建議修改」，送出一份修改申請。
+管理員看過、合併，寫回後台。隔天，又同步出去。
+中間那條橘色虛線是 AI insight：從 API 拿資料、去讀來源，寫成四行，再存回後台，一樣跟著同步上網站。
+資料就這樣轉一圈：看到的人可以修，修好的再流回去。</aside></section>
+
+<section class="slide video" data-auto><video src="media/25-api.mp4" muted playsinline preload="auto"></video>
+<aside class="notes">（影片：開放資料 API）</aside></section>
+
+<section class="slide">
+  <p class="kicker" data-i="1">拿得走</p>
+  <h2 data-i="2">開放資料 API</h2>
+  <div data-i="3"><code class="url">https://data.civictech.tw/v0/tech/projects.json</code></div>
+  <ul class="steps" style="margin-top:44px">
+    <li data-i="4">整份資料庫，就是幾個 JSON 檔</li>
+    <li data-i="5">不用申請、不用 token，直接拿</li>
+    <li data-i="6">每天凌晨 4 點自動同步，同步結果公開</li>
+  </ul>
+<aside class="notes">先講「拿得走」。
+整份資料庫放在 data.civictech.tw，就是幾個 JSON 檔。
+不用申請、不用帳號，網址打開就拿得到。
+每天凌晨四點自動同步一次，同步有沒有成功，有一頁公開的運作狀況可以看。</aside></section>
+
+<section class="slide">
+  <div class="grid2" style="grid-template-columns:.8fr 1.2fr;gap:48px">
+    <div>
+      <p class="kicker" data-i="1">放得回</p>
+      <h2 data-i="2" style="margin-bottom:28px">錯了，誰都能改</h2>
+      <ol class="flow-steps">
+        <li data-i="3">專案頁按「建議修改」</li>
+        <li data-i="4">直接在表單上改，寫一句為什麼</li>
+        <li data-i="5">到 GitHub 送出，或寄信給揪松團</li>
+        <li data-i="6">自動變成一份修改申請</li>
+        <li data-i="7">管理員看過，合併，寫回後台</li>
+        <li data-i="8">隔天同步，網站就更新了</li>
+      </ol>
+    </div>
+    <div class="morph" data-fx="morph" data-src="media/morph-edit" data-i="4" style="aspect-ratio:16/9"></div>
+  </div>
+<aside class="notes">再來是「放得回」。這是這次新做的。
+（右邊動畫：在專案頁點「建議修改」，頁面重組成表單。想重播按 R）
+每個專案頁都有「建議修改」，點進來就是這個表單，原本的資料已經填好，你直接改。
+改完寫一句為什麼要改。
+有 GitHub 帳號，就到 GitHub 送出；沒有的話，寄信給揪松團也可以。
+送出之後，系統自動把它變成一份修改申請。
+管理員看過、合併，就寫回後台。
+寫回之前會先比對：如果這段期間有人直接改過後台，就停下來給人決定，不會蓋掉別人改的。
+隔天同步，網站就更新了。
+資料拿得走，也放得回，這才稱得上「公民科技資料庫」。</aside></section>
+
+<section class="slide">
+  <p class="kicker" data-i="1">資料整理好，自己會說話</p>
+  <div class="grid2" style="gap:48px;align-items:start">
+    <div class="card" data-i="2"><span class="tag">每週連結健檢</span><div class="stat"><div class="n" style="font-size:96px"><span data-fx="count">10</span></div><div class="l">個專案的網址全部失效</div></div><p style="margin-top:18px">掃了 199 個專案、307 個網址</p></div>
+    <div class="card" data-i="3"><span class="tag">大松提案影片（整理中）</span><div class="stat"><div class="n" style="font-size:96px"><span data-fx="count">1165</span></div><div class="l">支提案影片</div></div><p style="margin-top:18px">從第 4 次大松到現在，每個專案怎麼長出來的</p></div>
+  </div>
+<aside class="notes">資料整理起來，自己就會說話。
+連結健檢每週自動跑。上個月掃了 199 個專案、307 個網址，有 10 個專案的網址全部失效。這些專案可能需要有人接手。
+另外我們在整理大松的提案影片，從第 4 次大松到現在一共 1165 支。
+這可以回答一個資料庫現在答不了的問題：一個專案是怎麼長出來的。
+（影片資料集還在分支上，講「整理中」）</aside></section>
+
+<section class="slide">
+  <p class="kicker" data-i="1">你可以拿它做什麼</p>
+  <h2 data-i="2">三個點子</h2>
+  <div class="grid3">
+    <div class="card" data-i="3"><span class="tag">01</span><h3>問 AI</h3><p>把資料丟進 NotebookLM，問「我住花蓮，有什麼專案能參與？」</p></div>
+    <div class="card" data-i="4"><span class="tag">02</span><h3>找空格</h3><p>挑一個需求高、專案少的議題，當你的提案題目</p></div>
+    <div class="card" data-i="5"><span class="tag">03</span><h3>救專案</h3><p>從失效名單裡，找一個值得復活的專案</p></div>
+  </div>
+<aside class="notes">那你可以拿它做什麼？三個點子。
+一，問 AI：整包丟進 NotebookLM，用自己的話問問題。
+二，找空格：剛剛那張長條圖，需求高、專案少的議題，就是現成的提案題目。
+三，救專案：失效的專案裡，可能有很好的點子只是沒人維護了。
+就像一開始的預算網站，一份資料打開，就有人能接著做下一件事。</aside></section>
+
+<!-- ========== 收尾 ========== -->
+<section class="slide video" data-auto><video src="media/27-kinetic.mp4" muted playsinline preload="auto"></video>
+<aside class="notes">（影片：在這裡，你可以——找到同伴、讀別人的經驗、許一個願、串接資料、開始動手）</aside></section>
+
+<section class="slide">
+  <p class="kicker" data-i="1">今天回家，做一件事就好</p>
+  <div class="grid3" style="margin-top:20px">
+    <div class="card" data-i="2"><span class="tag">5 分鐘</span><h3>逛一個議題</h3><p>挑你最在意的那一類</p></div>
+    <div class="card" data-i="3"><span class="tag">1 分鐘</span><h3>許一個願</h3><p>你希望有人做什麼工具？</p></div>
+    <div class="card" data-i="4" style="border-color:var(--accent)"><span class="tag">一個週末</span><h3 class="acc">加入一個專案</h3><p>點「討論在哪裡」，打聲招呼</p></div>
+  </div>
+<aside class="notes">最後，請大家今天回家做一件事就好。
+有五分鐘，逛一個議題。
+有一分鐘，許一個願。
+有一個週末，找一個專案，點討論在哪裡，去打聲招呼。</aside></section>
+
+<section class="slide video" data-auto><video src="media/28-bento-assemble.mp4" muted playsinline preload="auto"></video>
+<aside class="notes">（影片：整個站一格一格組起來）
+這就是現在的 civictech.tw。</aside></section>
+
+<section class="slide video" data-auto><video src="media/11-collapse.mp4" muted playsinline preload="auto"></video>
+<aside class="notes">（影片：整個站縮回一個網址）</aside></section>
+
+<section class="slide center section">
+  <h1 data-i="1" class="mono" style="font-size:120px;font-weight:600">civictech.tw</h1>
+  <p data-i="2">謝謝大家</p>
+<aside class="notes">網址是 civictech.tw。謝謝大家。</aside></section>
+
+</div>
+<script src="deck/deck.js"></script>
+</body>
+</html>

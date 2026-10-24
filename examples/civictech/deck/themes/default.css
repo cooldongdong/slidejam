@@ -1,0 +1,60 @@
+/* slidejam 主題：default（石油藍）
+ *
+ * 換主題：在簡報的 <head> 裡，deck.css 之後放一行
+ *   <link rel="stylesheet" href="deck/themes/default.css">
+ * 換成 warm.css、night.css、mono.css 就是別的主題。
+ * 做自己的主題：複製這個檔案改名，改下面的數值就好。用不到的變數可以刪掉，會沿用預設值。
+ * 也可以用效果圖鑑的「配色」頁調好再複製過來。
+ */
+:root{
+  /* ── 紙與文字 ── */
+  --paper:#f6f7f8;        /* 投影片底色 */
+  --surface:#fff;         /* 卡片、截圖框、對話泡泡 */
+  --surface-2:#eceff1;    /* 次要底色：長條圖軌道、圓環底、瀏覽器網址列 */
+  --ink:#111a1f;          /* 標題文字 */
+  --ink-2:#36444b;        /* 內文 */
+  --ink-muted:#5b6a71;    /* 說明、小字 */
+  --line:#dfe5e8;         /* 細框線 */
+  --line-strong:#c8d1d5;  /* 截圖外框 */
+
+  /* ── 強調色 ── */
+  --accent:#0d5f74;       /* 主色：小標、數字、按鈕、地圖插點 */
+  --accent-ink:#094656;   /* 主色深一階：連結文字 */
+  --accent-soft:#e0eef1;  /* 主色淡底：亮起的節點、提示框 */
+  --on-accent:#fff;       /* 放在主色上的字 */
+  --warn:#b45309;         /* 第二強調：痛點標籤、聚光燈框、長條圖的 hot */
+  --warn-soft:#fbeedd;    /* 螢光筆 */
+  --bad:#a3352b; --bad-soft:#f7e3e0;
+
+  /* ── 段落頁（class="section"） ── */
+  --section-bg:var(--accent-ink);
+  --section-ink:#fff;
+  --section-muted:#cfe3e8;
+  --section-num:#9cc9d4;
+
+  /* ── 深色區塊：bento 深色格、終端機、翻牌看板 ── */
+  --dark:#0f1a1d;
+  --dark-line:#1c2a2e;
+  --on-dark:#f2f5f5;
+  --on-dark-muted:#9fb0b4;
+  --code:#cfdde1; --code-key:#8fc8ff; --code-str:#f2c27b; --code-num:#b9a3ff; --code-prompt:#6fd1b0;
+
+  /* ── 圖表配色：network 的議題沒指定顏色時依序使用 ── */
+  --c1:#0d5f74; --c2:#b45309; --c3:#7c3aed; --c4:#15803d; --c5:#be185d; --c6:#1d4ed8; --c7:#a16207; --c8:#0f766e;
+
+  /* ── 裝置外框、聊天背景 ── */
+  --device:#15191b;       /* 手機、平板、螢幕邊框 */
+  --device-metal:#c4cbce; /* 螢幕支架、筆電底座 */
+  --chat-bg:#eef2f3;
+
+  /* ── 風格 ── */
+  --sans:'Geist','PingFang TC','Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;
+  --mono:'Geist Mono','SF Mono',ui-monospace,monospace;
+  --head:var(--sans);     /* 標題字體 */
+  --head-weight:700;
+  --radius:14px;          /* 截圖、框的圓角 */
+  --radius-lg:22px;       /* 卡片、bento 格子的圓角 */
+  --shadow-rgb:15 26 29;  /* 陰影顏色（RGB 三個數字） */
+  --shadow:0 30px 60px -30px rgb(var(--shadow-rgb)/.38);
+  --chrome:#0b1013;       /* 投影片外面的邊（視窗比例不是 16:9 時看得到） */
+}

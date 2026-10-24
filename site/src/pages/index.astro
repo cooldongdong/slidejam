@@ -1,0 +1,104 @@
+---
+import Base from "../layouts/Base.astro";
+const B = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+import { decks as examples } from "../data/decks";
+---
+<Base title={'slidejam — 會動的簡報，跟 AI 一起做'} description={'一個 HTML 檔，雙擊就開。從真網站拍下頁面動畫，45 種效果，跟 AI 一起即興做簡報。'}>
+<section class="hero"><div class="wrap">
+  <h1><span lang="zh">會<em>動</em>的簡報，<br>跟 AI 一起 jam 出來</span><span lang="en">Slides that <em>move</em>,<br>jammed out with an AI</span></h1>
+  <p class="sub"><span lang="zh">slidejam 做的簡報就是一個 HTML 檔，雙擊就能打開。真網站可以直接拍進投影片，45 種效果叫名字就有。你說想要什麼，AI 幫你做出來。</span><span lang="en">A slidejam deck is one HTML file you double-click. Real websites go straight into your slides, 45 effects come by name, and you tell an AI what you want.</span></p>
+  <div class="cta">
+    <a class="btn primary" href={B + "effects/"}><span lang="zh">看效果圖鑑 →</span><span lang="en">See the effects →</span></a>
+    <a class="btn" href="https://github.com/cooldongdong/slidejam">GitHub</a>
+  </div>
+  <div class="screen big"><iframe src={B + "demos/bento.html?embed&loop=10"} title="bento" loading="lazy" tabindex="-1"></iframe></div>
+</div></section>
+
+<section class="feat" id="motion"><div class="wrap grid">
+  <div class="text">
+    <p class="kicker"><span lang="zh">01 · 會動</span><span lang="en">01 · Motion</span></p>
+    <h2><span lang="zh">真網站點下去，<br>頁面就在投影片裡重組</span><span lang="en">Click a real website,<br>watch the page rebuild in your slide</span></h2>
+    <p><span lang="zh">給它兩個網址和「要點哪裡」，就會拍下卡片長成整頁、標題飛到新位置的動畫。介紹網站時，最有說服力的就是網站本身。</span><span lang="en">Give it two URLs and what to click. It captures the card growing into a page and the title flying to its new spot. When you present a website, the website itself is the best argument.</span></p>
+    <p><span lang="zh">其他還有 45 種效果，每一種都有名字：</span><span lang="en">Plus 45 effects, each with a name:</span></p>
+    <div class="chips">
+      <a href={B + "play/effects/?slide=bento"}>bento</a><a href={B + "play/effects/?slide=map"}>map</a><a href={B + "play/effects/?slide=particles"}>particles</a><a href={B + "play/effects/?slide=flap"}>flap</a><a href={B + "play/effects/?slide=spot"}>spot</a><a href={B + "play/effects/?slide=explode"}>explode</a><a href={B + "play/effects/?slide=dive"}>dive</a><a href={B + "play/effects/?slide=chat"}>chat</a><a href={B + "play/effects/?slide=network"}>network</a><a href={B + "play/effects/?slide=live"}>live</a><a href={B + "effects/"}><span lang="zh">全部 →</span><span lang="en">all →</span></a>
+    </div>
+  </div>
+  <div class="screen"><iframe src={B + "demos/morph.html?embed&loop=6"} title="morph" loading="lazy" tabindex="-1"></iframe></div>
+</div></section>
+
+<section class="feat flip" id="ai"><div class="wrap grid">
+  <div class="text">
+    <p class="kicker"><span lang="zh">02 · 跟 AI 一起做</span><span lang="en">02 · With an AI</span></p>
+    <h2><span lang="zh">說不清楚哪裡？<br>框起來就好</span><span lang="en">Hard to say where?<br>Just draw a box</span></h2>
+    <p><span lang="zh">按 A，在投影片上點一下或框一塊，寫下想要怎樣。複製出來的清單有頁碼、元素、精確位置，AI 不用猜「右邊那個」是哪個。</span><span lang="en">Press A, click or box anything on a slide and say what you want. The copied list carries the slide, the element and exact coordinates, so the AI never has to guess which "thing on the right" you meant.</span></p>
+    <ul>
+      <li><span lang="zh">看效果圖鑑挑效果，跟 AI 說「第 5 頁用 pan」就好</span><span lang="en">Pick from the gallery and say "slide 5, use pan"</span></li>
+      <li><span lang="zh">附 Claude Code skill：先討論大綱、照圖鑑寫、做完自己截圖檢查</span><span lang="en">Ships a Claude Code skill: outline first, build from the gallery, screenshot-check its own work</span></li>
+    </ul>
+  </div>
+  <div class="screen"><iframe src={B + "demos/annotate.html?embed&loop=10"} title="annotate" loading="lazy" tabindex="-1"></iframe></div>
+</div></section>
+
+<section class="feat" id="file"><div class="wrap grid">
+  <div class="text">
+    <p class="kicker"><span lang="zh">03 · 一個檔案</span><span lang="en">03 · One file</span></p>
+    <h2><span lang="zh">雙擊就開，<br>在投影片上直接改字</span><span lang="en">Double-click to open,<br>edit right on the slide</span></h2>
+    <p><span lang="zh">不用安裝、不用開伺服器、不用 build。整個資料夾壓縮就能寄，用隨身碟也能上台。</span><span lang="en">No install, no server, no build step. Zip the folder and mail it, or present from a USB stick.</span></p>
+    <p><span lang="zh">按 E 直接在投影片上改字，⌘S 存回檔案。只換掉你改的那一行，其他地方一個字都不動。</span><span lang="en">Press E and type on the slide; ⌘S writes it back. Only the line you changed is replaced, byte for byte.</span></p>
+  </div>
+  <div class="screen"><iframe src={B + "demos/edit.html?embed&loop=8"} title="edit" loading="lazy" tabindex="-1"></iframe></div>
+</div></section>
+
+<section class="start" id="start"><div class="wrap">
+  <h2><span lang="zh">三步開始</span><span lang="en">Three steps</span></h2>
+  <div class="steps">
+    <div class="step">
+      <h3><span lang="zh">拿到 slidejam</span><span lang="en">Get slidejam</span></h3>
+      <p><span lang="zh">拍真網站動畫時才需要 Playwright。</span><span lang="en">Playwright is only for capturing real sites.</span></p>
+      <pre>git clone https://github.com/cooldongdong/slidejam
+cd slidejam && npm install</pre>
+    </div>
+    <div class="step">
+      <h3><span lang="zh">開一份新簡報</span><span lang="en">Start a deck</span></h3>
+      <p><span lang="zh">做出一個資料夾，用 Chrome 打開 index.html。</span><span lang="en">Makes a folder; open its index.html in Chrome.</span></p>
+      <pre>node tools/new-deck.mjs ~/talks/my-talk</pre>
+    </div>
+    <div class="step">
+      <h3><span lang="zh">跟 AI 說要什麼</span><span lang="en">Tell the AI</span></h3>
+      <p><span lang="zh">叫效果的名字，或貼上按 A 標好的清單。</span><span lang="en">Name an effect, or paste a list marked with A.</span></p>
+      <div class="say"><span lang="zh">「封面標題用 letters，第 3 頁做一頁 bento」</span><span lang="en">"Use letters on the title, make slide 3 a bento"</span></div>
+    </div>
+  </div>
+  <p style="text-align:center;margin-top:28px;color:var(--ink-muted)"><span lang="zh"><a href={B + "guide/"}>使用流程：跟 AI 從零做到上台</a>・完整說明：<a href="https://github.com/cooldongdong/slidejam/blob/master/docs/%E4%BD%BF%E7%94%A8%E8%AA%AA%E6%98%8E.md">中文使用說明</a>・<a href="https://github.com/cooldongdong/slidejam#readme">README</a></span><span lang="en"><a href={B + "guide/"}>Workflow: from zero to stage with an AI</a> · Full docs: <a href="https://github.com/cooldongdong/slidejam#readme">README</a> · <a href="https://github.com/cooldongdong/slidejam/blob/master/docs/%E4%BD%BF%E7%94%A8%E8%AA%AA%E6%98%8E.md">user guide (Chinese)</a></span></p>
+</div></section>
+
+<section class="examples"><div class="wrap">
+  <h2><span lang="zh">看別人怎麼用</span><span lang="en">See it used</span></h2>
+  <p class="ex-sub"><span lang="zh">三份用 slidejam 做的簡報，每一份都能直接播放。</span><span lang="en">Three decks made with slidejam, each ready to play.</span></p>
+  <div class="ex-grid">
+    {examples.filter((d) => d.id !== "effects").map((d) => (
+      <a class="ex" href={`${B}play/${d.id}/`}>
+        <span class="ex-img"><img src={`${B}posters/${d.id}.jpg`} alt="" loading="lazy" /><span class="ex-play"><span lang="zh">播放</span><span lang="en">Play</span></span></span>
+        <b><span lang="zh">{d.zh[0]}</span><span lang="en">{d.en[0]}</span></b>
+        <small><span lang="zh">{d.who[0]}</span><span lang="en">{d.who[1]}</span></small>
+      </a>
+    ))}
+  </div>
+  <p style="text-align:center;margin-top:34px"><a class="btn" href={B + "play/"}><span lang="zh">看所有範例 →</span><span lang="en">All examples →</span></a></p>
+</div></section>
+</Base>
+
+<style is:global>
+.ex-sub{text-align:center;color:var(--ink-muted);margin:-18px 0 34px}
+.ex-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.ex{display:block;text-decoration:none;color:var(--ink)}
+.ex-img{position:relative;display:block;aspect-ratio:16/9;border-radius:12px;overflow:hidden;box-shadow:0 0 0 1px rgb(255 255 255/.1),0 30px 60px -30px rgb(0 0 0/.9);transition:transform .4s cubic-bezier(.16,1,.3,1)}
+.ex-img img{width:100%;height:100%;object-fit:cover;display:block}
+.ex-play{position:absolute;inset:0;display:grid;place-items:center;background:rgb(6 7 8/.55);color:#fff;font:600 15px var(--sans);letter-spacing:.06em;opacity:0;transition:opacity .3s}
+.ex:hover .ex-img{transform:translateY(-6px)}
+.ex:hover .ex-play{opacity:1}
+.ex b{display:block;margin-top:14px;font-size:17px}
+.ex small{color:var(--ink-muted);font-size:14px}
+@media (max-width:860px){.ex-grid{grid-template-columns:1fr}}
+</style>

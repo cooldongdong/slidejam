@@ -4,9 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>slidejam 效果圖鑑</title>
+<meta name="description" content="slidejam 的 45 種簡報效果，每一種都有示範和「跟 AI 這樣說」。按 W 一次看全部。">
+<meta property="og:title" content="slidejam 效果圖鑑">
+<meta property="og:description" content="45 種會動的簡報效果，每一種都有示範和「跟 AI 這樣說」。">
+<meta property="og:image" content="https://slidejam.pages.dev/og.png">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="deck/deck.css">
+<link rel="stylesheet" href="deck/themes/default.css" id="theme-css">
 <style>
 /* gallery layout: demo on the left, how to ask for it on the right */
 .fx{display:grid;grid-template-columns:1.3fr .7fr;gap:64px;align-items:center;padding:72px 96px}
@@ -24,14 +30,26 @@
 .keys{display:grid;grid-template-columns:repeat(2,1fr);gap:16px 60px;margin-top:20px}
 .keys div{font-size:28px;color:var(--ink-2)}
 .keys kbd{display:inline-block;min-width:56px;text-align:center;font:600 22px var(--mono);background:var(--surface);border:1px solid var(--line-strong);border-bottom-width:3px;border-radius:8px;padding:4px 10px;margin-right:16px;color:var(--ink)}
-.fx.wide{grid-template-columns:1fr;gap:28px;align-content:center;padding:48px 96px}
-.fx.wide .info{display:grid;grid-template-columns:auto 1fr 1fr;gap:20px 36px;align-items:start}
-.fx.wide .info > p:not(.kicker){display:none}
-.fx.wide .info .kicker{grid-column:1;margin:0}
-.fx.wide .info h2{grid-column:1;margin:0}
-.fx.wide .info .ask,.fx.wide .info .how{grid-row:1 / span 2;margin:0}
-.fx.wide .info .ask{grid-column:2}.fx.wide .info .how{grid-column:3;font-size:14px}
 #stack .card{padding:28px 32px}#stack .card b{font-size:34px}#stack .card p{font-size:24px}#stack .card .tag{font-size:16px}
+.pop-demo{display:flex;flex-wrap:wrap;gap:16px;align-content:center}
+.pop-demo > span{font-size:22px;font-weight:650;color:#fff;background:var(--c);border-radius:12px;padding:10px 18px}
+.fit-60{height:366px;position:relative}.fit-60 > *{position:absolute;left:0;top:0;transform:scale(.6);transform-origin:0 0}
+.tp{display:grid;gap:22px}
+.tp-presets{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tp-presets b{font-size:22px;margin-right:6px}
+.tp button{font:16px var(--sans);border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:999px;padding:8px 16px;cursor:pointer}
+.tp button.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.tp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 20px}
+.tp-grid label{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:18px;color:var(--ink-2);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+.tp-grid label.wide{grid-column:span 2}
+.tp-grid input[type=color]{width:46px;height:30px;border:0;background:none;padding:0;cursor:pointer}
+.tp-grid input[type=range]{flex:1}
+.tp-grid select{font:16px var(--sans);padding:4px 8px}
+.tp-sample{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;align-items:stretch}
+.tp-sample .card{padding:22px 26px}
+.tp-actions{display:flex;gap:12px}
+.tp-actions .tp-copy{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+
 .demo-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:26px 30px;font-size:26px}
 </style>
 </head>
@@ -41,9 +59,9 @@
 <section class="slide">
   <p class="kicker" data-i="1">SLIDEJAM</p>
   <h1 data-i="2">效果圖鑑</h1>
-  <p class="lede" data-i="3">挑一個效果，跟 AI 說「第幾頁的哪裡用哪個」就好。點名字直接跳過去看。</p>
+  <p class="lede" data-i="3">挑一個效果，跟 AI 說「第幾頁的哪裡用哪個」就好。點名字直接跳過去看，或<a href="?wall">點這裡讓全部效果一起動</a>。</p>
   <div class="index" data-i="4">
-    <div><b>基本</b><a href="#stagger">stagger<span>依序浮出</span></a><a href="#step">step<span>按一下才出現</span></a><a href="#video">video<span>影片轉場</span></a></div>
+    <div><b>基本</b><a href="#stagger">stagger<span>依序浮出</span></a><a href="#step">step<span>按一下才出現</span></a><a href="#video">video<span>影片轉場</span></a><a href="#theme">theme<span>配色與風格</span></a></div>
     <div><b>文字</b><a href="#type">type<span>打字</span></a><a href="#mark">mark<span>螢光筆</span></a><a href="#letters">letters<span>逐字浮現</span></a><a href="#rotate">rotate<span>換詞輪播</span></a><a href="#flap">flap<span>翻牌看板</span></a><a href="#particles">particles<span>粒子聚字</span></a><a href="#textmask">textmask<span>文字遮罩</span></a></div>
     <div><b>數字與資料</b><a href="#count">count<span>數字跳動</span></a><a href="#slot">slot<span>數字滾輪</span></a><a href="#bars">bars<span>長條圖</span></a><a href="#ring">ring<span>圓環進度</span></a><a href="#orbit">orbit<span>循環流程</span></a><a href="#network">network<span>議題星團</span></a><a href="#tunnel">tunnel<span>名稱隧道</span></a><a href="#swarm">swarm<span>蜂群飛入</span></a></div>
     <div><b>截圖</b><a href="#pan">pan<span>長截圖捲動</span></a><a href="#zoom">zoom<span>推近</span></a><a href="#cycle">cycle<span>輪播</span></a><a href="#spot">spot<span>聚光燈</span></a><a href="#hotspots">hotspots<span>熱點導覽</span></a><a href="#tilt">tilt<span>3D 斜放</span></a><a href="#explode">explode<span>拆層</span></a><a href="#parallax">parallax<span>景深</span></a><a href="#dive">dive<span>鑽進去</span></a><a href="#wipe">wipe<span>擦過去</span></a><a href="#morph">morph<span>頁面重組</span></a></div>
@@ -57,12 +75,46 @@
   <h2 data-i="2">放映、改字、標註</h2>
   <div class="keys" data-i="3">
     <div><kbd>→</kbd>下一步／下一頁</div><div><kbd>←</kbd>上一頁</div>
-    <div><kbd>G</kbd>總覽（點頁碼也可以）</div><div><kbd>R</kbd>重播這一頁</div>
+    <div><kbd>G</kbd>總覽，也能「播放全部」</div><div><kbd>R</kbd>重播這一頁</div>
     <div><kbd>N</kbd>講稿</div><div><kbd>F</kbd>全螢幕</div>
+    <div><kbd>P</kbd>講者視窗：講稿只在你的螢幕</div>
     <div><kbd>E</kbd>直接改字，<kbd>⌘S</kbd>存回檔案</div><div><kbd>A</kbd>標註「這裡想要怎樣」，複製給 AI</div>
   </div>
-  <p data-i="4" class="muted" style="margin-top:40px;font-size:26px">進度條滑過去會看到那一頁的縮圖，點下去就跳過去。</p>
+  <p data-i="4" class="muted" style="margin-top:40px;font-size:26px">進度條滑過去會看到那一頁的縮圖，點下去就跳過去。忘了按鍵？按 ? 或點左下角的小問號。</p>
 <aside class="notes">E 跟 A 是做簡報時用的，上台不用管。</aside></section>
+
+<!-- ===== theme ===== -->
+<section class="slide fx" id="theme">
+  <div class="tp">
+    <div class="tp-presets"><b>主題</b><button data-theme="default">default 石油藍</button><button data-theme="warm">warm 暖紙張</button><button data-theme="night">night 深色</button><button data-theme="mono">mono 黑白</button></div>
+    <div class="tp-grid">
+      <label><span>底色</span><input type="color" data-var="--paper"></label>
+      <label><span>卡片</span><input type="color" data-var="--surface"></label>
+      <label><span>文字</span><input type="color" data-var="--ink"></label>
+      <label><span>主色</span><input type="color" data-var="--accent"></label>
+      <label><span>主色淡底</span><input type="color" data-var="--accent-soft"></label>
+      <label><span>第二強調</span><input type="color" data-var="--warn"></label>
+      <label><span>深色區塊</span><input type="color" data-var="--dark"></label>
+      <label><span>段落頁底</span><input type="color" data-var="--section-bg"></label>
+      <label class="wide"><span>圓角</span><input type="range" min="0" max="28" data-var="--radius" data-unit="px"></label>
+      <label class="wide"><span>標題字體</span><select data-var="--head"><option value="var(--sans)">無襯線</option><option value="'Noto Serif TC','Songti TC',serif">襯線</option><option value="var(--mono)">等寬</option></select></label>
+    </div>
+    <div class="tp-sample">
+      <div class="card"><span class="tag">預覽</span><p style="font-size:24px">主色是 <b class="acc">這個顏色</b>，第二強調是 <b class="warn">這個</b>。</p></div>
+      <div class="tile dark" style="height:150px"><div class="head"><b>深色區塊</b></div><div class="big" style="font-size:64px">226</div></div>
+    </div>
+    <div class="tp-actions"><button class="tp-copy">複製這組設定</button><button class="tp-reset">清除調整</button></div>
+  </div>
+  <div class="info">
+    <p class="kicker">theme</p><h2>配色與風格</h2>
+    <p>選一套主題，或直接調顏色；整份圖鑑會跟著變。調好按「複製這組設定」，貼進你簡報的 &lt;style&gt;，或存成一個主題檔。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「這份簡報用 warm 主題，主色換成 #2f6f4f」</p></div>
+    <div class="how">&lt;link rel="stylesheet"
+  href="deck/themes/warm.css"&gt;
+主題檔在 deck/themes/，每個變數都有中文註解
+任何一份簡報按 T 都能換</div>
+  </div>
+<aside class="notes">右上角也可以隨時切換主題。調整只存在這個瀏覽器裡，不會改到檔案。</aside></section>
 
 <!-- ===== stagger ===== -->
 <section class="slide fx" id="stagger">
@@ -243,8 +295,8 @@ frame N（換第幾張）· wait 毫秒</div>
   </div>
 </section>
 
-<section class="slide fx wide" id="bento">
-  <div class="bento" data-fx="bento" style="height:610px;order:2">
+<section class="slide fx" id="bento">
+  <div class="fit-60"><div><div class="bento" data-fx="bento" style="width:1456px;height:610px">
     <div class="tile w2"><div class="head"><b>照議題找專案</b><span>17 個議題，挑你關心的那一個</span></div><div class="vis pan" data-fx="pan" data-delay="1.6"><img src="examples/media/cat-budget.png" alt=""></div></div>
     <div class="tile h2 dark"><div class="head"><b>資料庫裡</b><span>台灣公民科技專案</span></div><div class="big"><span data-fx="slot" data-delay="1.4">226</span><small>個專案</small></div></div>
     <div class="tile"><div class="head"><b>17 個議題</b><span>照大家最想先看的排</span></div><div class="dots" data-fx="pop" data-delay="1.6"><i style="--c:#7c5632"></i><i style="--c:#715080"></i><i style="--c:#7b5720"></i><i style="--c:#864f33"></i><i style="--c:#7b5064"></i><i style="--c:#834e4d"></i><i style="--c:#5e6244"></i><i style="--c:#426b3d"></i><i style="--c:#2e6a6a"></i><i style="--c:#516171"></i><i style="--c:#356580"></i><i style="--c:#6a5d44"></i><i style="--c:#4d5c8e"></i><i style="--c:#626235"></i><i style="--c:#4d6934"></i><i style="--c:#834a65"></i><i style="--c:#576165"></i></div></div>
@@ -264,7 +316,7 @@ frame N（換第幾張）· wait 毫秒</div>
         <div>  <span class="k">"label"</span>: <span class="s">"公民科技專案資料庫"</span>,</div>
         <div>  <span class="k">"recordCount"</span>: <span class="n">230</span>,</div>
       </div></div>
-  </div>
+  </div></div></div>
   <div class="info">
     <p class="kicker">bento</p><h2>功能格狀總覽</h2>
     <p>格子從離它最近的畫面邊飛進來，卡位時微微回彈，整面再慢慢拉近。每格裡面放別的效果：pan、slot、pop、compare、stack、type、terminal。</p>
@@ -346,17 +398,17 @@ data-ms="1600"　多久換一張</div>
 <!-- ===== map ===== -->
 <section class="slide fx" id="map">
   <div class="map" data-fx="map" style="height:660px"
-    data-center="24.984 121.408" data-zoom="13.75"
-    data-pins="24.99122 121.42454 樹林車站; 24.99386 121.42693 濟安宮; 24.97269 121.39257 山佳車站"
-    data-tour="24.99122 121.42454 16; 24.97269 121.39257 16; 24.984 121.408 13.75"></div>
+    data-center="25.04 121.533" data-zoom="13.25"
+    data-pins="25.0478 121.5170 台北車站; 25.0372 121.4999 龍山寺; 25.0340 121.5645 台北101"
+    data-tour="25.0478 121.5170 16; 25.0340 121.5645 16; 25.04 121.533 13.25"></div>
   <div class="info">
     <p class="kicker">map</p><h2>地圖</h2>
     <p>真的地圖，點位一個個掉下來；每按一下 →，飛到下一個地點。加 data-auto 就自己飛。需要網路。</p>
-    <div class="ask"><b>跟 AI 說</b><p>「第 5 頁放樹林的地圖，三個車站插點，按一下飛到樹林車站、再按飛到山佳」</p></div>
+    <div class="ask"><b>跟 AI 說</b><p>「第 5 頁放台北的地圖，插三個點，按一下飛到台北車站、再按飛到 101」</p></div>
     <div class="how">data-pins="緯度 經度 名字; …"
 data-tour="緯度 經度 縮放; …"</div>
   </div>
-<aside class="notes">座標取自 OpenStreetMap，跟樹林 storymap 用的是同一組。</aside></section>
+<aside class="notes">座標取自 OpenStreetMap，跟「台北一日遊」範例用的是同一組。</aside></section>
 
 <!-- ===== live ===== -->
 <section class="slide fx" id="live">
@@ -461,7 +513,7 @@ data-stagger="0.05"　字跟字的間隔</div>
 
 <!-- ===== textmask ===== -->
 <section class="slide fx" id="textmask">
-  <h1 data-fx="textmask" data-img="examples/media/hero-dark.png" style="font-size:190px;font-weight:900;line-height:1.1;white-space:nowrap">公民科技</h1>
+  <h1 data-fx="textmask" data-img="examples/taipei/media/elephant.jpg" style="font-size:190px;font-weight:900;line-height:1.1;white-space:nowrap">公民科技</h1>
   <div class="info">
     <p class="kicker">textmask</p><h2>文字遮罩</h2>
     <p>超大的字裡面填一張圖，圖慢慢移動。適合當段落的封面。</p>
@@ -627,7 +679,7 @@ data-mode="settle｜sway｜hold"</div>
 
 <!-- ===== tunnel ===== -->
 <section class="slide fx" id="tunnel">
-  <div class="tunnel" data-fx="tunnel" style="height:660px;border-radius:14px;background:radial-gradient(circle,#fff 0,var(--paper) 70%)">
+  <div class="tunnel" data-fx="tunnel" style="height:660px;border-radius:14px;background:radial-gradient(circle,var(--surface) 0,var(--paper) 70%)">
     <span>一鍵開大松</span><span>中央政府預算視覺化</span><span>選前大補帖</span><span>高雄氣爆</span><span>碳匯城鄉</span><span>CC0 繁體中文句庫</span><span>資料申請小幫手</span><span>disinfo</span><span>公務人員出國考察網</span><span>Think Tank Info</span><span>公民即時報</span><span>政治承諾追蹤網</span><span>阿龜微氣候</span><span>Wikidata</span><span>福利請聽</span><span>國家寶藏</span><span>LostSAR 無人機</span><span>騎樓抓漏</span><span>政府公開通訊錄</span><span>台灣路更平</span><span>HackingMap</span><span>國會大代誌</span><span>享食台灣</span><span>議見零時差</span><span>HackStory</span><span>秒懂災害潛勢</span><span>寵物需要我</span><span>立委投票指南</span><span>Vaxx.tw</span><span>零時空汙觀測網</span><span>來個判決書吧</span><span>臺灣好植地</span><span>美國國會台灣觀測站</span><span>國會調查兵團</span><span>血庫資訊</span><span>里伯 LINEbot</span><span>台灣 l10n 共筆</span><span>GoodJob 職場透明化</span><span>ChhoeTaigi</span><span>Disfactory</span><span>鄉民關心你</span><span>金流百科</span><span>農業災損幾多錢</span><span>零時小學校</span><span>公民記者證產生器</span><span>g0v 公報</span><span>開源出版</span><span>割闌尾計畫</span><span>司法陽光網</span><span>HackFoldr</span><span>公民科學計畫蒐集</span><span>新聞小幫手</span><span>政治獻金數位化</span><span>你被服貿了嗎?</span><span>CoTeach</span><span>臺灣黑熊通報</span><span>無麩質安全網</span><span>萌典</span><span>Cofacts 真的假的</span><span>vTaiwan</span>
   </div>
   <div class="info">
@@ -752,6 +804,51 @@ data-mode="settle｜sway｜hold"</div>
 
 </div>
 <script src="deck/deck.js"></script>
-<script src="deck/fx.js"></script>
+<script>
+// gallery only: switch themes, tweak tokens live, copy the result
+(() => {
+  const link = document.getElementById("theme-css"), root = document.documentElement;
+  const get = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
+  const set = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} };
+  const inputs = [...document.querySelectorAll(".tp [data-var]")];
+  let tweaks = JSON.parse(get("slidejam-gallery-tweaks") || "{}");
+  const toHex = (v) => { const c = document.createElement("canvas").getContext("2d"); c.fillStyle = v; return c.fillStyle; };
+  function readInputs() {
+    const cs = getComputedStyle(root);
+    inputs.forEach((i) => {
+      const v = cs.getPropertyValue(i.dataset.var).trim();
+      if (i.type === "color") i.value = /^#/.test(toHex(v)) ? toHex(v) : "#000000";
+      else if (i.type === "range") i.value = parseInt(v) || 0;
+      else if ([...i.options].some((o) => o.value === v)) i.value = v;
+    });
+  }
+  function apply() {
+    inputs.forEach((i) => root.style.removeProperty(i.dataset.var));
+    Object.entries(tweaks).forEach(([k, v]) => root.style.setProperty(k, v));
+    set("slidejam-gallery-tweaks", Object.keys(tweaks).length ? JSON.stringify(tweaks) : null);
+  }
+  const useTheme = (name) => Deck.setTheme(name);
+  // the corner picker lives in the engine now (press T); keep the choice for this gallery
+  const picker = { value: "default" };
+  Deck.onTheme = (name) => {
+    picker.value = name;
+    set("slidejam-gallery-theme", name);
+    document.querySelectorAll(".tp-presets button").forEach((b) => b.classList.toggle("on", b.dataset.theme === name));
+    link.onload = readInputs;
+  };
+  document.querySelectorAll(".tp-presets button").forEach((b) => (b.onclick = () => { tweaks = {}; apply(); useTheme(b.dataset.theme); }));
+  inputs.forEach((i) => (i.oninput = () => { tweaks[i.dataset.var] = i.value + (i.dataset.unit || ""); apply(); }));
+  document.querySelector(".tp-reset").onclick = () => { tweaks = {}; apply(); readInputs(); };
+  document.querySelector(".tp-copy").onclick = async () => {
+    const cs = getComputedStyle(root);
+    const lines = inputs.map((i) => `  ${i.dataset.var}:${tweaks[i.dataset.var] ?? cs.getPropertyValue(i.dataset.var).trim()};`);
+    const text = `/* slidejam：從效果圖鑑複製的配色（以 ${picker.value} 主題為底） */\n:root{\n${lines.join("\n")}\n}`;
+    try { await navigator.clipboard.writeText(text); Deck.toast("已複製，貼進簡報的 <style> 就好"); } catch { Deck.toast("複製失敗"); }
+  };
+  useTheme(get("slidejam-gallery-theme") || "default");
+  apply();
+  setTimeout(readInputs, 300);
+})();
+</script>
 </body>
 </html>

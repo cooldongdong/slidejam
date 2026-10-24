@@ -1,0 +1,14 @@
+{
+  "name": "slidejam-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "copy-decks": "node scripts/copy-decks.mjs",
+    "dev": "npm run copy-decks && astro dev",
+    "build": "npm run copy-decks && astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "^7.4.2"
+  }
+}

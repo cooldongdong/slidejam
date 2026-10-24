@@ -1,0 +1,246 @@
+---
+// Every effect at a glance. The hero is one big stage that runs through the effects, the name
+// changing on a split-flap board; each card below plays its effect live (on hover, or in the
+// middle of the screen on a phone) and opens the gallery at that slide.
+import Base from "../layouts/Base.astro";
+import { groups, effects } from "../data/effects";
+const B = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const ORDER = ["particles", "bento", "map", "morph", "tunnel", "explode", "flap", "network", "swarm", "compare", "dive", "textmask"];
+---
+<Base title="效果圖鑑 — slidejam" description="slidejam 的 45 種簡報效果：每一種都看得到動起來的樣子，挑好跟 AI 說名字就好。">
+<section class="st-hero">
+  <span class="st-ghost" id="st-ghost" aria-hidden="true"></span>
+  <div class="st-grid wrap">
+    <div class="st-text">
+      <p class="kicker"><span lang="zh">效果圖鑑</span><span lang="en">Effects</span></p>
+      <p class="st-count"><b id="st-n">01</b> / {String(effects.length).padStart(2, "0")} · <span id="st-group"></span></p>
+      <h1 class="st-name" id="st-name" aria-live="polite"></h1>
+      <p class="st-zh" id="st-zh"></p>
+      <p class="st-desc" id="st-desc"></p>
+      <div class="cta" style="justify-content:flex-start">
+        <a class="btn primary" href={B + "play/effects/?wall"}><span lang="zh">全部一起播放</span><span lang="en">Play them all</span></a>
+        <a class="btn ghost" id="st-open" href={B + "play/effects/?slide=1"}><span lang="zh">打開這一個</span><span lang="en">Open this one</span></a>
+      </div>
+    </div>
+    <div class="st-stage-wrap">
+      <div class="st-stage" id="st-stage"><iframe id="st-frame" title="effects" tabindex="-1"></iframe></div>
+    </div>
+  </div>
+  <div class="st-ticks" id="st-ticks"></div>
+</section>
+<script is:inline define:vars={{ base: B, effects, groups, order: ORDER }}>
+// the stage: the gallery deck in an iframe, cropped to the demo half; every few seconds it
+// moves to the next effect and the name flips over on a split-flap board
+const zh = () => document.documentElement.dataset.lang !== "en";
+const seq = [...order, ...effects.map((e) => e.id).filter((id) => !order.includes(id))].map((id) => effects.find((e) => e.id === id));
+const frame = document.getElementById("st-frame"), ticks = document.getElementById("st-ticks");
+seq.forEach((e, i) => { const t = document.createElement("button"); t.title = e.id; t.onclick = () => go(i, true); ticks.append(t); });
+let k = 0, timer = 0, held = false, left = 0, since = performance.now();
+// count down what is left of this effect's turn; hovering pauses the count, leaving resumes it
+const wait = () => { since = performance.now(); left = Math.max(left, 1500); timer = setTimeout(() => go(k + 1), left); };
+const GLYPHS = "abcdefghijklmnopqrstuvwxyz";
+function flap(el, text) {
+  el.innerHTML = "";
+  const cells = [...text].map((ch, i) => { const c = document.createElement("span"); c.className = "st-cell"; c.textContent = ch; el.append(c); return { c, ch, stop: 160 + i * 45 + Math.random() * 120 }; });
+  const t0 = performance.now();
+  const step = (now) => {
+    let busy = false;
+    cells.forEach((p) => { if (now - t0 < p.stop) { busy = true; p.c.textContent = GLYPHS[Math.floor(Math.random() * GLYPHS.length)]; p.c.classList.add("flip"); } else { p.c.textContent = p.ch; p.c.classList.remove("flip"); } });
+    if (busy) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+function go(i, user) {
+  k = (i + seq.length) % seq.length;
+  const e = seq[k], w = frame.contentWindow;
+  const idx = w?.Deck?.slides?.findIndex((s) => s.id === e.id);
+  if (idx >= 0) w.Deck.show(idx);
+  flap(document.getElementById("st-name"), e.id);
+  document.getElementById("st-ghost").textContent = e.id;
+  document.getElementById("st-zh").textContent = zh() ? e.zh : e.en;
+  document.getElementById("st-desc").textContent = zh() ? e.zhDesc : e.enDesc;
+  document.getElementById("st-group").textContent = (g => zh() ? g.zh : g.en)(groups.find((g) => g.id === e.group));
+  document.getElementById("st-n").textContent = String(effects.indexOf(e) + 1).padStart(2, "0");
+  document.getElementById("st-open").href = `${base}play/effects/?slide=${e.id}`;
+  [...ticks.children].forEach((t, j) => { t.classList.toggle("on", j === k); t.classList.toggle("done", j < k); });
+  ticks.style.setProperty("--dur", (user ? 9000 : 5200) + "ms");
+  ticks.classList.remove("run"); void ticks.offsetWidth; ticks.classList.add("run"); ticks.classList.toggle("paused", held);
+  clearTimeout(timer);
+  left = user ? 9000 : 5200;
+  if (!held) wait();
+}
+frame.src = `${base}effects.html?embed&slide=${seq[0].id}`;
+// the night theme glows on this dark page; dropping the gallery's onTheme first keeps the
+// viewer's own gallery theme choice (it saves on every change) untouched
+frame.onload = () => {
+  const w = frame.contentWindow;
+  const ready = () => { if (!w.Deck?.slides?.length) return setTimeout(ready, 100); w.Deck.onTheme = null; w.Deck.setTheme("night"); go(0); };
+  ready();
+};
+// hovering the stage holds the current effect
+const wrap = document.querySelector(".st-stage");
+wrap.addEventListener("mouseenter", () => { held = true; clearTimeout(timer); left -= performance.now() - since; ticks.classList.add("paused"); });
+wrap.addEventListener("mouseleave", () => { held = false; ticks.classList.remove("paused"); wait(); });
+// with a mouse the stage turns toward the pointer and lifts a little, a glare following it
+wrap.addEventListener("pointermove", (e) => {
+  if (e.pointerType !== "mouse") return;
+  const r = wrap.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+  wrap.style.transform = `rotateY(${x * 24}deg) rotateX(${-y * 18}deg) translateZ(40px)`;
+  wrap.style.setProperty("--mx", (x + 0.5) * 100 + "%"); wrap.style.setProperty("--my", (y + 0.5) * 100 + "%");
+  wrap.classList.add("hover");
+});
+wrap.addEventListener("pointerleave", () => { wrap.style.transform = ""; wrap.classList.remove("hover"); });
+</script>
+
+<section class="fx-list"><div class="wrap">
+  <div class="fx-filter">
+    <button class="on" data-g="all"><span lang="zh">全部</span><span lang="en">All</span> <small>{effects.length}</small></button>
+    {groups.map((g) => (
+      <button data-g={g.id}><span lang="zh">{g.zh}</span><span lang="en">{g.en}</span> <small>{effects.filter((e) => e.group === g.id).length}</small></button>
+    ))}
+    <input type="search" data-zh="搜尋：地圖、map、數字…" data-en="Search: map, chart, text…" aria-label="search" />
+  </div>
+  <div class="fx-grid">
+    {effects.map((e, i) => (
+      <a class="fx-card" href={`${B}play/effects/?slide=${e.id}`} data-id={e.id} data-g={e.group} data-q={`${e.id} ${e.zh} ${e.en} ${e.zhDesc} ${e.enDesc}`.toLowerCase()} style={`--d:${(i % 6) * 60}ms`}>
+        <div class="fx-thumb"><img src={`${B}thumbs/${e.id}.jpg`} alt="" loading="lazy" /><span class="fx-live"><span lang="zh">播放中</span><span lang="en">live</span></span></div>
+        <div class="fx-meta">
+          <code>{e.id}</code>
+          <b><span lang="zh">{e.zh}</span><span lang="en">{e.en}</span></b>
+          <p><span lang="zh">{e.zhDesc}</span><span lang="en">{e.enDesc}</span></p>
+        </div>
+      </a>
+    ))}
+  </div>
+  <p class="fx-empty" hidden><span lang="zh">沒有找到，換個字試試。</span><span lang="en">Nothing found; try another word.</span></p>
+</div></section>
+</Base>
+
+<script is:inline define:vars={{ deck: B + "effects.html" }}>
+// filter by group or text
+const cards = [...document.querySelectorAll(".fx-card")];
+const search = document.querySelector(".fx-filter input");
+let group = "all";
+function filter() {
+  const q = search.value.trim().toLowerCase();
+  let shown = 0;
+  cards.forEach((c) => {
+    const ok = (group === "all" || c.dataset.g === group) && (!q || c.dataset.q.includes(q));
+    c.hidden = !ok; if (ok) shown++;
+  });
+  document.querySelector(".fx-empty").hidden = shown > 0;
+}
+document.querySelectorAll(".fx-filter button").forEach((b) => b.addEventListener("click", () => {
+  group = b.dataset.g;
+  document.querySelectorAll(".fx-filter button").forEach((x) => x.classList.toggle("on", x === b));
+  filter();
+}));
+search.addEventListener("input", filter);
+// the placeholder follows the language switch
+const ph = () => (search.placeholder = search.dataset[document.documentElement.dataset.lang] || search.dataset.zh);
+ph(); new MutationObserver(ph).observe(document.documentElement, { attributes: true, attributeFilter: ["data-lang"] });
+
+// cards rise in as they scroll into view
+const io = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && (e.target.classList.add("in"), io.unobserve(e.target))), { rootMargin: "0px 0px -40px 0px" });
+cards.forEach((c) => io.observe(c));
+
+// a card plays its real effect over its picture: with a mouse, while you hover it; on a touch
+// screen, while it sits in the middle of the screen (one at a time — each loads the gallery)
+const playCard = (c) => {
+  const box = c.querySelector(".fx-thumb");
+  if (box.querySelector("iframe")) return;
+  const f = document.createElement("iframe");
+  f.src = `${deck}?embed&loop=7&slide=${c.dataset.id}`;
+  f.tabIndex = -1;
+  f.onload = () => c.classList.add("playing");
+  box.appendChild(f);
+};
+const stopCard = (c) => { c.classList.remove("playing"); c.querySelector(".fx-thumb iframe")?.remove(); };
+if (matchMedia("(hover: hover)").matches) {
+  cards.forEach((c) => {
+    let t = 0;
+    c.addEventListener("mouseenter", () => { t = setTimeout(() => playCard(c), 350); });
+    c.addEventListener("mouseleave", () => { clearTimeout(t); stopCard(c); });
+  });
+} else {
+  let t = 0, on = null;
+  const mid = new IntersectionObserver((es) => es.forEach((e) => {
+    if (e.isIntersecting) {
+      clearTimeout(t);
+      t = setTimeout(() => { if (on && on !== e.target) stopCard(on); on = e.target; playCard(on); }, 500);
+    } else if (e.target === on) { stopCard(on); on = null; }
+  }), { rootMargin: "-45% 0px -45% 0px" });
+  cards.forEach((c) => mid.observe(c));
+}
+</script>
+
+<style is:global>
+.btn.ghost{background:transparent;color:#fff;border-color:rgb(255 255 255/.35)}
+
+/* ---- filter + grid ---- */
+.fx-list{padding:0 0 80px}
+.fx-filter{position:sticky;top:64px;z-index:3;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:16px 0;background:rgb(7 9 10/.88);backdrop-filter:blur(8px);margin-bottom:12px}
+.fx-filter button{font:600 14px var(--sans);border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-2);border-radius:999px;padding:7px 14px;cursor:pointer}
+.fx-filter button small{font:12px var(--mono);color:var(--ink-muted);margin-left:2px}
+.fx-filter button.on{background:var(--ink);border-color:var(--ink);color:#07090a}
+.fx-filter button.on small{color:#5b6a71}
+.fx-filter input{margin-left:auto;font:15px var(--sans);border:1px solid var(--line-strong);border-radius:999px;padding:8px 16px;min-width:220px;background:var(--surface)}
+.fx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px}
+.fx-card{display:block;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;opacity:0;transform:translateY(24px);transition:opacity .6s cubic-bezier(.16,1,.3,1) var(--d),transform .6s cubic-bezier(.16,1,.3,1) var(--d),box-shadow .25s,border-color .25s}
+.fx-card.in{opacity:1;transform:none}
+.fx-card:hover{box-shadow:0 30px 60px -30px rgb(15 26 29/.45);border-color:var(--line-strong);transform:translateY(-4px)}
+.fx-card[hidden]{display:none}
+.fx-thumb{position:relative;aspect-ratio:16/10;background:#f6f7f8;border-bottom:1px solid var(--line);overflow:hidden}
+.fx-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transition:transform .5s cubic-bezier(.16,1,.3,1),opacity .4s}
+.fx-card:hover .fx-thumb img{transform:scale(1.04)}
+/* the live slide is drawn larger and shifted so only its demo half (x 60–1000 of 1600) shows */
+.fx-thumb iframe{position:absolute;left:-6.4%;top:50%;width:170.2%;aspect-ratio:16/9;height:auto;transform:translateY(-50%);border:0;pointer-events:none;opacity:0;transition:opacity .4s}
+.fx-card.playing .fx-thumb iframe{opacity:1}
+.fx-card.playing .fx-thumb img{opacity:0}
+.fx-live{position:absolute;left:10px;top:10px;z-index:2;font:600 11px var(--mono);letter-spacing:.06em;color:#fff;background:#d4380d;border-radius:999px;padding:3px 9px;opacity:0;transition:opacity .3s}
+.fx-card.playing .fx-live{opacity:1}
+.fx-meta{padding:14px 18px 18px}
+.fx-meta code{font:13px var(--mono);color:var(--accent-ink);background:var(--accent-soft);border-radius:6px;padding:2px 8px}
+.fx-meta b{display:block;font-size:19px;margin:8px 0 4px}
+.fx-meta p{margin:0;font-size:14px;color:var(--ink-muted);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fx-empty{text-align:center;color:var(--ink-muted);padding:40px 0}
+@media (max-width:860px){.fx-filter{top:64px}.fx-filter input{margin-left:0;flex:1}}
+</style>
+
+<style is:global>
+/* ---- hero: one big stage, the name on a split-flap board ---- */
+.st-hero{position:relative;background:radial-gradient(60% 80% at 72% 55%,#0d2a31,#07090a 72%);height:calc(100vh - 64px);min-height:680px;display:flex;align-items:center;overflow:hidden}
+/* the current effect's name, huge and hollow, behind everything */
+.st-ghost{position:absolute;left:-2vw;bottom:-6vh;font:700 clamp(160px,24vw,380px)/1 var(--mono);letter-spacing:-.06em;color:transparent;-webkit-text-stroke:1.5px rgb(127 209 226/.13);white-space:nowrap;pointer-events:none;user-select:none}
+.st-grid{position:relative;display:grid;grid-template-columns:minmax(0,.78fr) minmax(0,1.22fr);gap:0;align-items:center;width:100%}
+.st-text{position:relative;z-index:2}
+.st-count{font:14px var(--mono);color:#5b6a71;letter-spacing:.1em;margin:0 0 20px}
+.st-count b{color:#7fd1e2;font-weight:600;font-size:22px}
+/* sized so the longest name (9 letters) stays on one line, and runs over the stage's edge */
+.st-name{font:700 clamp(44px,6vw,104px)/1 var(--mono);letter-spacing:-.02em;color:#fff;margin:0 -12vw 22px 0;display:flex;flex-wrap:nowrap;gap:.05em;min-height:1.12em}
+.st-cell{display:inline-block;min-width:.64em;text-align:center;padding:.05em .02em;border-radius:.08em;background:linear-gradient(#18262b 0 49%,#081013 49% 52%,#111c20 52%);box-shadow:0 .06em .14em rgb(0 0 0/.6),inset 0 1px 0 rgb(255 255 255/.06)}
+.st-cell.flip{color:#7fd1e2}
+.st-zh{font-size:30px;color:#e8eef5;margin:0 0 12px;font-weight:600}
+.st-desc{color:#8a9ca3;font-size:16px;line-height:1.7;max-width:26em;min-height:3.4em;margin:0 0 30px}
+/* the stage: big, turned toward the text, glowing, with a reflection under it */
+.st-stage-wrap{position:relative;z-index:1;width:min(112%,calc((100vh - 210px) * 940 / 900));justify-self:start;margin-left:2vw;perspective:1800px}
+.st-stage{position:relative;aspect-ratio:940/900;border-radius:18px;overflow:hidden;background:#0b1013;transform:rotateY(-13deg) rotateX(4deg);transform-origin:20% 50%;box-shadow:0 0 0 1px rgb(127 209 226/.25),0 0 90px -10px rgb(127 209 226/.35),0 90px 160px -40px rgb(0 0 0/.95);-webkit-box-reflect:below 14px linear-gradient(transparent 70%,rgb(0 0 0/.18))}
+.st-stage{transition:transform .7s cubic-bezier(.16,1,.3,1),box-shadow .4s}
+.st-stage.hover{transition:transform .15s ease-out,box-shadow .4s;box-shadow:0 0 0 1px rgb(127 209 226/.45),0 0 140px -10px rgb(127 209 226/.5),0 110px 180px -40px rgb(0 0 0/.95)}
+.st-stage::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgb(255 255 255/.16),transparent 45%);opacity:0;transition:opacity .3s;pointer-events:none}
+.st-stage.hover::after{opacity:1}
+/* only the demo half of a gallery slide (x 60–1000 of 1600) shows */
+.st-stage iframe{position:absolute;left:-6.4%;top:0;width:170.2%;aspect-ratio:16/9;height:auto;border:0;pointer-events:none}
+.st-ticks{position:absolute;left:0;right:0;bottom:22px;display:flex;gap:3px;padding:0 max(32px,5vw);z-index:2}
+.st-ticks button{flex:1;height:14px;border:0;padding:0;background:none;cursor:pointer;position:relative}
+.st-ticks button::before,.st-ticks button::after{content:"";position:absolute;left:0;top:6px;height:2px;border-radius:1px}
+.st-ticks button::before{right:0;background:#1a262b;transition:background .2s}
+.st-ticks button:hover::before{background:#4a5a60}
+.st-ticks button.done::before{background:#2c4c55}
+/* the current tick fills up over the time the effect stays on stage */
+.st-ticks button.on::after{right:0;background:#7fd1e2;transform-origin:left;transform:scaleX(1)}
+.st-ticks.run button.on::after{animation:st-fill var(--dur) linear both}
+.st-ticks.paused button.on::after{animation-play-state:paused}
+@keyframes st-fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (max-width:960px){.st-hero{height:auto;padding:40px 0 70px}.st-grid{grid-template-columns:1fr;gap:28px}.st-name{margin-right:0}.st-stage-wrap{width:100%;margin:0}.st-stage{transform:none;-webkit-box-reflect:unset}.st-ghost{display:none}}
+</style>
