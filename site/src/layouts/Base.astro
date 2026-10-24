@@ -9,8 +9,10 @@ interface Props {
   description: string;
   /** pages that are mostly a deck want the footer out of the way */
   compact?: boolean;
+  /** a dark page: header and footer switch to dark too */
+  dark?: boolean;
 }
-const { title, description, compact = false } = Astro.props;
+const { title, description, compact = false, dark = false } = Astro.props;
 const B = import.meta.env.BASE_URL.replace(/\/?$/, "/");
 const here = Astro.url.pathname;
 const on = (p: string) => (here.startsWith(B + p) ? "on" : undefined);
@@ -44,7 +46,7 @@ function pickLang(l) {
 (() => { let saved = null; try { saved = localStorage.getItem("slidejam-lang"); } catch {} pickLang(saved || (navigator.language.startsWith("zh") ? "zh" : "en")); })();
 </script>
 </head>
-<body class:list={{ compact }}>
+<body class:list={{ compact, dark }}>
 <header id="top"><div class="wrap nav">
   <a class="logo" href={B}>slide<span>jam</span></a>
   <nav>
