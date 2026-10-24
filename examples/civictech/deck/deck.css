@@ -131,11 +131,14 @@ body.editing [data-edit].dirty{outline-color:var(--ui-dirty)}
 body.editing #notes{display:block}
 #notes [contenteditable]{outline:none;min-height:1.7em}
 body.annotating #stage *{cursor:crosshair}
+/* band and pins sit above anything a slide stacks (map layers sit at 200–1000); the stage
+   is transformed, so this stays below the tool UI outside it */
 /* a map or an embedded site would swallow the click or drag; let it reach the slide */
 body.annotating .leaflet-container *,body.annotating #stage iframe{pointer-events:none}
 .anno-hover{outline:2px solid var(--ui-anno) !important;outline-offset:3px}
-.anno-pin{position:absolute;z-index:9;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:var(--ui-anno);color:var(--ui-anno-ink);font:700 15px/30px var(--mono);text-align:center;pointer-events:none;box-shadow:0 4px 10px rgb(0 0 0/.3)}
-.anno-band{position:absolute;z-index:9;border:2px dashed var(--ui-anno);background:color-mix(in srgb,var(--ui-anno) 12%,transparent);pointer-events:none}
+.slide.full > .anno-hover{outline-offset:-4px}
+.anno-pin{position:absolute;z-index:2000;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:var(--ui-anno);color:var(--ui-anno-ink);font:700 15px/30px var(--mono);text-align:center;pointer-events:none;box-shadow:0 4px 10px rgb(0 0 0/.3)}
+.anno-band{position:absolute;z-index:2000;border:2px dashed var(--ui-anno);background:color-mix(in srgb,var(--ui-anno) 12%,transparent);pointer-events:none}
 .anno-band.done{border-style:solid}
 #anno-input .what{white-space:pre-line}
 #anno-input{position:fixed;z-index:35;display:none;background:var(--ui-bg);border-radius:12px;padding:10px;box-shadow:0 20px 40px rgb(0 0 0/.45);width:380px}

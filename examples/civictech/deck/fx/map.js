@@ -8,7 +8,7 @@
 (() => {
   const { register, num, ms, delay, timers, stop } = Deck.lib;
   Deck.lib.css(`
-.map{position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line-strong);background:var(--surface-2)}
+.map{position:relative;isolation:isolate;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line-strong);background:var(--surface-2)}
 .slide.full > .map{position:absolute;inset:0;border:0;border-radius:0}
 .map .leaflet-control-attribution{font-size:11px}
 .pin{position:relative}
