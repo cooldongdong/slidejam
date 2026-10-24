@@ -77,7 +77,7 @@ cd slidejam && npm install</pre>
   <h2><span lang="zh">看別人怎麼用</span><span lang="en">See it used</span></h2>
   <p class="ex-sub"><span lang="zh">三份用 slidejam 做的簡報，每一份都能直接播放。</span><span lang="en">Three decks made with slidejam, each ready to play.</span></p>
   <div class="ex-grid">
-    {examples.map((d) => (
+    {examples.filter((d) => d.id !== "effects").map((d) => (
       <a class="ex" href={`${B}play/${d.id}/`}>
         <span class="ex-img"><img src={`${B}posters/${d.id}.jpg`} alt="" loading="lazy" /><span class="ex-play"><span lang="zh">播放</span><span lang="en">Play</span></span></span>
         <b><span lang="zh">{d.zh[0]}</span><span lang="en">{d.en[0]}</span></b>
