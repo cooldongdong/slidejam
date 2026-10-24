@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>web-deck 效果圖鑑</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="deck/deck.css">
+<style>
+/* gallery layout: demo on the left, how to ask for it on the right */
+.fx{display:grid;grid-template-columns:1.3fr .7fr;gap:64px;align-items:center;padding:72px 96px}
+.fx .info .kicker{margin-bottom:14px}
+.fx .info h2{font-size:54px;margin-bottom:18px}
+.fx .info p{font-size:24px;line-height:1.6}
+.ask{margin-top:26px;background:var(--accent-soft);border-radius:14px;padding:18px 22px}
+.ask b{display:block;font:600 15px var(--mono);letter-spacing:.06em;color:var(--accent);margin-bottom:6px}
+.ask p{font-size:22px;color:var(--ink)}
+.how{margin-top:18px;font:16px/1.55 var(--mono);color:var(--ink-muted);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 18px;white-space:pre-wrap;word-break:break-all}
+.index{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 28px;margin-top:40px}
+.index a{font:22px/1.4 var(--mono);color:var(--accent-ink);text-decoration:none;display:flex;gap:12px}
+.index a span{font-family:var(--sans);color:var(--ink-2)}
+.keys{display:grid;grid-template-columns:repeat(2,1fr);gap:16px 60px;margin-top:20px}
+.keys div{font-size:28px;color:var(--ink-2)}
+.keys kbd{display:inline-block;min-width:56px;text-align:center;font:600 22px var(--mono);background:var(--surface);border:1px solid var(--line-strong);border-bottom-width:3px;border-radius:8px;padding:4px 10px;margin-right:16px;color:var(--ink)}
+.demo-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:26px 30px;font-size:26px}
+</style>
+</head>
+<body>
+<div id="stage">
+
+<section class="slide">
+  <p class="kicker" data-i="1">WEB-DECK</p>
+  <h1 data-i="2">效果圖鑑</h1>
+  <p class="lede" data-i="3">挑一個效果，跟 AI 說「第幾頁的哪裡用哪個」就好。點名字直接跳過去看。</p>
+  <div class="index" data-i="4">
+    <a href="#3">stagger<span>依序浮出</span></a><a href="#4">step<span>按一下才出現</span></a>
+    <a href="#5">bars<span>長條圖</span></a><a href="#6">count<span>數字跳動</span></a>
+    <a href="#7">type<span>打字</span></a><a href="#8">mark<span>螢光筆</span></a>
+    <a href="#9">pan<span>長截圖捲動</span></a><a href="#10">zoom<span>推近</span></a>
+    <a href="#11">cycle<span>輪播</span></a><a href="#12">clickpath<span>游標示範</span></a>
+    <a href="#13">orbit<span>循環流程</span></a><a href="#14">assemble<span>飛進來組合</span></a>
+    <a href="#15">spot<span>聚光燈</span></a><a href="#16">morph<span>頁面重組</span></a>
+    <a href="#18">map<span>地圖</span></a><a href="#19">live<span>真網站</span></a>
+    <a href="#20">frames<span>瀏覽器／手機框</span></a><a href="#21">video<span>影片轉場</span></a>
+  </div>
+<aside class="notes">這份圖鑑本身就是用 web-deck 做的簡報。按 G 看全部縮圖。</aside></section>
+
+<section class="slide">
+  <p class="kicker" data-i="1">按鍵</p>
+  <h2 data-i="2">放映、改字、標註</h2>
+  <div class="keys" data-i="3">
+    <div><kbd>→</kbd>下一步／下一頁</div><div><kbd>←</kbd>上一頁</div>
+    <div><kbd>G</kbd>總覽（點頁碼也可以）</div><div><kbd>R</kbd>重播這一頁</div>
+    <div><kbd>N</kbd>講稿</div><div><kbd>F</kbd>全螢幕</div>
+    <div><kbd>E</kbd>直接改字，<kbd>⌘S</kbd>存回檔案</div><div><kbd>A</kbd>標註「這裡想要怎樣」，複製給 AI</div>
+  </div>
+  <p data-i="4" class="muted" style="margin-top:40px;font-size:26px">進度條滑過去會看到那一頁的縮圖，點下去就跳過去。</p>
+<aside class="notes">E 跟 A 是做簡報時用的，上台不用管。</aside></section>
+
+<!-- ===== stagger ===== -->
+<section class="slide fx">
+  <div class="grid3">
+    <div class="demo-card" data-i="1">第一個</div><div class="demo-card" data-i="2">第二個</div><div class="demo-card" data-i="3">第三個</div>
+    <div class="demo-card" data-i="4">第四個</div><div class="demo-card" data-i="5">第五個</div><div class="demo-card" data-i="6">第六個</div>
+  </div>
+  <div class="info">
+    <p class="kicker">stagger</p><h2>依序浮出</h2>
+    <p>每一頁的東西照順序浮上來，最常用。按 R 重播。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「第 3 頁的三張卡片依序浮出」</p></div>
+    <div class="how">data-i="1" … data-i="10"</div>
+  </div>
+</section>
+
+<!-- ===== step ===== -->
+<section class="slide fx">
+  <div style="position:relative;height:440px">
+    <div data-step-out="1" class="grid3" style="position:absolute;inset:0;align-content:center">
+      <div class="demo-card muted">好長一段介紹……</div><div class="demo-card muted">另一段介紹……</div><div class="demo-card muted">更多介紹……</div>
+    </div>
+    <div style="position:absolute;inset:0;display:grid;align-content:center;gap:22px">
+      <p data-step="1" style="font-size:38px"><b class="acc">解決什麼</b>　一句話講完</p>
+      <p data-step="2" style="font-size:38px"><b class="acc">誰在用</b>　一句話講完</p>
+      <p data-step="3" style="font-size:38px"><b class="acc">怎麼參與</b>　一句話講完</p>
+    </div>
+  </div>
+  <div class="info">
+    <p class="kicker">step</p><h2>按一下才出現</h2>
+    <p>按 → 一次出現一組，全部出完才翻頁。也可以讓舊的東西在同一下消失（這頁就是）。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「第 24 頁先放三張卡，按一下卡片糊掉，換成三行重點逐行出現」</p></div>
+    <div class="how">data-step="1"　按第一下出現
+data-step-out="1"　按第一下消失</div>
+  </div>
+</section>
+
+<!-- ===== bars ===== -->
+<section class="slide fx">
+  <div data-fx="bars" data-max="65">
+    <div class="bar hot" data-v="60"><span>政府預算</span><em>60%</em></div>
+    <div class="bar" data-v="45"><span>假訊息防治</span><em>45%</em></div>
+    <div class="bar hot" data-v="39"><span>地方創生</span><em>39%</em></div>
+    <div class="bar" data-v="37"><span>防災</span><em>37%</em></div>
+    <div class="bar" data-v="24"><span>健康與醫療</span><em>24%</em></div>
+  </div>
+  <div class="info">
+    <p class="kicker">bars</p><h2>長條圖</h2>
+    <p>進到這頁時，長條一起長出來。想強調的那幾條加 hot 會變成橘色。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「第 18 頁做 bars，預算 60%、假訊息 45%……，預算那條標橘色」</p></div>
+    <div class="how">&lt;div data-fx="bars"&gt;
+  &lt;div class="bar hot" data-v="60"&gt;
+    &lt;span&gt;政府預算&lt;/span&gt;&lt;em&gt;60%&lt;/em&gt;</div>
+  </div>
+</section>
+
+<!-- ===== count ===== -->
+<section class="slide fx">
+  <div class="row" style="gap:80px">
+    <div class="stat"><div class="n" data-fx="count">1,165</div><div class="l">部影片</div></div>
+    <div class="stat"><div class="n" data-fx="count" data-delay="0.6">48%</div><div class="l">有寫簡介</div></div>
+  </div>
+  <div class="info">
+    <p class="kicker">count</p><h2>數字跳動</h2>
+    <p>從 0 數到寫在裡面的數字。逗號、百分比、小數點都照原樣保留。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「第 35 頁的 1,165 用 count 跳上去」</p></div>
+    <div class="how">&lt;div data-fx="count"&gt;1,165&lt;/div&gt;
+data-ms="1400"　跳多久
+data-delay="0.3"　等多久才開始</div>
+  </div>
+</section>
+
+<!-- ===== type ===== -->
+<section class="slide fx">
+  <div class="demo-card" style="font-size:40px;padding:40px 44px">
+    <p class="muted" style="font-size:22px;margin-bottom:12px">在 Google 搜尋</p>
+    <p data-fx="type" style="font-size:44px;color:var(--ink)">台灣有哪些公民科技專案？</p>
+  </div>
+  <div class="info">
+    <p class="kicker">type</p><h2>打字</h2>
+    <p>一個字一個字打出來，適合搜尋框、對話、提問。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「第 12 頁的搜尋字用 type 打出來」</p></div>
+    <div class="how">data-fx="type"　data-ms="55"　每個字幾毫秒</div>
+  </div>
+</section>
+
+<!-- ===== mark ===== -->
+<section class="slide fx">
+  <p style="font-size:52px;line-height:1.5;color:var(--ink)">想參與的人，最常卡在<b data-fx="mark">不知道從哪裡開始</b>。</p>
+  <div class="info">
+    <p class="kicker">mark</p><h2>螢光筆</h2>
+    <p>一段文字裡，把重點畫上螢光筆。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「第 9 頁的『不知道從哪裡開始』用 mark 畫起來」</p></div>
+    <div class="how">&lt;b data-fx="mark"&gt;重點&lt;/b&gt;</div>
+  </div>
+</section>
+
+<!-- ===== pan ===== -->
+<section class="slide fx">
+  <div class="pan" data-fx="pan" style="height:640px"><img src="examples/media/tall-cat.png" alt=""></div>
+  <div class="info">
+    <p class="kicker">pan</p><h2>長截圖捲動</h2>
+    <p>整頁的長截圖放進框裡，慢慢往下捲再捲回來。捲多遠會自己算。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「第 10 頁右邊放議題頁的長截圖，用 pan」</p></div>
+    <div class="how">&lt;div class="pan" data-fx="pan" style="height:640px"&gt;
+  &lt;img src="tall.png"&gt;
+data-ms="7000"　捲一趟多久</div>
+  </div>
+</section>
+
+<!-- ===== zoom ===== -->
+<section class="slide fx">
+  <div class="zoom" data-fx="zoom" data-at="20% 40%" data-scale="2" style="aspect-ratio:16/10"><img src="examples/media/p-cofacts.png" alt=""></div>
+  <div class="info">
+    <p class="kicker">zoom</p><h2>推近</h2>
+    <p>慢慢推近截圖上的一點，再拉回來。加 data-once 就只推一次。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「第 25 頁的截圖推近到左上的專案名稱」<br>（用 A 標註點一下位置最準）</p></div>
+    <div class="how">data-at="20% 40%"　推向哪一點
+data-scale="2"　放大幾倍</div>
+  </div>
+</section>
+
+<!-- ===== cycle ===== -->
+<section class="slide fx">
+  <div data-fx="cycle" data-ms="2500" style="aspect-ratio:16/10;border-radius:14px;overflow:hidden;border:1px solid var(--line-strong)">
+    <img src="examples/media/home.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
+    <img src="examples/media/c-budget.png" alt="">
+    <img src="examples/media/guides.png" alt="">
+  </div>
+  <div class="info">
+    <p class="kicker">cycle</p><h2>輪播</h2>
+    <p>幾張圖輪流淡入淡出，適合「同一個東西的幾個樣子」。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「第 6 頁把四個預算網站的截圖做成 cycle」</p></div>
+    <div class="how">&lt;div data-fx="cycle" data-ms="3000"&gt;
+  &lt;img&gt;&lt;img&gt;&lt;img&gt;</div>
+  </div>
+</section>
+
+<!-- ===== clickpath ===== -->
+<section class="slide fx">
+  <div class="clickpath" data-fx="clickpath" data-script="move 70 85; move 22 18; wait 500; click; wait 200; frame 1; wait 900; move 30 42; wait 500; click; wait 200; frame 2; wait 2500">
+    <img src="examples/media/home.png" alt=""><img src="examples/media/c-budget.png" alt=""><img src="examples/media/p-cofacts.png" alt="">
+  </div>
+  <div class="info">
+    <p class="kicker">clickpath</p><h2>游標示範</h2>
+    <p>游標在幾張截圖上移動、點擊、換頁，示範「要點哪裡才找得到」。會一直循環。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「第 26 頁做 clickpath：先點右上的『討論』，再點『過去的討論』」</p></div>
+    <div class="how">move X Y（百分比）· click
+frame N（換第幾張）· wait 毫秒</div>
+  </div>
+</section>
+
+<!-- ===== orbit ===== -->
+<section class="slide fx">
+  <div class="orbit" data-fx="orbit" style="height:640px">
+    <div>資料庫<small>Airtable</small></div><div>API<small>每天同步</small></div><div>網站<small>civictech.tw</small></div>
+    <div>使用者<small>看到錯字</small></div><div>建議修改<small>表單</small></div><div>審核<small>揪松團</small></div>
+  </div>
+  <div class="info">
+    <p class="kicker">orbit</p><h2>循環流程</h2>
+    <p>幾個步驟排成一圈，一個點沿著圈走，走到哪個就亮哪個。適合「會回到起點」的流程。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「第 31 頁用 orbit 畫資料流：資料庫 → API → 網站 → 使用者 → 建議修改 → 審核」</p></div>
+    <div class="how">&lt;div class="orbit" data-fx="orbit"&gt;
+  &lt;div&gt;資料庫&lt;small&gt;…&lt;/small&gt;&lt;/div&gt; …</div>
+  </div>
+</section>
+
+<!-- ===== assemble ===== -->
+<section class="slide fx">
+  <div class="grid3" data-fx="assemble" style="grid-template-rows:repeat(2,190px)">
+    <div class="demo-card">找得到</div><div class="demo-card">看得懂</div><div class="demo-card">進得去</div>
+    <div class="demo-card">拿得走</div><div class="demo-card">放得回</div><div class="demo-card">留得住</div>
+  </div>
+  <div class="info">
+    <p class="kicker">assemble</p><h2>飛進來組合</h2>
+    <p>一組卡片從四散的位置飛進來，拼成格子。適合「這些合起來就是解法」。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「第 10 頁的 bento 用 assemble 飛進來」</p></div>
+    <div class="how">data-fx="assemble"　data-stagger="0.12"</div>
+  </div>
+</section>
+
+<!-- ===== spot ===== -->
+<section class="slide fx">
+  <div class="spot" data-fx="spot" data-rects="12 16 46 12, 12 33 40 30, 62 30 30 50"><img src="examples/media/p-cofacts.png" alt=""></div>
+  <div class="info">
+    <p class="kicker">spot</p><h2>聚光燈</h2>
+    <p>截圖其他地方變暗，只亮一塊。有好幾塊的話，每按一下 → 移到下一塊。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「第 25 頁的截圖用 spot，依序亮標題、簡介、右邊的連結」<br>（用 A 點那幾個位置最準）</p></div>
+    <div class="how">data-rects="x y 寬 高, …"（百分比）</div>
+  </div>
+</section>
+
+<!-- ===== morph (framed) ===== -->
+<section class="slide fx">
+  <div class="morph" data-fx="morph" data-src="examples/media/morph-project"></div>
+  <div class="info">
+    <p class="kicker">morph</p><h2>頁面重組</h2>
+    <p>從真的網站拍下來：游標點一張卡片，卡片長成整頁，標題飛到新位置，其他內容浮上來。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「做一段 morph：在議題頁點『中央政府預算視覺化』，變成它的專案頁。標題、簡介要飛過去」</p></div>
+    <div class="how">npm run morph -- config.mjs
+&lt;div class="morph" data-fx="morph"
+  data-src="media/morph-x"&gt;</div>
+  </div>
+</section>
+
+<section class="slide full">
+  <div class="morph" data-fx="morph" data-src="examples/media/morph-project" data-delay="0.3"></div>
+<aside class="notes">同一段 morph 放滿整頁的樣子：slide 加 class="full"。</aside></section>
+
+<!-- ===== map ===== -->
+<section class="slide fx">
+  <div class="map" data-fx="map" style="height:660px"
+    data-center="24.985 121.41" data-zoom="13.5"
+    data-pins="24.9913 121.4246 樹林車站; 24.9838 121.4085 南樹林車站; 24.9729 121.3929 山佳車站"
+    data-tour="24.9913 121.4246 16; 24.9729 121.3929 16; 24.985 121.41 13.5"></div>
+  <div class="info">
+    <p class="kicker">map</p><h2>地圖</h2>
+    <p>真的地圖，點位一個個掉下來；每按一下 →，飛到下一個地點。加 data-auto 就自己飛。需要網路。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「第 5 頁放樹林的地圖，三個車站插點，按一下飛到樹林車站、再按飛到山佳」</p></div>
+    <div class="how">data-pins="緯度 經度 名字; …"
+data-tour="緯度 經度 縮放; …"</div>
+  </div>
+<aside class="notes">示範用的車站座標是大概的位置。</aside></section>
+
+<!-- ===== live ===== -->
+<section class="slide fx">
+  <div style="display:flex;justify-content:center"><div class="phone"><div class="live" data-fx="live" data-src="https://misheng.app" data-w="390" data-h="844"></div></div></div>
+  <div class="info">
+    <p class="kicker">live</p><h2>真網站</h2>
+    <p>把網站直接放進投影片，可以現場點。用手機的寬度畫再縮小，就是手機上的樣子。需要網路。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「第 8 頁放 misheng.app 的手機版，可以現場操作」</p></div>
+    <div class="how">&lt;div class="live" data-fx="live"
+  data-src="https://…" data-w="390" data-h="844"&gt;</div>
+  </div>
+<aside class="notes">有些網站不讓別人嵌入（X-Frame-Options），那種就要改用截圖或 morph。</aside></section>
+
+<!-- ===== frames ===== -->
+<section class="slide fx">
+  <div style="display:grid;grid-template-columns:1fr 240px;gap:40px;align-items:center">
+    <div class="browser"><span class="url">civictech.tw</span><img src="examples/media/home.png" alt=""></div>
+    <div class="phone" style="width:240px"><img src="examples/media/c-budget.png" alt="" style="object-position:0 0"></div>
+  </div>
+  <div class="info">
+    <p class="kicker">frames</p><h2>瀏覽器／手機框</h2>
+    <p>截圖、影片、真網站外面套一個框，一看就知道是網頁還是手機。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「第 7 頁的截圖套瀏覽器框，網址寫 civictech.tw」</p></div>
+    <div class="how">&lt;div class="browser"&gt;&lt;span class="url"&gt;…
+&lt;div class="phone"&gt;&lt;img&gt;</div>
+  </div>
+</section>
+
+<!-- ===== video ===== -->
+<section class="slide fx">
+  <div class="demo-card" style="aspect-ratio:16/9;display:grid;place-items:center;background:#000;color:#9cc9d4;font:28px var(--mono)">▶ 整頁影片</div>
+  <div class="info">
+    <p class="kicker">video</p><h2>影片轉場</h2>
+    <p>一整頁只放一支影片，翻到就自動播放。適合段落之間的轉場。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「第 15 頁放 06-explode.mp4 當轉場」</p></div>
+    <div class="how">&lt;section class="slide video"&gt;
+  &lt;video src="media/x.mp4" muted playsinline&gt;</div>
+  </div>
+</section>
+
+</div>
+<script src="deck/deck.js"></script>
+<script src="deck/fx.js"></script>
+</body>
+</html>
