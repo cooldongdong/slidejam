@@ -51,11 +51,8 @@
 .tp-actions .tp-copy{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
 /* corner theme picker: a small button that opens swatch cards */
 #theme-pick{position:fixed;right:14px;top:14px;z-index:15;font:13px var(--sans)}
-#theme-pick > button{display:flex;align-items:center;gap:8px;border:1px solid rgb(255 255 255/.18);background:rgb(10 14 17/.6);color:var(--ui-ink);border-radius:999px;padding:6px 12px 6px 8px;cursor:pointer;opacity:.55;transition:opacity .2s;font:inherit}
+#theme-pick > button{display:flex;align-items:center;gap:8px;border:1px solid rgb(255 255 255/.18);background:rgb(10 14 17/.6);color:var(--ui-ink);border-radius:999px;padding:6px 14px;cursor:pointer;opacity:.55;transition:opacity .2s;font:inherit}
 #theme-pick > button:hover,#theme-pick.open > button{opacity:1}
-#theme-pick .dots{display:flex}
-#theme-pick .dots i{width:14px;height:14px;border-radius:50%;margin-left:-4px;border:2px solid rgb(10 14 17/.6)}
-#theme-pick .dots i:first-child{margin-left:0}
 #theme-pick .menu{position:absolute;right:0;top:calc(100% + 8px);display:none;grid-template-columns:repeat(2,150px);gap:10px;padding:12px;background:var(--ui-bg);border-radius:14px;box-shadow:0 20px 40px rgb(0 0 0/.45)}
 #theme-pick.open .menu{display:grid}
 #theme-pick .sw{display:grid;gap:8px;text-align:left;border:2px solid transparent;border-radius:10px;padding:8px;background:var(--ui-line);color:var(--ui-ink);cursor:pointer;font:inherit}
@@ -872,8 +869,7 @@ data-mode="settle｜sway｜hold"</div>
     menu.appendChild(sw);
   });
   const drawButton = (name) => {
-    const [paper, , accent, warn] = THEMES[name].c;
-    btn.innerHTML = `<span class="dots"><i style="background:${paper}"></i><i style="background:${accent}"></i><i style="background:${warn}"></i></span>主題：${name}`;
+    btn.textContent = `主題：${name} ▾`;
     menu.querySelectorAll(".sw").forEach((x) => x.classList.toggle("on", x.dataset.theme === name));
   };
   btn.onclick = (e) => { e.stopPropagation(); pick.classList.toggle("open"); };

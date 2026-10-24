@@ -140,10 +140,13 @@
   };
   Deck.titleOf = titleOf;
 
-  let ovBuilt = false;
-  function toggleOverview(force) {
+  // the overview and Play all share one scroll position, so switching between them
+  // keeps every thumbnail where it was
+  let ovBuilt = false, ovScroll = 0;
+  function toggleOverview(force, keepScroll) {
     const ov = $("#overview");
     const on = force ?? !ov.classList.contains("show");
+    if (!on && ov.classList.contains("show")) ovScroll = ov.scrollTop;
     if (on && !ovBuilt) {
       const top = el("div", { className: "ov-top" }, ov);
       ov.prepend(top);
@@ -166,7 +169,8 @@
     ov.classList.toggle("show", on);
     if (on) {
       $$(".ov-item", ov).forEach((it) => it.classList.toggle("cur", +it.dataset.k === Deck.cur));
-      $(".ov-item.cur", ov)?.scrollIntoView({ block: "center" });
+      if (keepScroll) ov.scrollTop = ovScroll;
+      else $(".ov-item.cur", ov)?.scrollIntoView({ block: "center" });
     }
   }
 
@@ -531,7 +535,7 @@
     if (e.key === "Escape") {
       if (typing) return e.target.blur();
       if ($("#keys").classList.contains("show")) return toggleKeys(false);
-      if (walled) { toggleWall(false); return toggleOverview(true); }
+      if (walled) { toggleWall(false); return toggleOverview(true, true); }
       if (document.body.classList.contains("editing")) return setEditing(false);
       if (document.body.classList.contains("annotating")) return setAnnotating(false);
       return toggleOverview(false);
@@ -600,10 +604,10 @@
       const wall = el("div", { id: "wall" }, document.body);
       const top = el("div", { className: "ov-top" }, wall);
       const back = el("button", { className: "ov-back", textContent: "←", title: "回到總覽（Esc）" }, top);
-      back.onclick = () => { toggleWall(false); toggleOverview(true); };
+      back.onclick = () => { toggleWall(false); toggleOverview(true, true); };
       el("b", { textContent: "總覽・播放中" }, top);
       const stopBtn = el("button", { textContent: "■ 停止播放" }, top);
-      stopBtn.onclick = () => { toggleWall(false); toggleOverview(true); };
+      stopBtn.onclick = () => { toggleWall(false); toggleOverview(true, true); };
       el("span", { textContent: "滑過去重播・點一下打開那一頁" }, top);
       const grid = el("div", { className: "wall-grid" }, wall);
       Deck.slides.forEach((s, i) => {
@@ -614,6 +618,7 @@
         cell.onmouseenter = () => { eachFx(s, (d, e) => d.leave?.(e)); eachFx(s, (d, e) => d.enter?.(e, s)); };
       });
       fitWall();
+      wall.scrollTop = ovScroll;
       Deck.slides.forEach((s) => {
         s.classList.add("active");
         $$("video", s).forEach((v) => { v.currentTime = 0; v.play().catch(() => {}); });
@@ -628,6 +633,7 @@
         s.style.transform = "";
         stage.insertBefore(s, anchor);
       });
+      ovScroll = $("#wall").scrollTop;
       $("#wall").remove();
       show(Deck.cur);
     }
