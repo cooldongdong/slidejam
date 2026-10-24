@@ -1,12 +1,12 @@
 ---
-name: web-deck
-description: 用 web-deck 做或改「單一 index.html 的網頁簡報」——1600×900 舞台、data-fx 效果、從真網站拍下來的頁面重組（morph）動畫、地圖、真網站嵌入。當用戶說「做簡報」「做一份網頁簡報」「介紹某個網站／產品的簡報」「第 N 頁加動畫」「這頁用 pan／morph／map」，或貼上一段以「簡報：…／標註 N 則」開頭的標註清單時就要用。也用在新增一種效果、重拍 morph、檢查簡報截圖。Use for building or editing web-deck HTML slide decks, reading pasted annotation lists, adding effects, or capturing morphs from live sites; respond in Traditional Chinese.
+name: slidejam
+description: 用 slidejam 做或改「單一 index.html 的網頁簡報」——1600×900 舞台、data-fx 效果、從真網站拍下來的頁面重組（morph）動畫、地圖、真網站嵌入。當用戶說「做簡報」「做一份網頁簡報」「介紹某個網站／產品的簡報」「第 N 頁加動畫」「這頁用 pan／morph／map」，或貼上一段以「簡報：…／標註 N 則」開頭的標註清單時就要用。也用在新增一種效果、重拍 morph、檢查簡報截圖。Use for building or editing slidejam HTML slide decks, reading pasted annotation lists, adding effects, or capturing morphs from live sites; respond in Traditional Chinese.
 ---
 
-# web-deck
+# slidejam
 
 The repo root is the parent folder of this skill (resolve the symlink:
-`readlink -f ~/.claude/skills/web-deck/..`). Everything below is relative to it.
+`readlink -f ~/.claude/skills/slidejam/..`). Everything below is relative to it.
 
 **`effects.html` is the source of truth for effects.** Before writing markup for an
 effect, open that slide in `effects.html` and copy its pattern. Don't work from memory.

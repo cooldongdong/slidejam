@@ -1,4 +1,4 @@
-// web-deck core: a 1600×900 stage, slides, keyboard nav, overview, notes,
+// slidejam core: a 1600×900 stage, slides, keyboard nav, overview, notes,
 // plus two authoring modes — E edits text in place and writes it back to this
 // file, A collects "do X here" notes you can paste to an AI.
 // Effects live in fx.js and register themselves through Deck.fx.register().
@@ -28,7 +28,7 @@
   const fxOf = (e) => (e.dataset.fx || "").split(/\s+/).filter(Boolean).map((n) => [n, Deck.fx[n]]);
   function eachFx(slide, fn) {
     $$("[data-fx]", slide).forEach((e) => fxOf(e).forEach(([n, d]) => {
-      if (!d) return console.warn(`[web-deck] unknown effect "${n}"`, e);
+      if (!d) return console.warn(`[slidejam] unknown effect "${n}"`, e);
       fn(d, e);
     }));
   }
@@ -223,7 +223,7 @@
 
   // file handle, remembered per page so ⌘S only asks once
   const idb = (mode, fn) => new Promise((res, rej) => {
-    const r = indexedDB.open("web-deck", 1);
+    const r = indexedDB.open("slidejam", 1);
     r.onupgradeneeded = () => r.result.createObjectStore("h");
     r.onsuccess = () => {
       try { const q = fn(r.result.transaction("h", mode).objectStore("h")); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }
@@ -290,7 +290,7 @@
   }
 
   // ---------- A: annotate — click anything, say what you want there ----------
-  const annoKey = "web-deck-anno:" + location.pathname;
+  const annoKey = "slidejam-anno:" + location.pathname;
   let annos = store.get(annoKey) || [];
   let hoverEl = null, pendingAnno = null;
   function describe(e) {

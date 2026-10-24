@@ -1,6 +1,8 @@
-# web-deck
+# slidejam
 
-web-deck makes slide decks that are a single `index.html`. You double-click to
+Jam on a slide deck with an AI: slides that move, in one HTML file.
+
+slidejam makes slide decks that are a single `index.html`. You double-click to
 open one: there's no build step, no server and no framework.
 
 It was built for talks that **show a website**, and those talks have three needs:
@@ -22,7 +24,7 @@ selectors and coordinates that you can paste to an assistant.
 ## Quick start
 
 ```sh
-git clone … web-deck && cd web-deck
+git clone … slidejam && cd slidejam
 npm install                         # Playwright, only needed for the capture tools
 npx playwright install chromium-headless-shell
 node tools/new-deck.mjs ~/talks/my-talk
@@ -78,7 +80,7 @@ export default {
 ```
 
 ```sh
-cd ~/talks/my-talk && node ~/web-deck/tools/capture-morph.mjs morph.config.mjs
+cd ~/talks/my-talk && node ~/slidejam/tools/capture-morph.mjs morph.config.mjs
 ```
 
 Then add `<div class="morph" data-fx="morph" data-src="media/morph-project"></div>`
@@ -103,7 +105,7 @@ skill/       a Claude Code skill for building decks with an AI
 ```
 
 To use the skill with Claude Code, run
-`ln -s "$PWD/skill" ~/.claude/skills/web-deck`.
+`ln -s "$PWD/skill" ~/.claude/skills/slidejam`.
 
 ## License
 

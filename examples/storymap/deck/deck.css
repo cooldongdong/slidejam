@@ -1,4 +1,4 @@
-/* web-deck core styles. Override the tokens in your deck's own <style>. */
+/* slidejam core styles. Override the tokens in your deck's own <style>. */
 :root{
   --paper:#f6f7f8; --surface:#fff; --surface-2:#eceff1;
   --ink:#111a1f; --ink-2:#36444b; --ink-muted:#5b6a71;
@@ -343,3 +343,5 @@ body.editing .terminal > *,body.annotating .terminal > *{opacity:1}
 .tile.dark .cap{background:linear-gradient(to top,#0f1719 55%,transparent)}
 .tile.dark .cap b{color:#fff}
 .tile .wish{position:absolute;left:24px;right:24px;bottom:22px;border:1.5px solid var(--accent);border-radius:10px;padding:10px 14px;font-size:18px;color:var(--ink);background:var(--surface);min-height:46px}
+.pop-demo{display:flex;flex-wrap:wrap;gap:16px;align-content:center}
+.pop-demo > span{font-size:22px;font-weight:650;color:#fff;background:var(--c);border-radius:12px;padding:10px 18px}

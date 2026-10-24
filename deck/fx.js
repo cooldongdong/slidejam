@@ -1,4 +1,4 @@
-// web-deck effects. Each one is opted into with data-fx="name" and configured
+// slidejam effects. Each one is opted into with data-fx="name" and configured
 // with data-* attributes. effects.html shows every one of them running.
 (() => {
   const { register } = Deck.fx;

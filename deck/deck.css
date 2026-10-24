@@ -1,4 +1,4 @@
-/* web-deck core styles. Override the tokens in your deck's own <style>. */
+/* slidejam core styles. Override the tokens in your deck's own <style>. */
 :root{
   --paper:#f6f7f8; --surface:#fff; --surface-2:#eceff1;
   --ink:#111a1f; --ink-2:#36444b; --ink-muted:#5b6a71;
