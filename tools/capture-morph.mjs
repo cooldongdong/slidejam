@@ -22,6 +22,7 @@
 //   setup    async (page) => {}        runs before each page is captured
 // Selectors can use Playwright syntax, e.g. 'a[href="/p/x"] >> text=Title'.
 //   boxPad   px around the clicked element, default 0
+//   fill     colour of the growing box; default is the clicked element's background, "none" for no box
 //   stagger  seconds between rows, default 0.1
 import { chromium } from "playwright";
 import { mkdirSync, writeFileSync, rmSync } from "node:fs";
@@ -82,12 +83,22 @@ const one = async (sel) => {
   if (!(await loc.count())) throw new Error(`nothing matches "${sel}" on ${page.url()}`);
   return loc;
 };
-// screenshot one element with see-through background, so it can float over the other page
-async function grab(file, loc) {
+// screenshot one element alone on a see-through background, so it can float over the other page:
+// everything else is hidden (overlays that merely sit behind it included) and ancestors lose
+// their backgrounds. Flying text drops its own background too; rows keep theirs, so cards stay cards.
+async function grab(file, loc, self = false) {
   const b = await loc.boundingBox();
-  await loc.evaluate((e) => { window.__bg = []; for (let p = e.parentElement; p; p = p.parentElement) { window.__bg.push([p, p.style.background]); p.style.background = "transparent"; } });
+  await loc.evaluate((e, self) => {
+    const st = document.createElement("style");
+    st.id = "__grab";
+    st.textContent = "body *{visibility:hidden !important} [data-grab],[data-grab] *{visibility:visible !important}";
+    document.head.appendChild(st);
+    e.setAttribute("data-grab", "");
+    window.__bg = [];
+    for (let p = self ? e : e.parentElement; p; p = p.parentElement) { window.__bg.push([p, p.style.background]); p.style.background = "transparent"; }
+  }, self);
   await loc.screenshot({ path: `${OUT}/${file}`, omitBackground: true });
-  await page.evaluate(() => window.__bg.forEach(([p, bg]) => (p.style.background = bg)));
+  await loc.evaluate((e) => { e.removeAttribute("data-grab"); document.getElementById("__grab").remove(); window.__bg.forEach(([p, bg]) => (p.style.background = bg)); });
   return { x: b.x, y: b.y, w: b.width, h: b.height };
 }
 const fontSize = (loc) => loc.evaluate((e) => (e.textContent.trim() ? parseFloat(getComputedStyle(e).fontSize) : 0));
@@ -102,11 +113,13 @@ const tb = await target.boundingBox();
 if (tb.y + tb.height > H) throw new Error(`"${C.from.click}" is below the fold even after scrolling; pick something higher on the page`);
 const pad = C.boxPad ?? 0;
 const box = { x: tb.x - pad, y: tb.y - pad, w: tb.width + pad * 2, h: tb.height + pad * 2 };
+// the growing box is painted in the clicked element's own colour (none if it has no background)
+const fill = C.fill !== undefined ? (C.fill === "none" ? null : C.fill) : await target.evaluate((e) => { const c = getComputedStyle(e).backgroundColor; return /rgba\(.*,\s*0\)$|transparent/.test(c) ? null : c; });
 const pairs = C.pairs ?? [];
 const from = [];
 for (const [i, [a]] of pairs.entries()) {
   const loc = await one(a);
-  from.push({ ...(await grab(`pair-${i}-a.png`, loc)), fs: await fontSize(loc) });
+  from.push({ ...(await grab(`pair-${i}-a.png`, loc, true)), fs: await fontSize(loc) });
 }
 await page.screenshot({ path: `${OUT}/from.png` });
 
@@ -117,7 +130,7 @@ await settle();
 const to = [];
 for (const [i, [, b]] of pairs.entries()) {
   const loc = await one(b);
-  to.push({ ...(await grab(`pair-${i}-b.png`, loc)), fs: await fontSize(loc) });
+  to.push({ ...(await grab(`pair-${i}-b.png`, loc, true)), fs: await fontSize(loc) });
   await loc.evaluate((e) => e.setAttribute("data-morph-pair", ""));
 }
 const rows = [];
@@ -150,6 +163,7 @@ const data = {
   size: [W, H],
   box: round(box),
   click: [Math.round(box.x + box.w / 2), Math.round(box.y + box.h / 2)],
+  fill,
   pairs: pairs.map((_, i) => {
     const a = from[i], b = to[i];
     // text scales by font size (line wraps change widths); anything else by width

@@ -14,6 +14,7 @@ Deck.morph("examples/media/morph-project", {
   412,
   434
  ],
+ "fill": "rgb(255, 255, 255)",
  "pairs": [
   {
    "from": {

@@ -326,8 +326,11 @@
     const r = lerp(12, 0, k), rev = q(".mx-reveal");
     rev.style.visibility = started ? "visible" : "hidden";
     rev.style.clipPath = `inset(${bx.y}px ${W - bx.x - bx.w}px ${H - bx.y - bx.h}px ${bx.x}px round ${r}px)`;
-    q(".mx-fill").style.opacity = 1 - prog(t, T.expand[1] - 0.35, T.expand[1] + 0.15, eCubic);
+    const fillOn = C.fill !== null; // older captures have no fill key: keep the white box
+    q(".mx-fill").style.background = C.fill || "#fff";
+    q(".mx-fill").style.opacity = fillOn ? 1 - prog(t, T.expand[1] - 0.35, T.expand[1] + 0.15, eCubic) : 0;
     const sh = q(".mx-shadow");
+    sh.style.background = C.fill || "#fff";
     Object.assign(sh.style, { left: bx.x + "px", top: bx.y + "px", width: bx.w + "px", height: bx.h + "px", borderRadius: r + "px", visibility: started ? "visible" : "hidden" });
     sh.style.boxShadow = `0 ${2 + 40 * lift}px ${6 + 90 * lift}px rgba(15,23,42,${0.06 + 0.16 * lift})`;
     sh.style.opacity = 1 - k;
