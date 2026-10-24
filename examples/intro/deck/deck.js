@@ -368,7 +368,7 @@
   // ---------- A: annotate — click anything, say what you want there ----------
   const annoKey = "slidejam-anno:" + location.pathname;
   let annos = store.get(annoKey) || [];
-  let hoverEl = null, pendingAnno = null;
+  let hoverEl = null, pendingAnno = null, liveBand = null;
   function describe(e) {
     const tag = e.tagName.toLowerCase();
     const cls = [...e.classList].filter((c) => !/^(active|on|off|dirty|anno-hover)$/.test(c)).map((c) => "." + c).join("");
@@ -388,6 +388,7 @@
   }
   function cancelAnno() {
     pendingAnno = null;
+    liveBand?.remove(); liveBand = null;
     const box = $("#anno-input");
     if (box) box.style.display = "none";
   }
@@ -464,8 +465,38 @@
       hoverEl?.classList.remove("anno-hover"); hoverEl = t; t?.classList.add("anno-hover");
     });
     // click marks a point; drag draws a box (handy for spot / zoom / hotspots positions)
-    let down = null, band = null;
+    let down = null, band = null, target = null;
     const pct = (v) => Math.round(v * 10) / 10;
+    // a drawn box stays (dashed, with handles) until the note is sent; dragging a handle
+    // resizes it and the numbers follow
+    const setBox = ([x, y, w, h]) => {
+      const r = target.getBoundingClientRect(), s = stage.getBoundingClientRect();
+      const rx = (v) => ((s.left + (v / W) * s.width - r.left) / r.width) * 100, ry = (v) => ((s.top + (v / H) * s.height - r.top) / r.height) * 100;
+      pendingAnno.stageBox = [x, y, w, h];
+      pendingAnno.box = `${pct(rx(x))} ${pct(ry(y))} ${pct(rx(x + w) - rx(x))} ${pct(ry(y + h) - ry(y))}`;
+      Object.assign(liveBand.style, { left: x + "px", top: y + "px", width: w + "px", height: h + "px" });
+      $(".what", box).textContent = `第 ${Deck.cur + 1} 頁 · ${pendingAnno.what}\n框：${pendingAnno.box}（%）`;
+    };
+    const keepBand = (b) => {
+      liveBand = b;
+      ["nw", "n", "ne", "e", "se", "s", "sw", "w"].forEach((h) => {
+        const k = el("i", { className: "anno-h" }, b);
+        k.dataset.h = h;
+        k.addEventListener("pointerdown", (ev) => {
+          ev.preventDefault(); ev.stopPropagation();
+          const [x0, y0, w0, h0] = pendingAnno.stageBox, [px, py] = stagePoint(ev);
+          const move = (e2) => {
+            const [qx, qy] = stagePoint(e2), dx = qx - px, dy = qy - py;
+            let l = x0, t = y0, r = x0 + w0, btm = y0 + h0;
+            if (h.includes("w")) l += dx; if (h.includes("e")) r += dx;
+            if (h.includes("n")) t += dy; if (h.includes("s")) btm += dy;
+            setBox([Math.min(l, r), Math.min(t, btm), Math.max(8, Math.abs(r - l)), Math.max(8, Math.abs(btm - t))]);
+          };
+          const up = () => { removeEventListener("pointermove", move); removeEventListener("pointerup", up); ta.focus(); };
+          addEventListener("pointermove", move); addEventListener("pointerup", up);
+        });
+      });
+    };
     // pointer events, not mouse events: a map (Leaflet) cancels pointerdown, and then the
     // browser never sends the mouse events
     stage.addEventListener("pointerdown", (ev) => {
@@ -482,17 +513,15 @@
     });
     addEventListener("pointerup", (ev) => {
       if (!down) return;
-      const t = down.t, r = t.getBoundingClientRect(), [x0, y0] = down.p, [x1, y1] = stagePoint(ev), e0 = down.ev;
+      const t = (target = down.t), r = t.getBoundingClientRect(), [x0, y0] = down.p, [x1, y1] = stagePoint(ev), e0 = down.ev;
       const rx = (cx) => ((cx - r.left) / r.width) * 100, ry = (cy) => ((cy - r.top) / r.height) * 100;
       pendingAnno = { slide: Deck.cur, title: titleOf(Deck.cur), what: describe(t), selector: selectorOf(t), x: x0, y: y0, rel: `(${Math.round(rx(e0.clientX))}%, ${Math.round(ry(e0.clientY))}%)` };
-      if (band) {
-        const bx = Math.min(rx(e0.clientX), rx(ev.clientX)), by = Math.min(ry(e0.clientY), ry(ev.clientY));
-        pendingAnno.box = `${pct(bx)} ${pct(by)} ${pct(Math.abs(rx(ev.clientX) - rx(e0.clientX)))} ${pct(Math.abs(ry(ev.clientY) - ry(e0.clientY)))}`;
-        pendingAnno.stageBox = [Math.min(x0, x1), Math.min(y0, y1), Math.abs(x1 - x0), Math.abs(y1 - y0)];
-        band.remove(); band = null;
-      }
       down = null;
-      $(".what", box).textContent = `第 ${Deck.cur + 1} 頁 · ${pendingAnno.what}` + (pendingAnno.box ? `\n框：${pendingAnno.box}（%）` : "");
+      $(".what", box).textContent = `第 ${Deck.cur + 1} 頁 · ${pendingAnno.what}`;
+      if (band) {
+        keepBand(band); band = null;
+        setBox([Math.min(x0, x1), Math.min(y0, y1), Math.abs(x1 - x0), Math.abs(y1 - y0)]);
+      }
       box.style.left = Math.min(innerWidth - 400, ev.clientX + 12) + "px";
       box.style.top = Math.min(innerHeight - 160, ev.clientY + 12) + "px";
       box.style.display = "block"; ta.value = ""; ta.focus();
@@ -503,8 +532,8 @@
       if (ev.key === "Enter" && !ev.shiftKey) {
         ev.preventDefault();
         if (ta.value.trim()) { annos.push({ ...pendingAnno, note: ta.value.trim() }); store.set(annoKey, annos); }
-        box.style.display = "none"; pendingAnno = null; renderPanel(); renderPins();
-      } else if (ev.key === "Escape") { box.style.display = "none"; pendingAnno = null; }
+        cancelAnno(); renderPanel(); renderPins();
+      } else if (ev.key === "Escape") cancelAnno();
     });
   }
 
