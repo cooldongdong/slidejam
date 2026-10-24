@@ -1,7 +1,7 @@
 // rotate — one word in a sentence keeps changing. Words are separated by ｜.
 // <p>在這裡，你可以<span data-fx="rotate">讀別人的經驗｜串接資料｜找到夥伴</span></p>
 (() => {
-  const { register, gen, ms, timers, stop, keep, restore } = Deck.lib;
+  const { register, gen, ms, timers, stop, keep, restore, restoreLater } = Deck.lib;
   Deck.lib.css(`
 .rot-box{display:inline-block;position:relative;vertical-align:bottom;height:1.3em;overflow:hidden;transition:width .5s var(--ease);color:var(--accent)}
 .rot-word{position:absolute;left:0;top:0;white-space:nowrap;transform:translateY(100%);opacity:0;transition:transform .6s var(--ease),opacity .5s}
@@ -26,14 +26,7 @@
       const id = setInterval(() => { k = (k + 1) % spans.length; set(); }, ms(e, 2200));
       timers.set(e, () => clearInterval(id));
     },
-    leave(e) {
-      stop(e);
-      // restoring shows the raw "a｜b｜c" text, so wait for the slide to fade out first —
-      // except when editing or annotating, which need the authored text right away
-      if (document.body.classList.contains("editing") || document.body.classList.contains("annotating")) return restore(e);
-      const t = setTimeout(() => { if (!e.closest(".slide.active")) restore(e); }, 500);
-      timers.set(e, () => clearTimeout(t));
-    },
+    leave(e) { restoreLater(e); },
     thumb(e) { if (!e.querySelector(".rot-box")) e.textContent = e.textContent.split(/[|｜]/)[0]; },
   });
 })();

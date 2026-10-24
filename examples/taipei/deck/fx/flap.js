@@ -1,7 +1,7 @@
 // flap — split-flap board: every character flips through letters before it lands.
 // <p data-fx="flap">17 個議題</p>
 (() => {
-  const { register, num, delay, clamp, lerp, stop, loopRaf, rnd, keep, restore, splitChars } = Deck.lib;
+  const { register, num, delay, clamp, lerp, stop, loopRaf, rnd, keep, restore, restoreLater, splitChars } = Deck.lib;
   Deck.lib.css(`
 .flap-cell{display:inline-block;min-width:.92em;text-align:center;margin:0 .03em;padding:.05em .04em;border-radius:.1em;color:var(--on-dark);background:linear-gradient(color-mix(in srgb,var(--dark) 88%,#fff) 0 49%,color-mix(in srgb,var(--dark) 80%,#000) 49% 51%,var(--dark) 51%);box-shadow:0 .05em .1em rgb(0 0 0/.3);transform-origin:50% 50%}
 `);
@@ -29,6 +29,6 @@
         return t < end;
       });
     },
-    leave(e) { stop(e); restore(e); },
+    leave(e) { restoreLater(e); },
   });
 })();

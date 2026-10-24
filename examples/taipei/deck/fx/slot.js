@@ -1,6 +1,6 @@
 // slot — odometer: each digit rolls on its own reel and lands. <div class="n" data-fx="slot">226</div>
 (() => {
-  const { register, $$, gen, ms, delay, stop, anim, keep, restore } = Deck.lib;
+  const { register, $$, gen, ms, delay, stop, anim, keep, restore, restoreLater } = Deck.lib;
   Deck.lib.css(`
 .slot-col{display:inline-block;height:1em;line-height:1;overflow:hidden;vertical-align:top}
 .slot-strip{display:block}
@@ -24,6 +24,6 @@
           { duration: ms(e, 1600) + fromRight * 220, delay: delay(e, 0.3) * 1000, easing: "cubic-bezier(.2,.8,.2,1)" });
       });
     },
-    leave(e) { $$(".slot-strip", e).forEach(stop); restore(e); },
+    leave(e) { $$(".slot-strip", e).forEach(stop); restoreLater(e); },
   });
 })();

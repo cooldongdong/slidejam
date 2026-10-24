@@ -44,6 +44,15 @@
   const saved = new WeakMap();
   const keep = (e) => { if (!saved.has(e)) saved.set(e, e.innerHTML); };
   const restore = (e) => { if (saved.has(e)) { e.innerHTML = saved.get(e); saved.delete(e); } };
+  // on leave the slide is still fading out, and the authored text would flash in place of the
+  // effect (raw "a｜b｜c", plain digits), so put it back once the fade is over — except while
+  // editing or annotating, which need the authored text right away
+  function restoreLater(e) {
+    stop(e);
+    if (document.body.classList.contains("editing") || document.body.classList.contains("annotating")) return restore(e);
+    const t = setTimeout(() => { if (!e.closest(".slide.active")) restore(e); }, 500);
+    timers.set(e, () => clearTimeout(t));
+  }
   function splitChars(e, cls) {
     const out = [];
     const walk = (n) => [...n.childNodes].forEach((c) => {
@@ -74,5 +83,5 @@
   };
 
   Deck.lib = { register, css, $$, gen, num, ms, delay, clamp, lerp, timers, stop, loopRaf, anim,
-    kids, rnd, EASE, trigger, fire, keep, restore, splitChars, stageScale };
+    kids, rnd, EASE, trigger, fire, keep, restore, restoreLater, splitChars, stageScale };
 })();
