@@ -1,88 +1,8 @@
-<!doctype html>
-<html lang="zh-Hant-TW">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>使用流程 — slidejam</title>
-<meta name="description" content="跟 AI 用 slidejam 做簡報的完整流程：從說一句「做簡報」，到上台。">
-<meta property="og:title" content="slidejam 使用流程：跟 AI 從零做到上台">
-<meta property="og:description" content="六個步驟，每一步 AI 做什麼、你做什麼；第二份簡報、隔天接著做都說清楚。">
-<meta property="og:image" content="https://cooldongdong.github.io/slidejam/og.png">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site/site.css">
-<style>
-.page-hero{padding:64px 0 24px}
-.page-hero h1{font-size:clamp(34px,5vw,58px);line-height:1.15;margin:0;letter-spacing:-.02em}
-.page-hero p{font-size:19px;color:var(--ink-2);max-width:760px;margin:18px 0 0}
-.block{padding:56px 0;border-top:1px solid var(--line)}
-.block h2{font-size:clamp(26px,3.2vw,36px);margin:0 0 10px}
-.block > .wrap > p.lead{font-size:18px;color:var(--ink-2);margin:0 0 28px;max-width:760px}
-/* the six steps */
-.flow{display:grid;gap:18px;counter-reset:f}
-.fstep{display:grid;grid-template-columns:64px 1fr 1fr 1.1fr;grid-template-areas:"n h h h" "n a b c";gap:14px 22px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px 24px;counter-increment:f}
-.fstep::before{grid-area:n;content:counter(f);display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--accent);color:#fff;font:600 20px var(--mono)}
-.fstep h3{grid-area:h;margin:0;font-size:22px}
-.fstep > .who:nth-of-type(1){grid-area:a}.fstep > .who:nth-of-type(2){grid-area:b}.fstep > .chat{grid-area:c}
-.fstep h3 small{font:500 14px var(--mono);color:var(--warm);margin-left:10px}
-.who{font-size:15px;color:var(--ink-2)}
-.who b{display:block;font:600 13px var(--mono);letter-spacing:.06em;color:var(--ink-muted);margin-bottom:6px}
-.who ul{margin:0;padding-left:18px}
-.who li{margin-bottom:4px}
-.chat{display:grid;gap:8px;align-content:start}
-.chat p{margin:0;padding:10px 14px;border-radius:14px;font-size:14.5px;line-height:1.55}
-.chat .me{background:var(--accent);color:#fff;justify-self:end;border-radius:14px 14px 4px 14px;max-width:92%}
-.chat .ai{background:var(--surface-2);color:var(--ink);border-radius:14px 14px 14px 4px;max-width:96%}
-.fstep.zero{counter-increment:none}
-.fstep.zero::before{content:"0";background:var(--ink-muted)}
-.twocol > *,.case,.tools > *{min-width:0}
-.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.case{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px}
-.case h3{margin:0 0 10px;font-size:19px}
-.case p{margin:0 0 12px;color:var(--ink-2);font-size:15.5px}
-.keys{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 28px}
-.keys div{display:grid;grid-template-columns:70px 1fr;gap:12px;align-items:baseline;font-size:16px;color:var(--ink-2)}
-.keys kbd{font:600 15px var(--mono);background:var(--surface);border:1px solid var(--line-strong);border-bottom-width:3px;border-radius:8px;padding:3px 0;text-align:center;color:var(--ink)}
-.tools{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:32px}
-.tools .screen{margin-top:10px}
-.tools h3{margin:0;font-size:19px}
-.tools p{margin:6px 0 0;color:var(--ink-2);font-size:15.5px}
-.tree{background:#0f1719;color:#d6e2e5;border-radius:14px;padding:18px 22px;font:15px/1.7 var(--mono);white-space:pre;overflow-x:auto}
-.tree .c{color:#7d9096}
-.twocol{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
-ol.plain{margin:0;padding-left:22px;color:var(--ink-2);font-size:16px}
-ol.plain li{margin-bottom:8px}
-code{font-family:var(--mono);font-size:.92em;background:var(--surface-2);padding:1px 6px;border-radius:5px}
-@media (max-width:860px){
-  .fstep{grid-template-columns:1fr;grid-template-areas:"n" "h" "a" "b" "c";gap:12px}
-  .cases,.keys,.tools,.twocol{grid-template-columns:1fr}
-}
-</style>
-<script>
-function pickLang(l) {
-  document.documentElement.dataset.lang = l;
-  document.documentElement.lang = l === "zh" ? "zh-Hant-TW" : "en";
-  try { localStorage.setItem("slidejam-lang", l); } catch {}
-}
-(() => { let saved = null; try { saved = localStorage.getItem("slidejam-lang"); } catch {} pickLang(saved || (navigator.language.startsWith("zh") ? "zh" : "en")); })();
-</script>
-</head>
-<body>
-<header id="top"><div class="wrap nav">
-  <a class="logo" href="./">slide<span>jam</span></a>
-  <nav>
-    <a href="#setup"><span lang="zh">準備</span><span lang="en">Setup</span></a>
-    <a href="#flow"><span lang="zh">六個步驟</span><span lang="en">Six steps</span></a>
-    <a href="#decks"><span lang="zh">第二份簡報</span><span lang="en">More decks</span></a>
-    <a href="#tools"><span lang="zh">按鍵</span><span lang="en">Keys</span></a>
-    <a href="#effects"><span lang="zh">效果在哪</span><span lang="en">Effects</span></a>
-    <a href="https://github.com/cooldongdong/slidejam">GitHub</a>
-  </nav>
-  <div class="lang"><button data-l="zh">中文</button><button data-l="en">EN</button></div>
-</div></header>
-
-<main>
+---
+import Base from "../layouts/Base.astro";
+const B = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+---
+<Base title={'使用流程 — slidejam'} description={'跟 AI 用 slidejam 做簡報的完整流程：從說一句「做簡報」，到上台。'} nav={[['#setup', '準備', 'Setup'], ['#flow', '六個步驟', 'Six steps'], ['#decks', '第二份簡報', 'More decks'], ['#tools', '按鍵', 'Keys']]}>
 <section class="page-hero"><div class="wrap">
   <p class="kicker"><span lang="zh">使用流程</span><span lang="en">Workflow</span></p>
   <h1><span lang="zh">從一句「做簡報」，到上台</span><span lang="en">From "make me a deck" to the stage</span></h1>
@@ -99,7 +19,7 @@ npm install                      <span class="c"># 拍真網站動畫才需要</
 npx playwright install chromium-headless-shell
 ln -s "$PWD/skill" ~/.claude/skills/slidejam</pre>
     <div class="who" style="font-size:16px">
-      <p style="margin:0 0 10px"><span lang="zh">沒有用 Claude Code 也可以：打開 <a href="effects.html">效果圖鑑</a> 挑效果，把按 A 標註出來的清單貼給任何一個 AI。</span><span lang="en">Not on Claude Code? Pick effects from the <a href="effects.html">gallery</a> and paste the lists you mark with A to any AI.</span></p>
+      <p style="margin:0 0 10px"><span lang="zh">沒有用 Claude Code 也可以：打開 <a href={B + "play/effects/"}>效果圖鑑</a> 挑效果，把按 A 標註出來的清單貼給任何一個 AI。</span><span lang="en">Not on Claude Code? Pick effects from the <a href={B + "play/effects/"}>gallery</a> and paste the lists you mark with A to any AI.</span></p>
       <p style="margin:0"><span lang="zh">需要 Chrome（改字存檔只有 Chrome 能用）和 Node.js 22 以上。</span><span lang="en">You need Chrome (saving edits is Chrome-only) and Node.js 22+.</span></p>
     </div>
   </div>
@@ -199,9 +119,9 @@ ln -s "$PWD/skill" ~/.claude/skills/slidejam</pre>
   </div>
   <div class="tools">
     <div><h3><span lang="zh">A：說不清楚的，框起來</span><span lang="en">A: box what's hard to describe</span></h3><p><span lang="zh">清單有頁碼、元素和精確位置，AI 不用猜。</span><span lang="en">The list has the slide, the element and exact coordinates.</span></p>
-      <div class="screen"><iframe src="demos/annotate.html?embed&loop=10" title="annotate" loading="lazy" tabindex="-1"></iframe></div></div>
+      <div class="screen"><iframe src={B + "demos/annotate.html?embed&loop=10"} title="annotate" loading="lazy" tabindex="-1"></iframe></div></div>
     <div><h3><span lang="zh">E：字自己改最快</span><span lang="en">E: fixing words yourself is fastest</span></h3><p><span lang="zh">⌘S 只換掉改過的那一行，其他一個字都不動。</span><span lang="en">⌘S replaces only the line you changed.</span></p>
-      <div class="screen"><iframe src="demos/edit.html?embed&loop=8" title="edit" loading="lazy" tabindex="-1"></iframe></div></div>
+      <div class="screen"><iframe src={B + "demos/edit.html?embed&loop=8"} title="edit" loading="lazy" tabindex="-1"></iframe></div></div>
   </div>
 </div></section>
 
@@ -227,24 +147,56 @@ ln -s "$PWD/skill" ~/.claude/skills/slidejam</pre>
         <li><span lang="zh">在效果圖鑑加一頁示範，寫好「跟 AI 這樣說」</span><span lang="en">add a gallery slide with a demo and a line to ask with</span></li>
         <li><span lang="zh">用 <code>--update</code> 把它帶進你的簡報</span><span lang="en">bring it into your deck with <code>--update</code></span></li>
       </ol>
-      <p style="color:var(--ink-muted);font-size:15px;margin-top:16px"><span lang="zh">下次就能直接叫名字。<a href="effects.html?wall">看目前所有效果 →</a></span><span lang="en">Next time, just call it by name. <a href="effects.html?wall">See every effect →</a></span></p>
+      <p style="color:var(--ink-muted);font-size:15px;margin-top:16px"><span lang="zh">下次就能直接叫名字。<a href={B + "play/effects/?wall"}>看目前所有效果 →</a></span><span lang="en">Next time, just call it by name. <a href={B + "play/effects/?wall"}>See every effect →</a></span></p>
     </div>
   </div>
 </div></section>
-</main>
+</Base>
 
-<footer><div class="wrap">
-  <a class="logo" href="./" style="font-size:18px">slide<span>jam</span></a>
-  <span class="sp"></span>
-  <a href="./"><span lang="zh">首頁</span><span lang="en">Home</span></a>
-  <a href="effects.html"><span lang="zh">效果圖鑑</span><span lang="en">Effects</span></a>
-  <a href="https://github.com/cooldongdong/slidejam/blob/master/docs/%E4%BD%BF%E7%94%A8%E8%AA%AA%E6%98%8E.md"><span lang="zh">使用說明</span><span lang="en">User guide (zh)</span></a>
-  <a href="https://github.com/cooldongdong/slidejam">GitHub</a>
-</div></footer>
-
-<script>
-document.querySelectorAll(".lang button").forEach((b) => b.addEventListener("click", () => pickLang(b.dataset.l)));
-addEventListener("scroll", () => document.getElementById("top").classList.toggle("scrolled", scrollY > 8), { passive: true });
-</script>
-</body>
-</html>
+<style is:global>
+.page-hero{padding:64px 0 24px}
+.page-hero h1{font-size:clamp(34px,5vw,58px);line-height:1.15;margin:0;letter-spacing:-.02em}
+.page-hero p{font-size:19px;color:var(--ink-2);max-width:760px;margin:18px 0 0}
+.block{padding:56px 0;border-top:1px solid var(--line)}
+.block h2{font-size:clamp(26px,3.2vw,36px);margin:0 0 10px}
+.block > .wrap > p.lead{font-size:18px;color:var(--ink-2);margin:0 0 28px;max-width:760px}
+/* the six steps */
+.flow{display:grid;gap:18px;counter-reset:f}
+.fstep{display:grid;grid-template-columns:64px 1fr 1fr 1.1fr;grid-template-areas:"n h h h" "n a b c";gap:14px 22px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px 24px;counter-increment:f}
+.fstep::before{grid-area:n;content:counter(f);display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--accent);color:#fff;font:600 20px var(--mono)}
+.fstep h3{grid-area:h;margin:0;font-size:22px}
+.fstep > .who:nth-of-type(1){grid-area:a}.fstep > .who:nth-of-type(2){grid-area:b}.fstep > .chat{grid-area:c}
+.fstep h3 small{font:500 14px var(--mono);color:var(--warm);margin-left:10px}
+.who{font-size:15px;color:var(--ink-2)}
+.who b{display:block;font:600 13px var(--mono);letter-spacing:.06em;color:var(--ink-muted);margin-bottom:6px}
+.who ul{margin:0;padding-left:18px}
+.who li{margin-bottom:4px}
+.chat{display:grid;gap:8px;align-content:start}
+.chat p{margin:0;padding:10px 14px;border-radius:14px;font-size:14.5px;line-height:1.55}
+.chat .me{background:var(--accent);color:#fff;justify-self:end;border-radius:14px 14px 4px 14px;max-width:92%}
+.chat .ai{background:var(--surface-2);color:var(--ink);border-radius:14px 14px 14px 4px;max-width:96%}
+.fstep.zero{counter-increment:none}
+.fstep.zero::before{content:"0";background:var(--ink-muted)}
+.twocol > *,.case,.tools > *{min-width:0}
+.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.case{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px}
+.case h3{margin:0 0 10px;font-size:19px}
+.case p{margin:0 0 12px;color:var(--ink-2);font-size:15.5px}
+.keys{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 28px}
+.keys div{display:grid;grid-template-columns:70px 1fr;gap:12px;align-items:baseline;font-size:16px;color:var(--ink-2)}
+.keys kbd{font:600 15px var(--mono);background:var(--surface);border:1px solid var(--line-strong);border-bottom-width:3px;border-radius:8px;padding:3px 0;text-align:center;color:var(--ink)}
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:32px}
+.tools .screen{margin-top:10px}
+.tools h3{margin:0;font-size:19px}
+.tools p{margin:6px 0 0;color:var(--ink-2);font-size:15.5px}
+.tree{background:#0f1719;color:#d6e2e5;border-radius:14px;padding:18px 22px;font:15px/1.7 var(--mono);white-space:pre;overflow-x:auto}
+.tree .c{color:#7d9096}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+ol.plain{margin:0;padding-left:22px;color:var(--ink-2);font-size:16px}
+ol.plain li{margin-bottom:8px}
+code{font-family:var(--mono);font-size:.92em;background:var(--surface-2);padding:1px 6px;border-radius:5px}
+@media (max-width:860px){
+  .fstep{grid-template-columns:1fr;grid-template-areas:"n" "h" "a" "b" "c";gap:12px}
+  .cases,.keys,.tools,.twocol{grid-template-columns:1fr}
+}
+</style>
