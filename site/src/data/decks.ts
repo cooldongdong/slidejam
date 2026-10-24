@@ -13,6 +13,14 @@ export const decks = [
     goal: ["三分鐘講清楚它能做什麼：一個檔案、真網站拍進來、跟 AI 一起改。", "Show in three minutes what it does: one file, real sites captured, revised with an AI."],
   },
   {
+    id: "civictech",
+    file: "examples/civictech/index.html",
+    zh: ["civictech.tw 建置成果", "一場 41 頁的成果分享，用 default 主題。"],
+    en: ["Building civictech.tw", "A 41-slide project talk in the default theme."],
+    who: ["關心公民科技、想找專案參與的人", "People curious about civic tech who want a project to join"],
+    goal: ["講清楚一個網站為什麼長這樣：真網站拍下來的頁面重組、資料流動的循環、問卷長條圖，搭配錄好的網站動畫。", "Explain why a website looks the way it does: page morphs captured from the live site, the data loop, survey bars, and recorded site animations."],
+  },
+  {
     id: "taipei",
     file: "examples/taipei/index.html",
     zh: ["台北一日遊", "七個地方、真地圖、照片，用 warm 主題。"],
