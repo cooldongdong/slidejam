@@ -423,6 +423,542 @@
     leave(e) { stop(e); },
   });
 
+  // =====================================================================
+  // Motion effects adapted from the civictech.tw intro clips.
+  // Several wait for → instead of starting by themselves when given data-on="step".
+  // =====================================================================
+  const kids = (e) => [...e.children].filter((c) => !("gen" in c.dataset));
+  const rnd = (i, n) => ((Math.sin((i + 1) * 99.13 * n) * 43758.5453) % 1 + 1) % 1; // same scatter every run
+  const EASE = "cubic-bezier(.16,1,.3,1)";
+  function trigger(e, fn, d = 0.6) {
+    stop(e);
+    if (e.dataset.on === "step") { e._pending = fn; return; }
+    const t = setTimeout(fn, delay(e, d) * 1000);
+    timers.set(e, () => clearTimeout(t));
+  }
+  const fire = (e) => { const f = e._pending; if (!f) return false; e._pending = null; f(); return true; };
+  // effects that rebuild an element's inside keep the authored HTML and put it back on leave
+  const saved = new WeakMap();
+  const keep = (e) => { if (!saved.has(e)) saved.set(e, e.innerHTML); };
+  const restore = (e) => { if (saved.has(e)) { e.innerHTML = saved.get(e); saved.delete(e); } };
+  function splitChars(e, cls) {
+    const out = [];
+    const walk = (n) => [...n.childNodes].forEach((c) => {
+      if (c.nodeType === 3) {
+        const frag = document.createDocumentFragment();
+        for (const ch of c.textContent) {
+          if (/\s/.test(ch)) { frag.append(ch); continue; }
+          const s = document.createElement("span");
+          s.className = cls; s.dataset.gen = ""; s.textContent = ch;
+          frag.append(s); out.push(s);
+        }
+        c.replaceWith(frag);
+      } else if (c.nodeType === 1 && !("gen" in c.dataset)) walk(c);
+    });
+    walk(e);
+    return out;
+  }
+  const stageScale = (e) => e.getBoundingClientRect().width / (e.offsetWidth || 1);
+
+  // letters — each character rises out of a blur, one after another. <h1 data-fx="letters">
+  register("letters", {
+    enter(e) {
+      restore(e); keep(e);
+      const st = num(e.dataset.stagger, 0.05), d = delay(e, 0.2);
+      splitChars(e, "ltr").forEach((c, i) => anim(c,
+        [{ transform: "translateY(105%) rotate(8deg)", filter: "blur(14px)", opacity: 0 }, { transform: "none", filter: "blur(0)", opacity: 1 }],
+        { duration: 1000, delay: (d + i * st) * 1000, easing: EASE }));
+    },
+    leave(e) { restore(e); },
+  });
+
+  // rotate — one word in a sentence keeps changing. Words are separated by ｜.
+  // <p>在這裡，你可以<span data-fx="rotate">讀別人的經驗｜串接資料｜找到夥伴</span></p>
+  register("rotate", {
+    enter(e) {
+      restore(e); keep(e);
+      const words = e.textContent.split(/[|｜]/).map((w) => w.trim()).filter(Boolean);
+      e.textContent = "";
+      const box = gen("span", "rot-box", e);
+      const spans = words.map((w) => { const s = gen("span", "rot-word", box); s.textContent = w; return s; });
+      let k = 0;
+      const set = (first) => {
+        const prev = (k - 1 + spans.length) % spans.length;
+        spans.forEach((s, j) => (s.className = "rot-word" + (j === k ? " on" : !first && j === prev ? " out" : "")));
+        box.style.width = spans[k].offsetWidth + "px";
+      };
+      set(true); stop(e);
+      const id = setInterval(() => { k = (k + 1) % spans.length; set(); }, ms(e, 2200));
+      timers.set(e, () => clearInterval(id));
+    },
+    leave(e) { stop(e); restore(e); },
+    thumb(e) { if (!e.querySelector(".rot-box")) e.textContent = e.textContent.split(/[|｜]/)[0]; },
+  });
+
+  // flap — split-flap board: every character flips through letters before it lands.
+  // <p data-fx="flap">17 個議題</p>
+  register("flap", {
+    enter(e) {
+      restore(e); keep(e);
+      const cells = splitChars(e, "flap-cell");
+      const glyphs = [...new Set(e.textContent.replace(/\s/g, ""))].join("") + "公民科技資料開放政府議題專案";
+      const d = delay(e, 0.3), FL = 0.055, st = num(e.dataset.stagger, 0.04);
+      const plan = cells.map((c, i) => ({ c, ch: c.textContent, stop: d + 0.5 + i * st + rnd(i, 3) * 0.35, seed: rnd(i, 7) * 10, digit: /\d/.test(c.textContent) }));
+      const end = Math.max(...plan.map((p) => p.stop)) + FL;
+      loopRaf(e, (t) => {
+        for (const p of plan) {
+          if (t >= p.stop) {
+            p.c.textContent = p.ch;
+            const k = clamp((t - p.stop) / FL);
+            p.c.style.transform = `scaleY(${lerp(0.2, 1, 1 - Math.pow(1 - k, 3))})`;
+          } else {
+            const pool = p.digit ? "0123456789" : glyphs;
+            p.c.textContent = t < d ? " " : pool[Math.floor((t + p.seed) / FL) % pool.length];
+            p.c.style.transform = `scaleY(${Math.abs(Math.cos((((t + p.seed) % FL) / FL) * Math.PI))})`;
+          }
+        }
+        return t < end;
+      });
+    },
+    leave(e) { stop(e); restore(e); },
+  });
+
+  // slot — odometer: each digit rolls on its own reel and lands. <div class="n" data-fx="slot">226</div>
+  register("slot", {
+    enter(e) {
+      restore(e); keep(e);
+      const text = e.textContent;
+      e.textContent = "";
+      const chars = [...text], digits = chars.filter((c) => /\d/.test(c)).length;
+      let di = 0;
+      chars.forEach((ch) => {
+        if (!/\d/.test(ch)) { gen("span", "", e).textContent = ch; return; }
+        const fromRight = digits - 1 - di++;
+        const col = gen("span", "slot-col", e), strip = gen("span", "slot-strip", col);
+        const rounds = 1 + fromRight;
+        strip.innerHTML = Array.from({ length: rounds * 10 + +ch + 1 }, (_, j) => `<i>${j % 10}</i>`).join("");
+        anim(strip, [{ transform: "translateY(0)" }, { transform: `translateY(${-(rounds * 10 + +ch)}em)` }],
+          { duration: ms(e, 1600) + fromRight * 220, delay: delay(e, 0.3) * 1000, easing: "cubic-bezier(.2,.8,.2,1)" });
+      });
+    },
+    leave(e) { $$(".slot-strip", e).forEach(stop); restore(e); },
+  });
+
+  // particles — dots drift in from everywhere and gather into the text (one-line titles).
+  // <h1 data-fx="particles">civictech.tw</h1>
+  register("particles", {
+    async enter(e) {
+      this.leave(e);
+      await document.fonts.ready;
+      const slide = e.closest(".slide");
+      if (!slide.classList.contains("active")) return;
+      const cs = getComputedStyle(e), k = stageScale(slide);
+      const sr = slide.getBoundingClientRect(), er = e.getBoundingClientRect();
+      const x0 = (er.left - sr.left) / k, y0 = (er.top - sr.top) / k, w = Math.ceil(er.width / k), h = Math.ceil(er.height / k);
+      const off = document.createElement("canvas"); off.width = w; off.height = h;
+      const oc = off.getContext("2d", { willReadFrequently: true });
+      oc.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      oc.textBaseline = "middle";
+      oc.textAlign = cs.textAlign === "center" ? "center" : /right|end/.test(cs.textAlign) ? "right" : "left";
+      oc.fillText(e.textContent.trim(), oc.textAlign === "center" ? w / 2 : oc.textAlign === "right" ? w : 0, h / 2);
+      const px = oc.getImageData(0, 0, w, h).data, step = Math.max(3, Math.round(parseFloat(cs.fontSize) / 34));
+      const pts = [];
+      for (let y = 0; y < h; y += step) for (let x = 0; x < w; x += step) {
+        if (px[(y * w + x) * 4 + 3] > 128) {
+          const i = pts.length;
+          pts.push({ tx: x0 + x, ty: y0 + y, sx: rnd(i, 1) * Deck.W, sy: rnd(i, 2) * Deck.H, d: rnd(i, 3) * 0.8 + (x / w) * 0.5, r: 1.2 + rnd(i, 4) * (step / 3) });
+        }
+      }
+      const cv = gen("canvas", "fx-canvas", slide);
+      cv.width = Deck.W * 2; cv.height = Deck.H * 2;
+      const ctx = cv.getContext("2d"); ctx.scale(2, 2);
+      e.style.opacity = "0";
+      const d = delay(e, 0.2), color = cs.color;
+      loopRaf(e, (t) => {
+        ctx.clearRect(0, 0, Deck.W, Deck.H);
+        ctx.fillStyle = color;
+        let all = true;
+        for (const p of pts) {
+          const q = clamp((t - d - p.d) / 1.6), ez = 1 - Math.pow(1 - q, 5);
+          if (q < 1) all = false;
+          ctx.globalAlpha = 0.25 + 0.75 * ez;
+          ctx.beginPath();
+          ctx.arc(lerp(p.sx + Math.sin(t * 1.3 + p.sy) * 14, p.tx, ez), lerp(p.sy + Math.cos(t * 1.1 + p.sx) * 14, p.ty, ez), p.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        if (all) { e.style.opacity = ""; cv.style.transition = "opacity .8s"; cv.style.opacity = 0; return false; }
+      });
+    },
+    leave(e) { stop(e); e.style.opacity = ""; e.closest(".slide")?.querySelectorAll(".fx-canvas").forEach((c) => c.remove()); },
+  });
+
+  // textmask — big words filled with a picture that slowly drifts.
+  // <h1 data-fx="textmask" data-img="media/photo.jpg">公民科技</h1>
+  register("textmask", {
+    setup(e) { e.classList.add("textmask"); e.style.backgroundImage = `url("${e.dataset.img}")`; },
+    enter(e) {
+      this.setup(e);
+      anim(e, [{ backgroundPosition: "0% 20%", backgroundSize: "140%" }, { backgroundPosition: "100% 80%", backgroundSize: "170%" }],
+        { duration: ms(e, 9000), iterations: Infinity, direction: "alternate" });
+    },
+    leave(e) { stop(e); },
+  });
+
+  // tilt — a screenshot (or a whole grid) in 3D.
+  //   data-mode="settle" (default) lies tilted then swings flat · "sway" turns side to side · "hold" stays tilted and drifts
+  // <div data-fx="tilt"><img class="shot" src="…"></div>
+  register("tilt", {
+    enter(e) {
+      const rx = num(e.dataset.rx, 55), rz = num(e.dataset.rz, -25), mode = e.dataset.mode || "settle";
+      const tilted = `perspective(2400px) rotateX(${rx}deg) rotateZ(${rz}deg) scale(.8)`;
+      if (mode === "sway") anim(e, [{ transform: "perspective(1600px) rotateY(-20deg) rotateX(6deg)" }, { transform: "perspective(1600px) rotateY(20deg) rotateX(6deg)" }], { duration: ms(e, 5000), iterations: Infinity, direction: "alternate" });
+      else if (mode === "hold") anim(e, [{ transform: `${tilted} translateY(40px)` }, { transform: `${tilted} translateY(-40px)` }], { duration: ms(e, 8000), iterations: Infinity, direction: "alternate" });
+      else anim(e, [{ transform: tilted }, { transform: "perspective(2400px) rotateX(0deg) rotateZ(0deg) scale(1)" }], { duration: ms(e, 2200), delay: delay(e, 0.6) * 1000, easing: EASE });
+    },
+    leave(e) { stop(e); },
+  });
+
+  // explode — stacked layers lift apart in 3D, each with a label. Children are the layers,
+  // bottom first; data-label on a layer names it.
+  // <div class="explode" data-fx="explode"><div class="card">…</div><div data-label="專案名稱">…</div>…</div>
+  register("explode", {
+    setup(e) {
+      kids(e).forEach((c, i) => {
+        c.classList.add("x-layer"); c.style.setProperty("--k", i);
+        if (c.dataset.label && !c.querySelector(".x-tag")) {
+          const t = gen("div", "x-tag", c);
+          gen("i", "", t); gen("span", "", t).textContent = c.dataset.label;
+        }
+      });
+    },
+    enter(e) { this.setup(e); e.classList.remove("open"); trigger(e, () => e.classList.add("open"), 0.9); },
+    step(e) { return fire(e); },
+    leave(e) { stop(e); e.classList.remove("open"); },
+    thumb(e) { e.classList.add("open"); },
+  });
+
+  // parallax — layers at different depths drift and follow the mouse.
+  // <div class="parallax" data-fx="parallax"><img data-depth="0.2" …><div data-depth="1">…</div></div>
+  register("parallax", {
+    enter(e) {
+      const layers = kids(e), slide = e.closest(".slide");
+      let mx = 0, my = 0;
+      const move = (ev) => { const r = e.getBoundingClientRect(); mx = (ev.clientX - r.left) / r.width - 0.5; my = (ev.clientY - r.top) / r.height - 0.5; };
+      slide.addEventListener("mousemove", move);
+      let sx = 0, sy = 0;
+      loopRaf(e, (t) => {
+        sx += (mx + Math.sin(t * 0.45) * 0.35 - sx) * 0.06; sy += (my + Math.cos(t * 0.35) * 0.25 - sy) * 0.06;
+        layers.forEach((l) => { const d = num(l.dataset.depth, 0.5); l.style.transform = `translate3d(${-sx * d * 90}px, ${-sy * d * 60}px, 0) scale(${1 + d * 0.04})`; });
+      });
+      const cancel = timers.get(e);
+      timers.set(e, () => { cancel(); slide.removeEventListener("mousemove", move); });
+    },
+    leave(e) { stop(e); },
+  });
+
+  // dive — zooms into one spot of the first picture until it becomes the second.
+  // <div class="dive" data-fx="dive" data-at="30% 40%"><img src="a.png"><img src="b.png"></div>
+  register("dive", {
+    enter(e) {
+      const [a, b] = kids(e);
+      stop(a); stop(b);
+      trigger(e, () => {
+        a.style.transformOrigin = b.style.transformOrigin = e.dataset.at || "50% 50%";
+        anim(a, [{ transform: "scale(1)", filter: "blur(0)", opacity: 1 }, { transform: `scale(${num(e.dataset.scale, 6)})`, filter: "blur(6px)", opacity: 0 }], { duration: 1400, easing: "cubic-bezier(.6,0,.2,1)" });
+        anim(b, [{ transform: "scale(.2)", opacity: 0 }, { transform: "scale(1)", opacity: 1 }], { duration: 1400, delay: 200, easing: "cubic-bezier(.6,0,.2,1)" });
+      }, 1);
+    },
+    step(e) { return fire(e); },
+    leave(e) { stop(e); kids(e).forEach(stop); },
+  });
+
+  // wipe — a coloured band sweeps across, leaving the second picture behind it
+  // (before/after, light/dark). <div class="wipe" data-fx="wipe"><img src="before.png"><img src="after.png"></div>
+  register("wipe", {
+    enter(e) {
+      const [, b] = kids(e);
+      const band = e.querySelector(".wipe-band") || gen("i", "wipe-band", e);
+      stop(b); stop(band);
+      const ang = (Math.atan((0.3 * e.offsetWidth) / (e.offsetHeight || 1)) * 180) / Math.PI;
+      trigger(e, () => {
+        const opt = { duration: ms(e, 1300), easing: "cubic-bezier(.65,0,.35,1)" };
+        anim(b, [{ clipPath: "polygon(0 0, 0% 0, -30% 100%, 0 100%)" }, { clipPath: "polygon(0 0, 130% 0, 100% 100%, 0 100%)" }], opt);
+        anim(band, [{ left: "-20%", transform: `skewX(${-ang}deg)` }, { left: "115%", transform: `skewX(${-ang}deg)` }], opt);
+      }, 1);
+    },
+    step(e) { return fire(e); },
+    leave(e) { stop(e); kids(e).forEach(stop); const band = e.querySelector(".wipe-band"); band && stop(band); },
+  });
+
+  // hotspots — pulsing dots on a screenshot; each → opens the next one's note.
+  // Each note is a child with data-at="x y" (percent); add data-auto to step by itself.
+  // <div class="hotspots" data-fx="hotspots"><img src="…"><p data-at="62 18">每個專案有自己的網址</p></div>
+  register("hotspots", {
+    setup(e) {
+      kids(e).filter((c) => c.dataset.at).forEach((c) => {
+        const [x, y] = c.dataset.at.split(/\s+/).map(Number);
+        c.classList.add("hs-note");
+        c.style.left = x + "%"; c.style.top = y + "%";
+        if (!c._dot) { c._dot = gen("i", "hs-dot", e); c._dot.style.left = x + "%"; c._dot.style.top = y + "%"; }
+      });
+    },
+    notes(e) { return kids(e).filter((c) => c.dataset.at); },
+    enter(e) {
+      this.setup(e);
+      e.dataset.k = -1; e.classList.remove("lit");
+      this.notes(e).forEach((n) => n.classList.remove("open"));
+      stop(e);
+      const ts = [setTimeout(() => e.classList.add("lit"), delay(e, 0.8) * 1000)];
+      if (e.dataset.auto != null) this.notes(e).forEach((_, i) => ts.push(setTimeout(() => this.step(e), (delay(e, 0.8) + 0.8) * 1000 + i * ms(e, 2400))));
+      timers.set(e, () => ts.forEach(clearTimeout));
+    },
+    step(e) {
+      const ns = this.notes(e), k = +e.dataset.k + 1;
+      if (k >= ns.length) return false;
+      e.classList.add("lit");
+      ns.forEach((n, j) => { n.classList.toggle("open", j === k); n._dot?.classList.toggle("open", j === k); });
+      e.dataset.k = k;
+      return true;
+    },
+    leave(e) { stop(e); },
+    thumb(e) { e.classList.add("lit"); },
+  });
+
+  // story — a list of steps next to screens; the highlighted step and the screen move together.
+  // Automatic every data-ms; with data-on="step" each → moves on.
+  // <div class="story" data-fx="story"><ol><li>…</li>…</ol><div class="phone"><div data-frames><img>…</div></div></div>
+  register("story", {
+    parts(e) { return { items: $$("li", e.querySelector("ol, ul")), frames: kids(e.querySelector("[data-frames]") || e.lastElementChild) }; },
+    set(e, k) {
+      const { items, frames } = this.parts(e);
+      items.forEach((l, j) => l.classList.toggle("on", j === k));
+      frames.forEach((f, j) => f.classList.toggle("on", j === k));
+      e.dataset.k = k;
+    },
+    enter(e) {
+      this.set(e, 0); stop(e);
+      if (e.dataset.on === "step") return;
+      const n = this.parts(e).items.length;
+      const id = setInterval(() => this.set(e, (+e.dataset.k + 1) % n), ms(e, 3000));
+      timers.set(e, () => clearInterval(id));
+    },
+    step(e) {
+      if (e.dataset.on !== "step") return false;
+      const k = +e.dataset.k + 1;
+      if (k >= this.parts(e).items.length) return false;
+      this.set(e, k); return true;
+    },
+    leave(e) { stop(e); },
+    thumb(e) { this.set(e, 0); },
+  });
+
+  // chat — messages pop in one by one, with "typing…" before the other side's.
+  // class="me" puts a bubble on the right; class="link" makes a link preview.
+  // <div class="chat" data-fx="chat"><p>有網站整理公民科技專案嗎？</p><p class="me">有！</p>…</div>
+  register("chat", {
+    enter(e) {
+      const msgs = kids(e);
+      msgs.forEach((m) => m.classList.remove("on"));
+      e.querySelector(".chat-typing")?.remove();
+      stop(e);
+      const ts = [];
+      timers.set(e, () => ts.forEach(clearTimeout));
+      const gap = ms(e, 1300);
+      let at = delay(e, 0.6) * 1000;
+      msgs.forEach((m) => {
+        if (!m.classList.contains("me")) {
+          ts.push(setTimeout(() => { const t = gen("p", "chat-typing", e, m); t.innerHTML = "<i></i><i></i><i></i>"; }, at));
+          at += 800;
+        }
+        ts.push(setTimeout(() => { e.querySelector(".chat-typing")?.remove(); m.classList.add("on"); }, at));
+        at += gap;
+      });
+    },
+    leave(e) { stop(e); e.querySelector(".chat-typing")?.remove(); },
+    thumb(e) { kids(e).forEach((m) => m.classList.add("on")); },
+  });
+
+  // terminal — the command types itself, then the output prints line by line.
+  // <div class="terminal" data-fx="terminal"><div class="cmd">curl …</div><div>{</div>…</div>
+  register("terminal", {
+    enter(e) {
+      const [cmd, ...lines] = kids(e);
+      lines.forEach((l) => l.classList.remove("on"));
+      restore(cmd); keep(cmd);
+      const text = cmd.textContent, per = 0.045, d = delay(e, 0.6);
+      cmd.textContent = "";
+      cmd.classList.add("typing");
+      loopRaf(e, (t) => {
+        const n = clamp(Math.floor((t - d) / per), 0, text.length);
+        cmd.textContent = text.slice(0, n);
+        if (n < text.length) return;
+        cmd.classList.remove("typing");
+        const shown = Math.floor((t - d - text.length * per - 0.5) / 0.07);
+        lines.forEach((l, i) => l.classList.toggle("on", i < shown));
+        return shown < lines.length;
+      });
+    },
+    leave(e) { stop(e); const cmd = kids(e)[0]; cmd.classList.remove("typing"); restore(cmd); },
+    thumb(e) { kids(e).forEach((l) => l.classList.add("on")); },
+  });
+
+  // tunnel — names stream past on the walls of a tunnel ("this many projects").
+  // <div class="tunnel" data-fx="tunnel"><span>零時政府</span><span>萌典</span>…</div>
+  register("tunnel", {
+    place(e, t) {
+      const chips = kids(e), per = num(e.dataset.per, 12), R = num(e.dataset.radius, 380), pitch = 240;
+      const len = Math.max(1, Math.ceil(chips.length / per)) * pitch, speed = num(e.dataset.speed, 260);
+      chips.forEach((c, i) => {
+        const ring = Math.floor(i / per), a = ((i % per) / per) * 360 + ring * 13;
+        const z = ((((-ring * pitch + t * speed) % len) + len) % len) - len + 300;
+        c.style.opacity = clamp((z + len - 150) / 700) * clamp((300 - z) / 160);
+        c.style.transform = `translate(-50%,-50%) rotateZ(${a + t * 5}deg) translate3d(0, ${R}px, ${z}px) rotateX(90deg)`;
+      });
+    },
+    setup(e) { kids(e).forEach((c) => c.classList.add("tn-chip")); this.place(e, 1.5); },
+    enter(e) { this.setup(e); loopRaf(e, (t) => this.place(e, t + 1.5)); },
+    leave(e) { stop(e); },
+  });
+
+  // network — topics as hubs, their projects as dots around them, slowly turning in 3D.
+  // <div class="network" data-fx="network"><div><b>政府預算</b><span>twbudget</span>…</div>…</div>
+  const PALETTE = ["#0d5f74", "#b45309", "#7c3aed", "#15803d", "#be185d", "#1d4ed8", "#a16207", "#0f766e"];
+  register("network", {
+    build(e) {
+      if (e._nw) return e._nw;
+      const groups = kids(e), hubs = [], dots = [];
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"); svg.dataset.gen = ""; svg.classList.add("nw-lines");
+      e.prepend(svg);
+      groups.forEach((g, i) => {
+        const y = 1 - ((i + 0.5) / groups.length) * 2, r = Math.sqrt(1 - y * y), th = i * 2.39996;
+        const color = g.dataset.color || PALETTE[i % PALETTE.length];
+        g.classList.add("nw-group"); g.style.setProperty("--c", color);
+        const label = g.querySelector("b"), members = $$("span", g);
+        const hub = { el: label, x: Math.cos(th) * r, y: y * 0.75, z: Math.sin(th) * r, n: members.length };
+        hubs.push(hub);
+        members.forEach((m, j) => {
+          const u = rnd(j, i + 1) * 2 - 1, a = rnd(j, i + 7) * Math.PI * 2, d = (0.08 + Math.sqrt(members.length) * 0.03) * Math.cbrt(rnd(j, i + 3)), s = Math.sqrt(1 - u * u);
+          const line = document.createElementNS("http://www.w3.org/2000/svg", "line"); line.setAttribute("stroke", color); svg.appendChild(line);
+          m.classList.add("nw-dot");
+          dots.push({ el: m, hub, line, x: hub.x + Math.cos(a) * s * d, y: hub.y + u * d, z: hub.z + Math.sin(a) * s * d, delay: rnd(j, i + 11) * 0.8 });
+        });
+      });
+      return (e._nw = { svg, hubs, dots });
+    },
+    draw(e, t) {
+      const { svg, hubs, dots } = this.build(e);
+      const W = e.offsetWidth, H = e.offsetHeight, RAD = Math.min(W, H * 1.4) * 0.42;
+      svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+      const yaw = -0.6 + t * 0.12, pitch = 0.3, boom = 1 - Math.pow(1 - clamp((t - 0.2) / 2), 5);
+      const proj = (p) => {
+        let x = p.x * RAD * boom, y = p.y * RAD * boom, z = p.z * RAD * boom;
+        [x, z] = [x * Math.cos(yaw) - z * Math.sin(yaw), x * Math.sin(yaw) + z * Math.cos(yaw)];
+        [y, z] = [y * Math.cos(pitch) - z * Math.sin(pitch), y * Math.sin(pitch) + z * Math.cos(pitch)];
+        const s = 1100 / (1100 + z + 300);
+        return { x: W / 2 + x * s, y: H / 2 + y * s, s, z };
+      };
+      const fogOf = (z) => clamp(1 - (z + RAD * 0.4) / (RAD * 2.6));
+      const hp = new Map(hubs.map((h) => [h, proj(h)]));
+      for (const d of dots) {
+        const p = proj(d), h = hp.get(d.hub), k = clamp((t - 0.4 - d.delay) / 1.2), f = fogOf(p.z);
+        d.el.style.transform = `translate(${p.x}px, ${p.y}px) scale(${p.s})`;
+        d.el.style.opacity = k * (0.35 + 0.65 * f);
+        d.line.setAttribute("x1", h.x); d.line.setAttribute("y1", h.y); d.line.setAttribute("x2", p.x); d.line.setAttribute("y2", p.y);
+        d.line.setAttribute("opacity", k * 0.5 * (0.35 + 0.65 * f));
+      }
+      const lab = clamp((t - 2) / 1);
+      for (const h of hubs) {
+        const p = hp.get(h), f = fogOf(p.z);
+        h.el.style.transform = `translate(${p.x}px, ${p.y}px) translate(-50%, calc(-100% - 22px)) scale(${0.7 + p.s * 0.4})`;
+        h.el.style.opacity = 0.4 + 0.6 * f;
+        h.el.style.setProperty("--lab", lab * clamp((f - 0.35) / 0.25));
+        h.el.style.zIndex = Math.round(1000 - p.z);
+      }
+    },
+    setup(e) { this.draw(e, 6); },
+    enter(e) { loopRaf(e, (t) => this.draw(e, t)); },
+    leave(e) { stop(e); },
+  });
+
+  // ring — a progress ring that fills to data-v of data-max. Put a label inside.
+  // <div class="ring" data-fx="ring" data-v="84" data-max="226"><b>84</b><span>有寫簡介</span></div>
+  register("ring", {
+    setup(e) {
+      if (e.querySelector(".ring-svg")) return;
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.dataset.gen = ""; svg.classList.add("ring-svg"); svg.setAttribute("viewBox", "0 0 100 100");
+      svg.innerHTML = '<circle cx="50" cy="50" r="45" pathLength="100" class="ring-track"/><circle cx="50" cy="50" r="45" pathLength="100" class="ring-arc"/>';
+      e.prepend(svg);
+    },
+    frac(e) { return clamp(num(e.dataset.v, 0) / num(e.dataset.max, 100)); },
+    enter(e) {
+      this.setup(e);
+      const arc = e.querySelector(".ring-arc");
+      anim(arc, [{ strokeDashoffset: 100 }, { strokeDashoffset: 100 - this.frac(e) * 100 }], { duration: ms(e, 1500), delay: delay(e, 0.3) * 1000, easing: "cubic-bezier(.3,.7,.2,1)" });
+    },
+    leave(e) { const arc = e.querySelector(".ring-arc"); arc && stop(arc); },
+    thumb(e) { const arc = e.querySelector(".ring-arc"); if (arc) arc.style.strokeDashoffset = 100 - this.frac(e) * 100; },
+  });
+
+  // feature — tiles of a grid take turns being the big one, the others making room.
+  // <div class="feature" data-fx="feature" data-ms="2800"><div class="card">…</div>…</div>
+  register("feature", {
+    set(e, k, animate) {
+      const tiles = kids(e), s = stageScale(e);
+      const before = tiles.map((c) => c.getBoundingClientRect());
+      tiles.forEach((c, j) => c.classList.toggle("featured", j === k));
+      e.dataset.k = k;
+      if (!animate) return;
+      tiles.forEach((c, j) => {
+        const a = before[j], b = c.getBoundingClientRect();
+        if (!b.width) return;
+        anim(c, [{ transform: `translate(${(a.left - b.left) / s}px, ${(a.top - b.top) / s}px) scale(${a.width / b.width}, ${a.height / b.height})`, transformOrigin: "0 0" }, { transform: "none", transformOrigin: "0 0" }], { duration: 900, easing: EASE });
+      });
+    },
+    enter(e) {
+      this.set(e, 0, false); stop(e);
+      const n = kids(e).length;
+      const id = setInterval(() => this.set(e, (+e.dataset.k + 1) % n, true), ms(e, 2800));
+      timers.set(e, () => clearInterval(id));
+    },
+    leave(e) { stop(e); kids(e).forEach(stop); },
+    thumb(e) { this.set(e, 0, false); },
+  });
+
+  // swarm — lots of small things rush in from deep space and settle into place.
+  // <div class="swarm" data-fx="swarm"><span>…</span>×100</div>
+  register("swarm", {
+    enter(e) {
+      const items = kids(e), n = items.length, spread = ms(e, 1600) / 1000, d = delay(e, 0.2);
+      items.forEach((c, i) => {
+        const dx = (rnd(i, 1) - 0.5) * 1800, dy = (rnd(i, 2) - 0.5) * 1100, dz = -400 - rnd(i, 3) * 1600, r = (rnd(i, 4) - 0.5) * 120;
+        anim(c, [{ opacity: 0, transform: `perspective(1200px) translate3d(${dx}px, ${dy}px, ${dz}px) rotateX(${r}deg) rotateY(${-r}deg)` }, { opacity: 1, transform: "none" }],
+          { duration: 1300, delay: (d + (i / n) * spread * 0.6 + rnd(i, 5) * spread * 0.4) * 1000, easing: EASE });
+      });
+    },
+    leave(e) { kids(e).forEach(stop); },
+  });
+
+  // collapse — everything shrinks into the centre and one last thing appears (an ending).
+  // The child with data-end is what's left. <div class="collapse" data-fx="collapse">…<div data-end>civictech.tw</div></div>
+  register("collapse", {
+    enter(e) {
+      const items = kids(e).filter((c) => !("end" in c.dataset)), end = e.querySelector("[data-end]");
+      items.forEach(stop); end && stop(end);
+      trigger(e, () => {
+        const er = e.getBoundingClientRect(), s = stageScale(e);
+        items.forEach((c, i) => {
+          const r = c.getBoundingClientRect();
+          const dx = (er.left + er.width / 2 - (r.left + r.width / 2)) / s, dy = (er.top + er.height / 2 - (r.top + r.height / 2)) / s;
+          anim(c, [{ transform: "none", opacity: 1 }, { transform: `translate(${dx}px, ${dy}px) scale(.1)`, opacity: 0 }], { duration: 900, delay: i * 70, easing: "cubic-bezier(.7,0,.3,1)" });
+        });
+        if (end) anim(end, [{ opacity: 0, transform: "scale(.6)", filter: "blur(10px)" }, { opacity: 1, transform: "none", filter: "blur(0)" }], { duration: 900, delay: 800 + items.length * 70, easing: EASE });
+      }, 1.2);
+    },
+    step(e) { return fire(e); },
+    leave(e) { stop(e); kids(e).forEach(stop); },
+  });
+
   // preload every morph on the page so thumbnails have something to show
   const preload = () => document.querySelectorAll('[data-fx~="morph"]').forEach(loadMorph);
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", preload) : preload();

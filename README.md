@@ -47,22 +47,16 @@ Open `effects.html` to see every effect running next to the markup it needs.
 
 Elements opt in to an effect with `data-fx="name"`:
 
-| Name | What it does |
+| Group | Effects |
 |---|---|
-| `bars` | bar chart that grows in |
-| `count` | counts up to the number |
-| `type` | typewriter |
-| `mark` | highlighter sweep |
-| `pan` | scrolls a tall screenshot |
-| `zoom` | pushes in on a point |
-| `cycle` | cross-fades between images |
-| `clickpath` | a cursor clicks through screenshots |
-| `orbit` | steps around a loop, lighting each in turn |
-| `assemble` | cards fly in and settle into a grid |
-| `spot` | spotlight on parts of a screenshot, stepped |
-| `morph` | page rebuild captured from a real site |
-| `map` | Leaflet map with pins and a fly-to tour |
-| `live` | a real website inside the slide |
+| Text | `type` typewriter · `mark` highlighter · `letters` characters rise out of a blur · `rotate` one word keeps changing · `flap` split-flap board · `particles` dots gather into a title · `textmask` words filled with a drifting picture |
+| Numbers & data | `count` counts up · `slot` odometer reels · `bars` bar chart · `ring` progress ring · `orbit` steps around a loop · `network` topics and projects as a turning 3D cluster · `tunnel` names stream down a tunnel · `swarm` many items rush in and settle |
+| Screenshots | `pan` scroll a tall shot · `zoom` push in · `cycle` cross-fade · `spot` stepped spotlight · `hotspots` pulsing dots with notes · `tilt` 3D tilt / sway · `explode` layers lift apart with labels · `parallax` depth layers · `dive` zoom into a spot until it becomes the next page · `wipe` coloured band reveals an after-image · `morph` page rebuild captured from a real site |
+| Walkthroughs | `clickpath` cursor clicks through screenshots · `story` steps synced with screens · `chat` messages pop in · `terminal` command types, output prints · `live` real website in the slide · `map` Leaflet map with pins and a fly-to tour |
+| Layout | `assemble` cards fly into a grid · `feature` tiles take turns being big · `collapse` everything shrinks into one last line |
+
+Frames are plain classes: `.browser`, `.phone`, `.tablet`, `.laptop`, and `.devices` to group them.
+Effects that wait for → instead of starting by themselves take `data-on="step"`.
 
 Two behaviours need no `data-fx`. `data-i="n"` sets the entrance order, and
 `data-step="n"` / `data-step-out="n"` make things appear or leave on each →.

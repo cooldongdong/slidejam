@@ -17,9 +17,10 @@
 .ask b{display:block;font:600 15px var(--mono);letter-spacing:.06em;color:var(--accent);margin-bottom:6px}
 .ask p{font-size:22px;color:var(--ink)}
 .how{margin-top:18px;font:16px/1.55 var(--mono);color:var(--ink-muted);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 18px;white-space:pre-wrap;word-break:break-all}
-.index{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 28px;margin-top:40px}
-.index a{font:22px/1.4 var(--mono);color:var(--accent-ink);text-decoration:none;display:flex;gap:12px}
-.index a span{font-family:var(--sans);color:var(--ink-2)}
+.index{display:grid;grid-template-columns:repeat(6,1fr);gap:28px;margin-top:36px;align-items:start}
+.index b{display:block;font-size:18px;color:var(--ink-muted);margin-bottom:10px;letter-spacing:.04em}
+.index a{font:17px/1.75 var(--mono);color:var(--accent-ink);text-decoration:none;display:block;white-space:nowrap}
+.index a span{font:14px var(--sans);color:var(--ink-muted);margin-left:8px}
 .keys{display:grid;grid-template-columns:repeat(2,1fr);gap:16px 60px;margin-top:20px}
 .keys div{font-size:28px;color:var(--ink-2)}
 .keys kbd{display:inline-block;min-width:56px;text-align:center;font:600 22px var(--mono);background:var(--surface);border:1px solid var(--line-strong);border-bottom-width:3px;border-radius:8px;padding:4px 10px;margin-right:16px;color:var(--ink)}
@@ -34,15 +35,12 @@
   <h1 data-i="2">效果圖鑑</h1>
   <p class="lede" data-i="3">挑一個效果，跟 AI 說「第幾頁的哪裡用哪個」就好。點名字直接跳過去看。</p>
   <div class="index" data-i="4">
-    <a href="#3">stagger<span>依序浮出</span></a><a href="#4">step<span>按一下才出現</span></a>
-    <a href="#5">bars<span>長條圖</span></a><a href="#6">count<span>數字跳動</span></a>
-    <a href="#7">type<span>打字</span></a><a href="#8">mark<span>螢光筆</span></a>
-    <a href="#9">pan<span>長截圖捲動</span></a><a href="#10">zoom<span>推近</span></a>
-    <a href="#11">cycle<span>輪播</span></a><a href="#12">clickpath<span>游標示範</span></a>
-    <a href="#13">orbit<span>循環流程</span></a><a href="#14">assemble<span>飛進來組合</span></a>
-    <a href="#15">spot<span>聚光燈</span></a><a href="#16">morph<span>頁面重組</span></a>
-    <a href="#18">map<span>地圖</span></a><a href="#19">live<span>真網站</span></a>
-    <a href="#20">frames<span>瀏覽器／手機框</span></a><a href="#21">video<span>影片轉場</span></a>
+    <div><b>基本</b><a href="#3">stagger<span>依序浮出</span></a><a href="#4">step<span>按一下才出現</span></a><a href="#21">video<span>影片轉場</span></a></div>
+    <div><b>文字</b><a href="#7">type<span>打字</span></a><a href="#8">mark<span>螢光筆</span></a><a href="#22">letters<span>逐字浮現</span></a><a href="#23">rotate<span>換詞輪播</span></a><a href="#24">flap<span>翻牌看板</span></a><a href="#26">particles<span>粒子聚字</span></a><a href="#27">textmask<span>文字遮罩</span></a></div>
+    <div><b>數字與資料</b><a href="#6">count<span>數字跳動</span></a><a href="#25">slot<span>數字滾輪</span></a><a href="#5">bars<span>長條圖</span></a><a href="#39">ring<span>圓環進度</span></a><a href="#13">orbit<span>循環流程</span></a><a href="#38">network<span>議題星團</span></a><a href="#37">tunnel<span>名稱隧道</span></a><a href="#41">swarm<span>蜂群飛入</span></a></div>
+    <div><b>截圖</b><a href="#9">pan<span>長截圖捲動</span></a><a href="#10">zoom<span>推近</span></a><a href="#11">cycle<span>輪播</span></a><a href="#15">spot<span>聚光燈</span></a><a href="#33">hotspots<span>熱點導覽</span></a><a href="#28">tilt<span>3D 斜放</span></a><a href="#29">explode<span>拆層</span></a><a href="#30">parallax<span>景深</span></a><a href="#31">dive<span>鑽進去</span></a><a href="#32">wipe<span>擦過去</span></a><a href="#16">morph<span>頁面重組</span></a></div>
+    <div><b>操作示範</b><a href="#12">clickpath<span>游標示範</span></a><a href="#34">story<span>步驟配畫面</span></a><a href="#35">chat<span>聊天對話</span></a><a href="#36">terminal<span>終端機</span></a><a href="#19">live<span>真網站</span></a><a href="#18">map<span>地圖</span></a></div>
+    <div><b>版面與外框</b><a href="#14">assemble<span>飛進來組合</span></a><a href="#40">feature<span>輪流當主角</span></a><a href="#42">collapse<span>收成網址</span></a><a href="#20">frames<span>瀏覽器／手機框</span></a><a href="#43">devices<span>多裝置</span></a></div>
   </div>
 <aside class="notes">這份圖鑑本身就是用 web-deck 做的簡報。按 G 看全部縮圖。</aside></section>
 
@@ -316,6 +314,359 @@ data-tour="緯度 經度 縮放; …"</div>
     <div class="ask"><b>跟 AI 說</b><p>「第 15 頁放 06-explode.mp4 當轉場」</p></div>
     <div class="how">&lt;section class="slide video"&gt;
   &lt;video src="media/x.mp4" muted playsinline&gt;</div>
+  </div>
+</section>
+
+<!-- ===== letters ===== -->
+<section class="slide fx">
+  <div><h1 data-fx="letters" style="font-size:110px">想改變的事，</h1><h1 data-fx="letters" data-delay="0.6" style="font-size:110px">已經有人在做</h1></div>
+  <div class="info">
+    <p class="kicker">letters</p><h2>逐字浮現</h2>
+    <p>標題一個字一個字從模糊裡浮上來。適合開場、段落標題。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「封面標題用 letters」</p></div>
+    <div class="how">&lt;h1 data-fx="letters"&gt;
+data-stagger="0.05"　字跟字的間隔</div>
+  </div>
+</section>
+
+<!-- ===== rotate ===== -->
+<section class="slide fx">
+  <p style="font-size:56px;font-weight:650;color:var(--ink)">在這裡，你可以<br><span data-fx="rotate">讀別人的經驗｜串接資料｜找到夥伴｜開始一個專案</span></p>
+  <div class="info">
+    <p class="kicker">rotate</p><h2>換詞輪播</h2>
+    <p>一句話裡的某個詞一直換，講「可以做很多事」很好用。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「『你可以＿＿』那句用 rotate，輪流換成讀經驗、串資料、找夥伴」</p></div>
+    <div class="how">&lt;span data-fx="rotate"&gt;詞一｜詞二｜詞三&lt;/span&gt;</div>
+  </div>
+</section>
+
+<!-- ===== flap ===== -->
+<section class="slide fx">
+  <div style="display:grid;gap:18px;font-size:52px;font-weight:650">
+    <p data-fx="flap" style="font-size:52px">17 個議題</p>
+    <p data-fx="flap" data-delay="0.6" style="font-size:52px">226 個專案</p>
+  </div>
+  <div class="info">
+    <p class="kicker">flap</p><h2>翻牌看板</h2>
+    <p>像車站的翻牌看板，每個字先亂翻幾下再停住。適合數字、名單。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「第 3 頁的兩行數字用 flap 翻出來」</p></div>
+    <div class="how">&lt;p data-fx="flap"&gt;17 個議題&lt;/p&gt;</div>
+  </div>
+</section>
+
+<!-- ===== slot ===== -->
+<section class="slide fx">
+  <div class="row" style="gap:90px">
+    <div class="stat"><div class="n" data-fx="slot">226</div><div class="l">個專案</div></div>
+    <div class="stat"><div class="n" data-fx="slot" data-delay="0.5">1,165</div><div class="l">部影片</div></div>
+  </div>
+  <div class="info">
+    <p class="kicker">slot</p><h2>數字滾輪</h2>
+    <p>每一位數像里程表一樣各自滾動再停下。跟 count 比，更有「機器在跑」的感覺。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「226 用 slot 滾出來」</p></div>
+    <div class="how">&lt;div class="n" data-fx="slot"&gt;226&lt;/div&gt;</div>
+  </div>
+</section>
+
+<!-- ===== particles ===== -->
+<section class="slide fx">
+  <div style="text-align:center"><h1 class="mono" data-fx="particles" style="font-size:120px;font-weight:600">civictech.tw</h1></div>
+  <div class="info">
+    <p class="kicker">particles</p><h2>粒子聚字</h2>
+    <p>滿畫面的點飄過來，聚成一行字。適合結尾的網址、品牌名。只支援一行字。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「最後一頁的網址用 particles 聚出來」</p></div>
+    <div class="how">&lt;h1 data-fx="particles"&gt;civictech.tw&lt;/h1&gt;</div>
+  </div>
+</section>
+
+<!-- ===== textmask ===== -->
+<section class="slide fx">
+  <h1 data-fx="textmask" data-img="examples/media/hero-dark.png" style="font-size:190px;font-weight:900;line-height:1.1;white-space:nowrap">公民科技</h1>
+  <div class="info">
+    <p class="kicker">textmask</p><h2>文字遮罩</h2>
+    <p>超大的字裡面填一張圖，圖慢慢移動。適合當段落的封面。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「段落頁的『公民科技』用 textmask，裡面放首頁截圖」</p></div>
+    <div class="how">&lt;h1 data-fx="textmask"
+  data-img="media/x.png"&gt;公民科技&lt;/h1&gt;</div>
+  </div>
+</section>
+
+<!-- ===== tilt ===== -->
+<section class="slide fx">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center">
+    <div data-fx="tilt"><img class="shot" src="examples/media/c-budget.png" alt=""></div>
+    <div data-fx="tilt" data-mode="sway"><img class="shot" src="examples/media/p-cofacts.png" alt=""></div>
+  </div>
+  <div class="info">
+    <p class="kicker">tilt</p><h2>3D 斜放</h2>
+    <p>截圖斜躺著再轉正（左），或左右輕輕轉（右）。data-mode="hold" 會一直斜著慢慢飄。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「議題頁截圖用 tilt 斜躺進來」</p></div>
+    <div class="how">data-fx="tilt"
+data-mode="settle｜sway｜hold"</div>
+  </div>
+</section>
+
+<!-- ===== explode ===== -->
+<section class="slide fx">
+  <div class="explode" data-fx="explode" style="width:752px;height:382px">
+    <div style="background:#fff;border:2px solid var(--line-strong);border-radius:14px;box-shadow:0 30px 60px -30px rgb(15 26 29/.35)"><img src="examples/media/pc-shell.png" alt="" style="width:100%;opacity:0"></div>
+    <div data-label="專案名稱"><img src="examples/media/pc-name.png" alt="" style="position:absolute;left:40px;top:37px;width:671px"></div>
+    <div data-label="一句話介紹"><img src="examples/media/pc-intro.png" alt="" style="position:absolute;left:40px;top:102px;width:671px"></div>
+    <div data-label="連結"><img src="examples/media/pc-foot.png" alt="" style="position:absolute;left:40px;top:270px;width:671px"></div>
+  </div>
+  <div class="info">
+    <p class="kicker">explode</p><h2>拆層</h2>
+    <p>一張卡片拆成好幾層往上浮，每層拉一條線說明它是什麼。適合解釋「這個設計由哪些部分組成」。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「專案卡用 explode 拆成名稱、介紹、連結三層」</p></div>
+    <div class="how">&lt;div class="explode" data-fx="explode"&gt;
+  &lt;div&gt;底&lt;/div&gt;
+  &lt;div data-label="名稱"&gt;…</div>
+  </div>
+</section>
+
+<!-- ===== parallax ===== -->
+<section class="slide fx">
+  <div class="parallax" data-fx="parallax" style="height:600px;border-radius:14px">
+    <img data-depth="0.15" src="examples/media/hero.png" alt="" style="inset:-40px;width:calc(100% + 80px);height:calc(100% + 80px);object-fit:cover;filter:blur(2px) brightness(1.05)">
+    <div data-depth="0.6" class="card" style="left:8%;top:18%;width:46%"><p class="kicker" style="margin-bottom:10px">每個專案</p><h3>都有自己的一頁</h3></div>
+    <img data-depth="1" class="shot" src="examples/media/pc-intro.png" alt="" style="right:6%;bottom:14%;width:48%;background:#fff;padding:20px">
+  </div>
+  <div class="info">
+    <p class="kicker">parallax</p><h2>景深</h2>
+    <p>前中後幾層，越前面動得越多，滑鼠移動時也會跟著。讓靜態截圖有空間感。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「首頁截圖當背景，前面浮兩張卡，用 parallax」</p></div>
+    <div class="how">&lt;div class="parallax" data-fx="parallax"&gt;
+  &lt;img data-depth="0.2"&gt;
+  &lt;div data-depth="1"&gt;…</div>
+  </div>
+</section>
+
+<!-- ===== dive ===== -->
+<section class="slide fx">
+  <div class="dive" data-fx="dive" data-at="21% 47%" style="aspect-ratio:16/10"><img src="examples/media/c-budget.png" alt=""><img src="examples/media/p-cofacts.png" alt=""></div>
+  <div class="info">
+    <p class="kicker">dive</p><h2>鑽進去</h2>
+    <p>往截圖的某一點一直推近，推到底就變成下一頁。加 data-on="step" 就等你按 → 才鑽。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「從議題頁鑽進第一張卡，變成專案頁」</p></div>
+    <div class="how">&lt;div class="dive" data-fx="dive" data-at="21% 47%"&gt;
+  &lt;img 前&gt;&lt;img 後&gt;</div>
+  </div>
+</section>
+
+<!-- ===== wipe ===== -->
+<section class="slide fx">
+  <div class="wipe" data-fx="wipe" style="aspect-ratio:16/9"><img src="examples/media/hero.png" alt=""><img src="examples/media/hero-dark.png" alt=""></div>
+  <div class="info">
+    <p class="kicker">wipe</p><h2>擦過去</h2>
+    <p>一條色帶斜斜掃過，後面露出第二張。適合改版前後、淺色深色對比。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「首頁淺色版用 wipe 擦成深色版」</p></div>
+    <div class="how">&lt;div class="wipe" data-fx="wipe"&gt;
+  &lt;img 前&gt;&lt;img 後&gt;</div>
+  </div>
+</section>
+
+<!-- ===== hotspots ===== -->
+<section class="slide fx">
+  <div class="hotspots" data-fx="hotspots">
+    <img src="examples/media/p-cofacts.png" alt="">
+    <p data-at="22 21">專案名稱和一句話介紹</p>
+    <p data-at="18 46">它解決什麼、怎麼運作</p>
+    <p data-at="72 50">想修改資料，從這裡建議</p>
+  </div>
+  <div class="info">
+    <p class="kicker">hotspots</p><h2>熱點導覽</h2>
+    <p>截圖上幾個會跳動的點，每按一下 → 打開下一個說明。加 data-auto 就自己輪流。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「專案頁截圖加三個 hotspots：名稱、運作方式、建議修改」</p></div>
+    <div class="how">&lt;div class="hotspots" data-fx="hotspots"&gt;
+  &lt;img&gt;
+  &lt;p data-at="22 21"&gt;說明&lt;/p&gt;</div>
+  </div>
+</section>
+
+<!-- ===== story ===== -->
+<section class="slide fx">
+  <div class="story" data-fx="story">
+    <ol>
+      <li><span><b>挑一個議題</b><small>17 個議題，從關心的開始</small></span></li>
+      <li><span><b>看做過的人怎麼做</b><small>每個專案一頁，一句話講完</small></span></li>
+      <li><span><b>找到人，一起做</b><small>討論區、聯絡方式都在</small></span></li>
+    </ol>
+    <div class="phone" style="width:300px"><div data-frames><img src="examples/media/dev-mobile.png" alt=""><img src="examples/media/c-budget.png" alt="" style="object-position:12% 0"><img src="examples/media/p-cofacts.png" alt="" style="object-position:12% 0"></div></div>
+  </div>
+  <div class="info">
+    <p class="kicker">story</p><h2>步驟配畫面</h2>
+    <p>左邊步驟、右邊畫面，亮到哪一步就換哪一張。自動輪流，或 data-on="step" 按一下換一步。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「做 story：三個步驟配三張手機截圖」</p></div>
+    <div class="how">&lt;div class="story" data-fx="story"&gt;
+  &lt;ol&gt;&lt;li&gt;…&lt;/ol&gt;
+  &lt;div data-frames&gt;&lt;img&gt;…</div>
+  </div>
+</section>
+
+<!-- ===== chat ===== -->
+<section class="slide fx">
+  <div style="display:flex;justify-content:center"><div class="phone" style="width:340px"><div class="chat" data-fx="chat">
+    <p>有沒有網站整理台灣的公民科技專案？</p>
+    <p class="me">有！每個專案都有自己的網址</p>
+    <p class="me link"><b>civictech.tw/p/cofacts</b><small>Cofacts 真的假的：在 LINE 上查證可疑訊息</small></p>
+    <p>太好了，我轉給我們班</p>
+  </div></div></div>
+  <div class="info">
+    <p class="kicker">chat</p><h2>聊天對話</h2>
+    <p>訊息一則一則跳出來，對方會先「打字中…」。適合講「怎麼被分享出去」。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「做一段 chat：朋友問、我回一個連結」</p></div>
+    <div class="how">&lt;div class="chat" data-fx="chat"&gt;
+  &lt;p&gt;對方&lt;/p&gt;&lt;p class="me"&gt;我&lt;/p&gt;
+  &lt;p class="me link"&gt;&lt;b&gt;網址&lt;/b&gt;…</div>
+  </div>
+</section>
+
+<!-- ===== terminal ===== -->
+<section class="slide fx">
+  <div class="terminal" data-fx="terminal">
+    <div class="cmd">curl https://data.civictech.tw/v0/tech/projects.json</div>
+    <div>{</div>
+    <div>  <span class="k">"version"</span>: <span class="s">"v0"</span>,</div>
+    <div>  <span class="k">"dataset"</span>: {</div>
+    <div>    <span class="k">"slug"</span>: <span class="s">"tech"</span>,</div>
+    <div>    <span class="k">"label"</span>: <span class="s">"公民科技專案資料庫"</span></div>
+    <div>  },</div>
+    <div>  <span class="k">"recordCount"</span>: <span class="n">230</span>,</div>
+    <div>  …</div>
+    <div>}</div>
+  </div>
+  <div class="info">
+    <p class="kicker">terminal</p><h2>終端機</h2>
+    <p>指令自己打出來，按下去之後回應一行一行印出。適合講 API、開放資料。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「做 terminal：curl 我們的 API，印出前兩筆」</p></div>
+    <div class="how">&lt;div class="terminal" data-fx="terminal"&gt;
+  &lt;div class="cmd"&gt;指令&lt;/div&gt;
+  &lt;div&gt;輸出&lt;/div&gt;…</div>
+  </div>
+</section>
+
+<!-- ===== tunnel ===== -->
+<section class="slide fx">
+  <div class="tunnel" data-fx="tunnel" style="height:660px;border-radius:14px;background:radial-gradient(circle,#fff 0,var(--paper) 70%)">
+    <span>一鍵開大松</span><span>中央政府預算視覺化</span><span>選前大補帖</span><span>高雄氣爆</span><span>碳匯城鄉</span><span>CC0 繁體中文句庫</span><span>資料申請小幫手</span><span>disinfo</span><span>公務人員出國考察網</span><span>Think Tank Info</span><span>公民即時報</span><span>政治承諾追蹤網</span><span>阿龜微氣候</span><span>Wikidata</span><span>福利請聽</span><span>國家寶藏</span><span>LostSAR 無人機</span><span>騎樓抓漏</span><span>政府公開通訊錄</span><span>台灣路更平</span><span>HackingMap</span><span>國會大代誌</span><span>享食台灣</span><span>議見零時差</span><span>HackStory</span><span>秒懂災害潛勢</span><span>寵物需要我</span><span>立委投票指南</span><span>Vaxx.tw</span><span>零時空汙觀測網</span><span>來個判決書吧</span><span>臺灣好植地</span><span>美國國會台灣觀測站</span><span>國會調查兵團</span><span>血庫資訊</span><span>里伯 LINEbot</span><span>台灣 l10n 共筆</span><span>GoodJob 職場透明化</span><span>ChhoeTaigi</span><span>Disfactory</span><span>鄉民關心你</span><span>金流百科</span><span>農業災損幾多錢</span><span>零時小學校</span><span>公民記者證產生器</span><span>g0v 公報</span><span>開源出版</span><span>割闌尾計畫</span><span>司法陽光網</span><span>HackFoldr</span><span>公民科學計畫蒐集</span><span>新聞小幫手</span><span>政治獻金數位化</span><span>你被服貿了嗎?</span><span>CoTeach</span><span>臺灣黑熊通報</span><span>無麩質安全網</span><span>萌典</span><span>Cofacts 真的假的</span><span>vTaiwan</span>
+  </div>
+  <div class="info">
+    <p class="kicker">tunnel</p><h2>名稱隧道</h2>
+    <p>一大串名字貼在隧道牆上往你衝過來。講「有這麼多」的時候很有感。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「把全部專案名稱做成 tunnel，上面疊一句『226 個專案』」</p></div>
+    <div class="how">&lt;div class="tunnel" data-fx="tunnel"&gt;
+  &lt;span&gt;名字&lt;/span&gt;…</div>
+  </div>
+</section>
+
+<!-- ===== network ===== -->
+<section class="slide fx">
+  <div class="network" data-fx="network" style="height:660px">
+    <div data-color="#7c5632"><b>政府預算</b><span>中央政府預算視覺化</span><span>公務人員出國考察網</span><span>標案資料瀏覽</span><span>總預算案審查監督平台</span><span>台電睦鄰金流大解析</span><span>預算視覺化產生器</span><span>貪汙查詢網站</span><span>OpenBudget</span><span>預算查詢</span></div>
+    <div data-color="#715080"><b>假訊息防治</b><span>disinfo</span><span>Cofacts</span><span>Lee-Su-Threads</span><span>新聞小幫手</span><span>收款人帳戶安全守護站</span><span>詐騙情境蒐集</span><span>查無此人</span></div>
+    <div data-color="#864f33"><b>防災</b><span>LostSAR</span><span>秒懂災害潛勢</span><span>農業災損幾多錢</span><span>Bifrost</span><span>iCanHelp</span><span>NCDR 災情通報</span><span>高雄氣爆</span><span>太魯閣號事故</span><span>八仙塵爆</span><span>物資捐贈</span><span>防災地圖</span><span>避難所</span></div>
+    <div data-color="#7b5064"><b>法律與立法</b><span>司法陽光網</span><span>vTaiwan</span><span>開放立法院</span><span>LegislatureAI</span><span>憲庭加好友</span><span>法律偵探</span><span>憲法急診室</span><span>國會大代誌</span><span>國會調查兵團</span><span>你被服貿了嗎</span><span>立委投票指南</span><span>來個判決書吧</span></div>
+    <div data-color="#426b3d"><b>生態</b><span>寵物需要我</span><span>臺灣好植地</span><span>臺灣黑熊通報</span><span>Animalia Live</span><span>植物辨識圖鑑</span><span>救救食蛇龜</span><span>認識植物</span></div>
+    <div data-color="#5e6244"><b>環境汙染</b><span>OPEN 集團</span><span>空污曝露路徑</span><span>零時空汙觀測網</span></div>
+    <div data-color="#834e4d"><b>居住</b><span>開放租屋資料</span><span>開放易樓網</span><span>Rentea</span></div>
+    <div data-color="#7b5720"><b>地方創生</b><span>里伯 LINEbot</span><span>ReSchool</span><span>Collage</span></div>
+  </div>
+  <div class="info">
+    <p class="kicker">network</p><h2>議題星團</h2>
+    <p>每個議題是一顆星，專案是圍著它的小點，整團在 3D 裡慢慢轉。看得出哪裡多、哪裡少。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「用 network 畫議題和專案的星團」</p></div>
+    <div class="how">&lt;div class="network" data-fx="network"&gt;
+  &lt;div&gt;&lt;b&gt;議題&lt;/b&gt;
+    &lt;span&gt;專案&lt;/span&gt;…</div>
+  </div>
+</section>
+
+<!-- ===== ring ===== -->
+<section class="slide fx">
+  <div class="row" style="gap:60px;justify-content:center">
+    <div class="ring" data-fx="ring" data-v="84" data-max="226"><b data-fx="count">84</b><span>／ 226</span></div>
+    <div class="ring" data-fx="ring" data-v="199" data-max="226" data-delay="0.5"><b data-fx="count" data-delay="0.5">199</b><span>／ 226</span></div>
+  </div>
+  <div class="info">
+    <p class="kicker">ring</p><h2>圓環進度</h2>
+    <p>一圈環慢慢填到比例。裡面的數字可以再加 count 一起跳。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「226 個裡有 84 個寫了簡介，用 ring 畫」</p></div>
+    <div class="how">&lt;div class="ring" data-fx="ring"
+  data-v="84" data-max="226"&gt;
+  &lt;b&gt;84&lt;/b&gt;&lt;span&gt;說明&lt;/span&gt;</div>
+  </div>
+</section>
+
+<!-- ===== feature ===== -->
+<section class="slide fx">
+  <div class="feature" data-fx="feature" style="height:600px">
+    <div class="card"><span class="tag">找得到</span><p>兩步就到每一個專案</p></div>
+    <div class="card"><span class="tag">看得懂</span><p>四行讀完一個專案</p></div>
+    <div class="card"><span class="tag">進得去</span><p>討論在哪，一鍵就到</p></div>
+    <div class="card"><span class="tag">拿得走</span><p>開放 API</p></div>
+    <div class="card"><span class="tag">放得回</span><p>建議修改</p></div>
+  </div>
+  <div class="info">
+    <p class="kicker">feature</p><h2>輪流當主角</h2>
+    <p>一組格子輪流有一格變大，其他格子讓位。適合一次介紹好幾個功能。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「五個解法做成 feature，每 3 秒換一個變大」</p></div>
+    <div class="how">&lt;div class="feature" data-fx="feature"&gt;
+  &lt;div class="card"&gt;…</div>
+  </div>
+</section>
+
+<!-- ===== swarm ===== -->
+<section class="slide fx">
+  <div class="swarm" data-fx="swarm" style="height:640px">
+    <span>一鍵開大松</span><span>中央政府預算視覺化</span><span>選前大補帖</span><span>高雄氣爆</span><span>碳匯城鄉</span><span>CC0 繁體中文句庫</span><span>資料申請小幫手</span><span>disinfo</span><span>公務人員出國考察網</span><span>Think Tank Info</span><span>公民即時報</span><span>政治承諾追蹤網</span><span>阿龜微氣候</span><span>Wikidata</span><span>福利請聽</span><span>國家寶藏</span><span>LostSAR 無人機</span><span>騎樓抓漏</span><span>政府公開通訊錄</span><span>台灣路更平</span><span>HackingMap</span><span>國會大代誌</span><span>享食台灣</span><span>議見零時差</span><span>HackStory</span><span>秒懂災害潛勢</span><span>寵物需要我</span><span>立委投票指南</span><span>Vaxx.tw</span><span>零時空汙觀測網</span><span>來個判決書吧</span><span>臺灣好植地</span><span>美國國會台灣觀測站</span><span>國會調查兵團</span><span>血庫資訊</span><span>里伯 LINEbot</span><span>台灣 l10n 共筆</span><span>GoodJob 職場透明化</span><span>ChhoeTaigi</span><span>Disfactory</span><span>鄉民關心你</span><span>金流百科</span><span>農業災損幾多錢</span><span>零時小學校</span><span>公民記者證產生器</span><span>g0v 公報</span><span>開源出版</span><span>割闌尾計畫</span><span>司法陽光網</span><span>HackFoldr</span><span>公民科學計畫蒐集</span><span>新聞小幫手</span><span>政治獻金數位化</span><span>你被服貿了嗎?</span><span>CoTeach</span><span>臺灣黑熊通報</span><span>無麩質安全網</span><span>萌典</span><span>Cofacts 真的假的</span><span>vTaiwan</span>
+  </div>
+  <div class="info">
+    <p class="kicker">swarm</p><h2>蜂群飛入</h2>
+    <p>一大堆小東西從畫面深處衝出來，排成整齊的一片。跟 assemble 比，適合「很多很多個」。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「全部專案名稱用 swarm 飛進來」</p></div>
+    <div class="how">&lt;div class="swarm" data-fx="swarm"&gt;
+  &lt;span&gt;名字&lt;/span&gt;…</div>
+  </div>
+</section>
+
+<!-- ===== collapse ===== -->
+<section class="slide fx">
+  <div class="collapse" data-fx="collapse" style="height:560px">
+    <div class="grid3" style="height:100%;grid-template-rows:1fr 1fr">
+      <img class="shot" src="examples/media/home.png" alt="" style="height:100%;object-fit:cover;object-position:top">
+      <img class="shot" src="examples/media/c-budget.png" alt="" style="height:100%;object-fit:cover;object-position:top">
+      <img class="shot" src="examples/media/p-cofacts.png" alt="" style="height:100%;object-fit:cover;object-position:top">
+      <img class="shot" src="examples/media/guides.png" alt="" style="height:100%;object-fit:cover;object-position:top">
+      <img class="shot" src="examples/media/hero-dark.png" alt="" style="height:100%;object-fit:cover;object-position:top">
+      <img class="shot" src="examples/media/tall-cat.png" alt="" style="height:100%;object-fit:cover;object-position:top">
+    </div>
+    <div data-end><p class="mono" style="font-size:80px;font-weight:600;color:var(--ink)">civictech.tw</p></div>
+  </div>
+  <div class="info">
+    <p class="kicker">collapse</p><h2>收成一個網址</h2>
+    <p>畫面上的東西全部縮進中間，最後只剩一行字。適合結尾。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「最後一頁把六張截圖 collapse 成網址」</p></div>
+    <div class="how">&lt;div class="collapse" data-fx="collapse"&gt;
+  …（會縮掉的東西）
+  &lt;div data-end&gt;網址&lt;/div&gt;</div>
+  </div>
+</section>
+
+<!-- ===== devices ===== -->
+<section class="slide fx">
+  <div class="devices" data-fx="tilt" data-mode="sway" data-ms="7000">
+    <div class="laptop"><img src="examples/media/dev-desktop.png" alt=""></div>
+    <div class="tablet"><img src="examples/media/dev-tablet.png" alt=""></div>
+    <div class="phone"><img src="examples/media/dev-mobile.png" alt=""></div>
+  </div>
+  <div class="info">
+    <p class="kicker">devices</p><h2>多裝置</h2>
+    <p>筆電、平板、手機排在一起，一看就知道「哪裡都能用」。可以再加 tilt 讓它轉。</p>
+    <div class="ask"><b>跟 AI 說</b><p>「放一頁 devices，三種裝置的截圖」</p></div>
+    <div class="how">&lt;div class="devices"&gt;
+  &lt;div class="laptop"&gt;&lt;img&gt;
+  &lt;div class="tablet"&gt;&lt;img&gt;
+  &lt;div class="phone"&gt;&lt;img&gt;</div>
   </div>
 </section>
 
