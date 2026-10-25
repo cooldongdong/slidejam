@@ -111,6 +111,10 @@
     eachFx(s, (d, e) => (on ? d.leave?.(e) : d.enter?.(e, s)));
   }
 
+  // A phone or tablet: no keyboard, so every mode needs a way out by tap, and the ? panel lists
+  // what can be done by touch instead of keys.
+  const touch = matchMedia("(hover: none) and (pointer: coarse)").matches;
+
   // ---------- notes ----------
   const notesOf = (s) => $("aside.notes", s);
   function renderNotes() {
@@ -124,6 +128,9 @@
     } else {
       notes.textContent = `［${Deck.cur + 1}］ ` + text;
     }
+    const x = el("button", { className: "notes-close", textContent: "✕", title: "關閉講稿（N）" });
+    x.onclick = (e) => { e.stopPropagation(); notes.classList.remove("show"); };
+    notes.prepend(x);
   }
 
   // ---------- thumbnails, overview, progress peek ----------
@@ -601,14 +608,14 @@
     { id: "next", fixed: "→ / 空白", label: "下一步、下一頁", run: () => next() },
     { id: "prev", fixed: "←", label: "上一頁", run: () => show(Deck.cur - 1) },
     { id: "overview", key: "g", label: "總覽：點縮圖跳頁，也能「播放全部」", run: () => toggleOverview() },
-    { id: "presenter", key: "p", label: "講者視窗：講稿只在你的螢幕", run: () => openPresenter() },
+    { id: "presenter", key: "p", desk: true, label: "講者視窗：講稿只在你的螢幕", run: () => openPresenter() },
     { id: "notes", key: "n", label: "講稿（在同一個視窗）", run: () => notes.classList.toggle("show") },
     { id: "replay", key: "r", label: "重播這一頁", run: () => show(Deck.cur) },
-    { id: "fullscreen", key: "f", label: "全螢幕", run: fullscreen },
-    { id: "edit", key: "e", label: "直接改字，⌘S 存回檔案", run: () => setEditing(!document.body.classList.contains("editing")) },
-    { id: "annotate", key: "a", label: "標註給 AI：點一下或拖拉框選", run: () => setAnnotating(!document.body.classList.contains("annotating")) },
+    { id: "fullscreen", key: "f", label: "全螢幕", run: fullscreen, can: () => document.fullscreenEnabled },
+    { id: "edit", key: "e", desk: true, label: "直接改字，⌘S 存回檔案", run: () => setEditing(!document.body.classList.contains("editing")) },
+    { id: "annotate", key: "a", desk: true, label: "標註給 AI：點一下或拖拉框選", run: () => setAnnotating(!document.body.classList.contains("annotating")) },
     { id: "theme", key: "t", label: "換主題（預覽；⌘S 存進檔案）", run: () => toggleThemes() },
-    { id: "help", key: "?", label: "這份說明", run: () => toggleKeys() },
+    { id: "help", key: "?", desk: true, label: "這份說明", run: () => toggleKeys() },
   ];
   const keyStore = "slidejam-keys";
   const customKeys = () => store.get(keyStore) || {};
@@ -618,7 +625,18 @@
     const box = $("#keys");
     box.innerHTML = "";
     const head = el("div", { className: "keys-head" }, box);
-    el("b", { textContent: "快捷鍵" }, head);
+    el("b", { textContent: touch ? "操作" : "快捷鍵" }, head);
+    // by touch: how to turn pages, then the things a tap can do (no keys to show or change;
+    // the presenter window and saving edits need a computer)
+    if (touch) {
+      el("small", { className: "keys-hint", textContent: "左右滑翻頁，點右邊下一頁、左邊上一頁。下面點一列直接執行。" }, box);
+      ACTIONS.filter((a) => !a.fixed && !a.desk && (!a.can || a.can())).forEach((a) => {
+        const row = el("div", { className: "key-row" }, box);
+        el("span", { textContent: a.label.split(/[：（]/)[0] }, row);
+        row.onclick = () => { toggleKeys(false); a.run(); };
+      });
+      return;
+    }
     if (Object.keys(customKeys()).length) {
       const reset = el("button", { className: "keys-reset", textContent: "↺", title: "恢復預設按鍵" }, head);
       reset.onclick = (ev) => { ev.stopPropagation(); store.set(keyStore, {}); renderKeys(); toast("按鍵恢復預設"); };
@@ -787,6 +805,7 @@
     stage = $("#stage");
     Deck.slides = $$(".slide", stage).filter((s) => s.parentElement === stage);
     const chrome = (tag, id, parent) => el(tag, { id }, parent);
+    document.documentElement.classList.toggle("touch", touch);
     ["hoverzone", "bar", "page", "peek", "peek-tick"].forEach((id) => chrome("div", id, stage));
     notes = chrome("div", "notes", document.body);
     el("div", { className: "grid" }, chrome("div", "overview", document.body));
@@ -797,7 +816,7 @@
     el("div", { className: "hint", textContent: "Enter 送出・Shift+Enter 換行・Esc 取消" }, ai);
     chrome("div", "anno-panel", document.body);
     const help = chrome("button", "help", document.body);
-    help.textContent = "?"; help.title = "快捷鍵";
+    help.textContent = "?"; help.title = touch ? "操作" : "快捷鍵";
     help.onclick = () => toggleKeys();
     chrome("div", "keys", document.body);
     chrome("div", "themes", document.body);
@@ -808,7 +827,10 @@
     }, true);
     $("#page").title = "總覽（G）";
     $("#page").addEventListener("click", (e) => { e.stopPropagation(); toggleOverview(true); });
+    // the mode badge also ends the mode when clicked
     const badge = () => ($("#modebadge").textContent = document.body.classList.contains("editing") ? "編輯 · ⌘S 存檔" : "標註");
+    $("#modebadge").title = "結束";
+    $("#modebadge").addEventListener("click", (e) => { e.stopPropagation(); setEditing(false); setAnnotating(false); });
     new MutationObserver(badge).observe(document.body, { attributes: true, attributeFilter: ["class"] });
     setupPeek(); setupAnnotate();
     addEventListener("resize", () => { fit(); fitWall(); }); fit();
