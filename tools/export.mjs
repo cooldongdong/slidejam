@@ -7,7 +7,8 @@
 //   node tools/export.mjs index.html --font "Noto Sans TC" set all text in a font the other app has
 //   node tools/export.mjs index.html --steps               a page for every step, not just each slide's last
 //   node tools/export.mjs index.html --slides 3,8          only these slides
-//   node tools/export.mjs index.html --wait 5 --out x.pptx seconds to let a slide settle; where to write
+//   node tools/export.mjs index.html --wait 5,12:3         seconds to let a slide settle (slide 12: 3, for
+//                                                           an effect that loops and starts over); --out file
 //
 // In the .pptx every picture, box and line of text is its own object, so they can be moved,
 // copied and reused. What the slide shows after it settles is what gets exported: videos
@@ -34,7 +35,9 @@ const opt = (k, d) => { const i = args.indexOf("--" + k); if (i < 0) return d; c
 const flag = (k) => { const i = args.indexOf("--" + k); if (i < 0) return false; args.splice(i, 1); return true; };
 const font = opt("font", null);
 let mono = opt("mono", font ? "Space Mono" : null);
-const wait = +opt("wait", 5);
+// "5,12:3": 5 seconds, but 3 for slide 12
+const waits = opt("wait", "5").split(",");
+const waitFor = (i) => +(waits.find((w) => w.startsWith(i + 1 + ":"))?.split(":")[1] ?? waits.find((w) => !w.includes(":")) ?? 5);
 const stageSel = opt("stage", "#stage");
 const outArg = opt("out", null);
 const pdf = flag("pdf");
@@ -94,7 +97,7 @@ async function settle(i, steps) {
   const size = await open(i);
   await page.waitForTimeout(600);
   for (let s = 0; s < steps; s++) { await page.evaluate(() => __x.next()); await page.waitForTimeout(400); }
-  await page.waitForTimeout(wait * 1000);
+  await page.waitForTimeout(waitFor(i) * 1000);
   await page.evaluate(async (sel) => {
     const slide = __x.slide();
     await Promise.all([...slide.querySelectorAll("video")].map((v) => !v.loop && v.duration
@@ -206,7 +209,8 @@ function readSlide(stageSel) {
     const vis = R.width && R.height ? meet(R, clip) : null;
     if (!vis && c.display !== "contents" && c.overflow !== "visible") return;
     // pictures, and anything rotated, skewed or in 3D (shapes and text boxes can't follow it)
-    const many = e.querySelectorAll("img,canvas,svg,video").length > 12;
+    // many pictures and little text (map tiles, a morph built from screenshot pieces): one picture
+    const many = e !== slide && e.querySelectorAll("img,canvas,svg,video").length > 12 && e.innerText.trim().length < 80;
     if (vis && (PICS.has(e.tagName) || e instanceof SVGElement || !flat(c.transform) || many || /text/.test(c.webkitBackgroundClip + c.backgroundClip))) {
       items.push({ kind: "pic", xid: tag(e, "x-pic"), box: box(vis) });
       return;
@@ -302,7 +306,7 @@ const ISO = `html.x-iso,html.x-iso body{background:transparent!important}
 // what's left once pictures, boxes and text are taken out
 const LEFT = `html.x-left,html.x-left body{background:transparent!important}
   html.x-left ${stageSel},html.x-left ${stageSel} .x-slide{background:transparent!important}
-  html.x-left .x-pic{visibility:hidden!important}
+  html.x-left .x-pic,html.x-left .x-pic *{visibility:hidden!important}
   html.x-left .x-picbg{background:none!important;border-color:transparent!important}
   html.x-left .x-shape{background-color:transparent!important}
   html.x-left .x-line{border-color:transparent!important}
