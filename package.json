@@ -9,6 +9,8 @@
     "shoot": "node tools/shoot.mjs"
   },
   "devDependencies": {
-    "playwright": "1.58.2"
+    "pdf-lib": "^1.17.1",
+    "playwright": "1.58.2",
+    "pptxgenjs": "^3.12.0"
   }
 }
