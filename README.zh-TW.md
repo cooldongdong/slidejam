@@ -111,12 +111,23 @@ node tools/shoot.mjs ~/talks/my-talk/index.html --sheet     # 每一頁截一張
 node tools/shoot.mjs index.html 12 --at 0.5,2,4             # 同一頁在不同時間點各截一張
 ```
 
+## 匯出成 PowerPoint 或 PDF
+
+```sh
+node tools/export.mjs ~/talks/my-talk/index.html --font "Noto Sans TC"         # 做出 index.pptx
+node tools/export.mjs ~/talks/my-talk/index.html --font "Noto Sans TC" --pdf   # 做出 index.pdf
+```
+
+PowerPoint 檔裡，每張圖、每個框、每段字都是獨立的物件，在 Canva、Google 簡報、Keynote、PowerPoint 裡都能個別移動、複製、拿去別處用。PDF 的文字可以選取、搜尋。
+
+匯出的是每一頁動畫跑完的樣子：影片會變成最後一格，加上 `--steps` 則每一步各自匯出成一頁。`--font` 換成對方軟體也有的字型，文字的位置和換行才不會跑掉。
+
 ## 資料夾結構
 
 ```
 deck/        引擎：deck.css、deck.js（核心與各種模式）、fx/（每種效果一個檔，用到才載入）、themes/
 template/    新簡報的 index.html
-tools/       new-deck、capture-morph、shoot、thumbs（網站縮圖與海報）、shoot-og（og.png）
+tools/       new-deck、capture-morph、shoot、export（PowerPoint 與 PDF）、thumbs（網站縮圖與海報）、shoot-og（og.png）
 effects.html 效果圖鑑
 examples/    範例簡報（intro、civictech、taipei）和圖鑑用的素材
 skill/       跟 AI 一起做簡報用的 Claude Code skill

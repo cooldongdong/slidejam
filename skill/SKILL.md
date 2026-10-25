@@ -1,6 +1,6 @@
 ---
 name: slidejam
-description: 用 slidejam 做或改「單一 index.html 的網頁簡報」——1600×900 舞台、data-fx 效果、用真網站做出的頁面重組（morph）動畫、地圖、真網站嵌入。當用戶說「做簡報」「做一份網頁簡報」「介紹某個網站／產品的簡報」「第 N 頁加動畫」「這頁用 pan／morph／map」，或貼上一段以「簡報：…／標註 N 則」開頭的標註清單時就要用。也用在新增一種效果、重拍 morph、檢查簡報截圖。Use for building or editing slidejam HTML slide decks, reading pasted annotation lists, adding effects, or capturing morphs from live sites; respond in Traditional Chinese.
+description: 用 slidejam 做或改「單一 index.html 的網頁簡報」——1600×900 舞台、data-fx 效果、用真網站做出的頁面重組（morph）動畫、地圖、真網站嵌入。當用戶說「做簡報」「做一份網頁簡報」「介紹某個網站／產品的簡報」「第 N 頁加動畫」「這頁用 pan／morph／map」，或貼上一段以「簡報：…／標註 N 則」開頭的標註清單時就要用。也用在新增一種效果、重拍 morph、檢查簡報截圖、把簡報匯出成 PPT／PDF（給 Canva、Google 簡報用）。Use for building or editing slidejam HTML slide decks, reading pasted annotation lists, adding effects, capturing morphs from live sites, or exporting a deck to PowerPoint or PDF; respond in Traditional Chinese.
 ---
 
 # slidejam
@@ -70,6 +70,11 @@ Run through this with the user:
   window only.
 - **Full screen:** F.
 - **Blank slides:** look for any in the G overview.
+
+When someone needs the deck as PowerPoint, PDF, or in Canva / Google Slides, run
+`node tools/export.mjs <deck>/index.html --font "Noto Sans TC"` (add `--pdf` for a PDF).
+Every picture, box and line of text becomes its own object. To check the result, open the
+.pptx in Keynote, export slide images, and compare them with `shoot.mjs` shots.
 
 ## More than one deck
 - Every deck is its own folder with its own copy of the engine. Decks never

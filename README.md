@@ -122,12 +122,25 @@ node tools/shoot.mjs ~/talks/my-talk/index.html --sheet     # every slide, plus 
 node tools/shoot.mjs index.html 12 --at 0.5,2,4             # one slide at several moments
 ```
 
+## Exporting to PowerPoint or PDF
+
+```sh
+node tools/export.mjs ~/talks/my-talk/index.html --font "Noto Sans TC"         # index.pptx
+node tools/export.mjs ~/talks/my-talk/index.html --font "Noto Sans TC" --pdf   # index.pdf
+```
+
+In the .pptx, every picture, box and line of text is its own object, so it can be moved,
+copied and reused in Canva, Google Slides, Keynote or PowerPoint. The PDF has text you can
+select and search. Each slide is exported as it looks once it settles: a video becomes its
+last frame, and `--steps` adds a page for every step. `--font` names a font the other app
+has, so text keeps its place and wrapping there.
+
 ## Layout
 
 ```
 deck/        the engine: deck.css, deck.js (core and modes), fx/ (one file per effect, loaded on demand), themes/
 template/    the starting index.html
-tools/       new-deck, capture-morph, shoot, thumbs (site thumbnails and posters), shoot-og (og.png)
+tools/       new-deck, capture-morph, shoot, export (PowerPoint and PDF), thumbs (site thumbnails and posters), shoot-og (og.png)
 effects.html gallery of every effect
 examples/    example decks (intro, civictech, taipei) and the gallery's media
 skill/       a Claude Code skill for building decks with an AI
