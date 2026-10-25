@@ -253,11 +253,6 @@ body.presenter{background:var(--chrome);color:var(--ui-ink);overflow:auto;font-f
 body.embed #themes{display:none}
 
 /* ---------- touch screens and narrow windows ---------- */
-.anno-acts{display:none;justify-content:flex-end;gap:8px;margin-top:8px}
-.anno-acts button{font:600 15px var(--sans);border:0;border-radius:999px;padding:8px 18px;background:var(--ui-anno);color:var(--ui-anno-ink);cursor:pointer}
-.anno-acts button.no{background:var(--ui-line);color:var(--ui-ink)}
-.touch .anno-acts{display:flex}
-.touch #anno-input .hint{display:none}
 .touch #help{width:42px;height:42px;font-size:18px;opacity:.75}
 /* by touch the toast sits low, clear of the panels at the top, and the overview bar keeps only its buttons */
 .touch #toast{top:auto;bottom:72px;max-width:calc(100vw - 32px)}
@@ -268,7 +263,6 @@ body.embed #themes{display:none}
 #notes.show ~ #help{display:none}
 .touch #keys{bottom:66px}
 .touch .key-row{padding:10px 8px}
-.touch #modebadge{font-size:14px;padding:9px 14px}
 @media (max-width:600px){
   #toast{top:auto;bottom:72px;max-width:calc(100vw - 32px)}
   #overview,#wall{padding:16px}

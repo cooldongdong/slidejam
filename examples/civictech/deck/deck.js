@@ -250,7 +250,7 @@
     });
     $$("aside.notes").forEach((n) => { if (!orig.has(n)) orig.set(n, n.innerHTML); });
     renderNotes();
-    toast(on ? (touch ? "編輯模式：點文字直接改。點左上角「編輯」結束" : "編輯模式：點文字直接改，⌘S 存回檔案，Esc 離開") : dirty.size ? `還有 ${dirty.size} 處沒存（⌘S）` : "離開編輯模式");
+    toast(on ? "編輯模式：點文字直接改，⌘S 存回檔案，Esc 離開" : dirty.size ? `還有 ${dirty.size} 處沒存（⌘S）` : "離開編輯模式");
   }
 
   // file handle, remembered per page so ⌘S only asks once
@@ -419,7 +419,7 @@
     hoverEl?.classList.remove("anno-hover");
     if (!on) cancelAnno();
     renderPanel(); renderPins();
-    if (on) toast("標註模式：點一下標位置，拖拉可以框範圍，寫下想要怎樣。右上角可以複製給 AI。" + (touch ? "點左上角「標註」結束" : "A 或 Esc 離開"));
+    if (on) toast("標註模式：點一下標位置，拖拉可以框範圍，寫下想要怎樣。右上角可以複製給 AI。A 或 Esc 離開");
   }
   // ---- boxes: eight handles resize, dragging inside moves. The box being written about and
   // the saved ones both work this way; the numbers in the note follow.
@@ -613,7 +613,7 @@
     { id: "replay", key: "r", label: "重播這一頁", run: () => show(Deck.cur) },
     { id: "fullscreen", key: "f", label: "全螢幕", run: fullscreen, can: () => document.fullscreenEnabled },
     { id: "edit", key: "e", desk: true, label: "直接改字，⌘S 存回檔案", run: () => setEditing(!document.body.classList.contains("editing")) },
-    { id: "annotate", key: "a", label: "標註給 AI：點一下或拖拉框選", run: () => setAnnotating(!document.body.classList.contains("annotating")) },
+    { id: "annotate", key: "a", desk: true, label: "標註給 AI：點一下或拖拉框選", run: () => setAnnotating(!document.body.classList.contains("annotating")) },
     { id: "theme", key: "t", label: "換主題（預覽；⌘S 存進檔案）", run: () => toggleThemes() },
     { id: "help", key: "?", desk: true, label: "這份說明", run: () => toggleKeys() },
   ];
@@ -814,9 +814,6 @@
     const ai = chrome("div", "anno-input", document.body);
     el("div", { className: "what" }, ai); el("textarea", { placeholder: "想要怎樣？例如：這張圖慢慢放大到右上角" }, ai);
     el("div", { className: "hint", textContent: "Enter 送出・Shift+Enter 換行・Esc 取消" }, ai);
-    const acts = el("div", { className: "anno-acts" }, ai);
-    el("button", { textContent: "取消", className: "no" }, acts).onclick = (e) => { e.stopPropagation(); cancelAnno(); };
-    el("button", { textContent: "送出" }, acts).onclick = (e) => { e.stopPropagation(); $("textarea", ai).dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true })); };
     chrome("div", "anno-panel", document.body);
     const help = chrome("button", "help", document.body);
     help.textContent = "?"; help.title = touch ? "操作" : "快捷鍵";
@@ -830,8 +827,8 @@
     }, true);
     $("#page").title = "總覽（G）";
     $("#page").addEventListener("click", (e) => { e.stopPropagation(); toggleOverview(true); });
-    // the mode badge also ends the mode when tapped (the only way out without a keyboard)
-    const badge = () => ($("#modebadge").textContent = document.body.classList.contains("editing") ? (touch ? "編輯 · 點這裡結束" : "編輯 · ⌘S 存檔") : (touch ? "標註 · 點這裡結束" : "標註"));
+    // the mode badge also ends the mode when clicked
+    const badge = () => ($("#modebadge").textContent = document.body.classList.contains("editing") ? "編輯 · ⌘S 存檔" : "標註");
     $("#modebadge").title = "結束";
     $("#modebadge").addEventListener("click", (e) => { e.stopPropagation(); setEditing(false); setAnnotating(false); });
     new MutationObserver(badge).observe(document.body, { attributes: true, attributeFilter: ["class"] });
