@@ -116,11 +116,14 @@ node tools/shoot.mjs index.html 12 --at 0.5,2,4             # 同一頁在不同
 ```sh
 node tools/export.mjs ~/talks/my-talk/index.html --font "Noto Sans TC"         # 做出 index.pptx
 node tools/export.mjs ~/talks/my-talk/index.html --font "Noto Sans TC" --pdf   # 做出 index.pdf
+node tools/export.mjs ~/talks/my-talk/index.html --play                        # 做出 index-play.pptx
 ```
 
 PowerPoint 檔裡，每張圖、每個框、每段字都是獨立的物件，在 Canva、Google 簡報、Keynote、PowerPoint 裡都能個別移動、複製、拿去別處用。PDF 的文字可以選取、搜尋。
 
 匯出的是每一頁動畫跑完的樣子：影片會變成最後一格，加上 `--steps` 則每一步各自匯出成一頁。`--font` 換成對方軟體也有的字型，文字的位置和換行才不會跑掉。
+
+`--play` 是上台用的備份：每一步錄成一段影片，進到那一頁就自動播放，按 → 換下一步，動畫、地圖、真網站都照原樣。場地沒有網路，或只能用別人的電腦時用得上。裡面的東西不能改，講稿放在備忘稿裡。
 
 ## 資料夾結構
 

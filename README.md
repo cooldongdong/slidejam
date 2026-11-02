@@ -127,6 +127,7 @@ node tools/shoot.mjs index.html 12 --at 0.5,2,4             # one slide at sever
 ```sh
 node tools/export.mjs ~/talks/my-talk/index.html --font "Noto Sans TC"         # index.pptx
 node tools/export.mjs ~/talks/my-talk/index.html --font "Noto Sans TC" --pdf   # index.pdf
+node tools/export.mjs ~/talks/my-talk/index.html --play                        # index-play.pptx
 ```
 
 In the .pptx, every picture, box and line of text is its own object, so it can be moved,
@@ -134,6 +135,11 @@ copied and reused in Canva, Google Slides, Keynote or PowerPoint. The PDF has te
 select and search. Each slide is exported as it looks once it settles: a video becomes its
 last frame, and `--steps` adds a page for every step. `--font` names a font the other app
 has, so text keeps its place and wrapping there.
+
+`--play` makes a backup for showing the talk: every step is recorded as a video that starts
+with its page, and → moves on, so effects, maps and live sites look as they do in the browser.
+It's for a venue without a network, or a computer that isn't yours. Nothing in it can be
+edited, and the speaker notes are in the slide notes.
 
 ## Layout
 

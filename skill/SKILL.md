@@ -70,6 +70,8 @@ Run through this with the user:
   window only.
 - **Full screen:** F.
 - **Blank slides:** look for any in the G overview.
+- **Backup:** offer `node tools/export.mjs <deck>/index.html --play`, run while online. Every
+  step becomes a video that plays with its page in PowerPoint or Keynote, with the notes.
 
 When someone needs the deck as PowerPoint, PDF, or in Canva / Google Slides, run
 `node tools/export.mjs <deck>/index.html --font "Noto Sans TC"` (add `--pdf` for a PDF).
