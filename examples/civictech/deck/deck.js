@@ -224,6 +224,13 @@
     await Promise.all($$("img", box).map((i) => i.decode().catch(() => {})));
     window.print();
   }
+  // the other exports run on the computer, not in the page: copy what to tell the AI, and the
+  // slidejam skill lists the choices
+  async function copyExport() {
+    const where = location.protocol === "file:" ? decodeURIComponent(location.pathname) : location.href.split("#")[0];
+    try { await navigator.clipboard.writeText(`/slidejam export ${where}`); toast("已複製，貼給 Claude Code，它會列出匯出的選項"); }
+    catch { toast("複製失敗：跟 AI 說「/slidejam export」，再加上這份簡報的路徑"); }
+  }
   addEventListener("beforeprint", () => $("#print") || buildPrint());
   addEventListener("afterprint", () => $("#print")?.remove());
 
@@ -651,6 +658,7 @@
     { id: "annotate", key: "a", desk: true, label: "標註給 AI：點一下或拖拉框選", run: () => setAnnotating(!document.body.classList.contains("annotating")) },
     { id: "theme", key: "t", label: "換主題（預覽；⌘S 存進檔案）", run: () => toggleThemes() },
     { id: "print", fixed: "⌘P", desk: true, label: "存成 PDF：每頁一張，停在動畫跑完的樣子", run: () => printDeck() },
+    { id: "export", key: "x", desk: true, label: "匯出成 PPT、PDF 或上台備份：複製一句話給 AI", run: () => copyExport() },
     { id: "help", key: "?", desk: true, label: "這份說明", run: () => toggleKeys() },
   ];
   const keyStore = "slidejam-keys";
