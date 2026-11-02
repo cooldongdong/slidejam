@@ -58,6 +58,7 @@ Claude Code and it walks you through a new deck in six steps.
 | G or click the page number | overview; its ▶ Play all button runs every slide at once |
 | P | presenter window: notes, next slide and a clock, on your screen only |
 | T | themes: preview any theme live; ⌘S writes the choice into the file |
+| ⌘P | save as PDF: a page per slide, as it looks once it settles |
 | ? or the small button bottom-left | list the keys; click a row to run it, click a key to change it |
 | hover the progress bar | peek at a slide; click to jump |
 | R | replay this slide |
@@ -123,6 +124,9 @@ node tools/shoot.mjs index.html 12 --at 0.5,2,4             # one slide at sever
 ```
 
 ## Exporting to PowerPoint or PDF
+
+Without a terminal, press **⌘P** in the browser and save as PDF: a page per slide, as it
+looks once it settles. For more, use the tool:
 
 ```sh
 node tools/export.mjs ~/talks/my-talk/index.html --font "Noto Sans TC"         # index.pptx

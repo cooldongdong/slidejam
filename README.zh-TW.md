@@ -49,6 +49,7 @@ open ~/talks/my-talk/index.html
 | G 或點頁碼 | 總覽；按上方的「▶ 播放全部」，每一頁會同時動起來 |
 | P | 講者視窗：講稿、下一頁和計時器，只在你自己的螢幕上 |
 | T | 換主題：即時預覽每一套主題，⌘S 把選擇寫進檔案 |
+| ⌘P | 存成 PDF：每頁一張，停在動畫跑完的樣子 |
 | ? 或左下角的小按鈕 | 列出所有按鍵；點一列直接執行，點右邊的鍵可以換成別的鍵 |
 | 滑到最下面的進度條 | 預覽那一頁，點一下就跳過去 |
 | R | 重播這一頁 |
@@ -112,6 +113,8 @@ node tools/shoot.mjs index.html 12 --at 0.5,2,4             # 同一頁在不同
 ```
 
 ## 匯出成 PowerPoint 或 PDF
+
+不用終端機的話，在瀏覽器裡按 **⌘P**，選「另存為 PDF」，每一頁存成一張、停在動畫跑完的樣子。要更多選擇，用下面的工具：
 
 ```sh
 node tools/export.mjs ~/talks/my-talk/index.html --font "Noto Sans TC"         # 做出 index.pptx
