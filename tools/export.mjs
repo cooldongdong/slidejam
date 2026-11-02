@@ -4,6 +4,8 @@
 //
 //   node tools/export.mjs path/to/index.html               → index.pptx next to the deck
 //   node tools/export.mjs index.html --pdf                 → index.pdf, text you can select and search
+//   node tools/export.mjs index.html --play                → index-play.pptx, every step a video that
+//                                                           plays by itself: a backup for showing the talk
 //   node tools/export.mjs index.html --font "Noto Sans TC" set all text in a font the other app has
 //   node tools/export.mjs index.html --steps               a page for every step, not just each slide's last
 //   node tools/export.mjs index.html --slides 3,8          only these slides
@@ -20,12 +22,21 @@
 // installed or on Google Fonts, so pages are measured in the font the file will name; a PDF
 // keeps its name only when it is installed as a .ttf file.
 //
+// --play is for showing the talk where the deck itself can't run (no network for maps, live
+// sites and web fonts; a computer with no browser to spare). Every step is recorded, frame by
+// frame on a virtual clock so nothing is dropped, until it stops moving; one that never stops
+// (a loop) is recorded for its --wait (default 12 s) and repeats. → plays the next step. Nothing
+// in it can be edited; speaker notes come along in both kinds of .pptx.
+//
 // Works on slidejam decks, and on any deck with a fixed-size #stage that exposes `slides`,
 // `show(i)`, `next()` and `cur` as globals (--stage picks another stage element).
 import { chromium } from "playwright";
 import PptxGenJS from "pptxgenjs";
+import JSZip from "jszip";
 import { PDFDocument, PDFName, PDFRawStream } from "pdf-lib";
-import { writeFileSync } from "node:fs";
+import { writeFileSync, mkdtempSync, rmSync } from "node:fs";
+import { spawn } from "node:child_process";
+import { tmpdir } from "node:os";
 import { inflateSync, deflateSync } from "node:zlib";
 import { resolve, dirname, basename, join } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -36,15 +47,16 @@ const flag = (k) => { const i = args.indexOf("--" + k); if (i < 0) return false;
 const font = opt("font", null);
 let mono = opt("mono", font ? "Space Mono" : null);
 // "5,12:3": 5 seconds, but 3 for slide 12
-const waits = opt("wait", "5").split(",");
+const play = flag("play");
+const waits = opt("wait", play ? "12" : "5").split(",");
 const waitFor = (i) => +(waits.find((w) => w.startsWith(i + 1 + ":"))?.split(":")[1] ?? waits.find((w) => !w.includes(":")) ?? 5);
 const stageSel = opt("stage", "#stage");
 const outArg = opt("out", null);
 const pdf = flag("pdf");
-const everyStep = flag("steps");
+const everyStep = flag("steps") || play;
 const only = opt("slides", null)?.split(",").map(Number);
 const file = resolve(args.shift() || "index.html");
-const out = outArg ? resolve(outArg) : join(dirname(file), basename(file, ".html") + (pdf ? ".pdf" : ".pptx"));
+const out = outArg ? resolve(outArg) : join(dirname(file), basename(file, ".html") + (pdf ? ".pdf" : play ? "-play.pptx" : ".pptx"));
 const url = pathToFileURL(file).href;
 
 const browser = await chromium.launch();
@@ -53,18 +65,33 @@ const errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
 
 // ---------- driving the deck ----------
+// one interface over slidejam's Deck and the plain globals of older decks
+const DRIVER = (sel) => {
+  window.__x = window.Deck?.slides?.length
+    ? { count: () => Deck.slides.length, cur: () => Deck.cur, slide: (i = Deck.cur) => Deck.slides[i], show: (i) => Deck.show(i), next: () => Deck.next() }
+    : { count: () => slides.length, cur: () => cur, slide: (i = cur) => slides[i], show: (i) => show(i), next: () => next() };
+  const st = document.querySelector(sel);
+  return { w: st.offsetWidth, h: st.offsetHeight };
+};
+const booted = () => window.Deck?.slides?.length || (typeof slides !== "undefined" && typeof show === "function");
+
+// show only one slide: the stage at the top left, unscaled; deck chrome and other slides hidden
+function stageOnly({ sel, i }) {
+  const st = document.querySelector(sel), slide = __x.slide(i ?? __x.cur());
+  for (let e = st; e && e !== document.body; e = e.parentElement)
+    for (const sib of e.parentElement.children) if (sib !== e) sib.style.setProperty("display", "none", "important");
+  for (const c of st.children) if (c !== slide) c.style.setProperty("display", "none", "important");
+  const css = document.createElement("style");
+  css.textContent = `html,body{overflow:visible!important;margin:0!important}
+    ${sel}{position:absolute!important;left:0!important;top:0!important;transform:none!important;margin:0!important}`;
+  document.head.append(css);
+}
+
 async function open(i) {
   await page.goto("about:blank"); // a new hash alone wouldn't reload the deck
   await page.goto(url + "#" + (i + 1));
-  await page.waitForFunction(() => window.Deck?.slides?.length || (typeof slides !== "undefined" && typeof show === "function"));
-  const size = await page.evaluate((sel) => {
-    // one interface over slidejam's Deck and the plain globals of older decks
-    window.__x = window.Deck?.slides?.length
-      ? { count: () => Deck.slides.length, cur: () => Deck.cur, slide: () => Deck.slides[Deck.cur], show: (i) => Deck.show(i), next: () => Deck.next() }
-      : { count: () => slides.length, cur: () => cur, slide: () => slides[cur], show: (i) => show(i), next: () => next() };
-    const st = document.querySelector(sel);
-    return { w: st.offsetWidth, h: st.offsetHeight };
-  }, stageSel);
+  await page.waitForFunction(booted);
+  const size = await page.evaluate(DRIVER, stageSel);
   if (size.w !== page.viewportSize().width || size.h !== page.viewportSize().height) await page.setViewportSize({ width: size.w, height: size.h });
   await page.evaluate((i) => __x.cur() !== i && __x.show(i), i);
   return size;
@@ -107,18 +134,13 @@ async function settle(i, steps) {
     window.requestAnimationFrame = () => 0;
     for (let id = 1; id < 1e5; id++) { clearInterval(id); }
     window.setTimeout = window.setInterval = () => 0;
-    // show only the slide: the stage at the top left, unscaled; deck chrome and other slides hidden
     const st = document.querySelector(sel);
-    for (let e = st; e && e !== document.body; e = e.parentElement)
-      for (const sib of e.parentElement.children) if (sib !== e) sib.style.setProperty("display", "none", "important");
-    for (const c of st.children) if (c !== slide) c.style.setProperty("display", "none", "important");
     const css = document.createElement("style");
-    css.textContent = `html,body{overflow:visible!important;margin:0!important}
-      ${sel}{position:absolute!important;left:0!important;top:0!important;transform:none!important;margin:0!important}
-      ${sel} *,${sel} *::before,${sel} *::after{box-shadow:none!important;text-shadow:none!important;transition:none!important}
+    css.textContent = `${sel} *,${sel} *::before,${sel} *::after{box-shadow:none!important;text-shadow:none!important;transition:none!important}
       @page{size:${st.offsetWidth}px ${st.offsetHeight}px;margin:0}`;
     document.head.append(css);
   }, stageSel);
+  await page.evaluate(stageOnly, { sel: stageSel, i: null });
   if (font) await useFont();
   await page.waitForTimeout(300);
   return size;
@@ -362,9 +384,105 @@ async function leftovers() {
   return parts;
 }
 
+// ---------- recording: each step a video ----------
+const FPS = 30;
+// before the deck's scripts run: videos don't play on their own, the recorder moves them along
+const QUIET = () => {
+  const M = HTMLMediaElement.prototype, pause = M.pause;
+  window.__pause = pause;
+  M.play = function () { pause.call(this); this.__on = true; this.__t0 = performance.now() - this.currentTime * 1000; return Promise.resolve(); };
+  M.pause = function () { pause.call(this); this.__on = false; };
+};
+// bring CSS and Web Animations and videos to the virtual clock. They run on the browser's own
+// time, which keeps going while a frame is shot, so each is slowed almost to a stop and set
+// to where it should be; set past its end, it finishes and fires its events as usual
+function sync() {
+  const now = performance.now(), A = (window.__A ||= new WeakMap());
+  for (const a of document.getAnimations()) {
+    if (a.playState === "paused" || a.playState === "idle") continue;
+    let s = A.get(a);
+    if (!s) { s = { t0: now, rate: a.playbackRate }; A.set(a, s); a.playbackRate = s.rate / 1e4; }
+    a.currentTime = (now - s.t0) * s.rate;
+  }
+  for (const v of document.querySelectorAll("video")) {
+    if (!v.paused) { __pause.call(v); v.__on = true; v.__t0 = now - v.currentTime * 1000; } // autoplay
+    if (!v.__on || !v.duration) continue;
+    let t = (now - v.__t0) / 1000;
+    if (t >= v.duration) { if (v.loop) t %= v.duration; else { t = v.duration - 0.04; v.__on = false; v.dispatchEvent(new Event("ended")); } }
+    if (Math.abs(v.currentTime - t) > 0.001) v.currentTime = t;
+  }
+}
+// pictures and seeking videos the frame is waiting on (map tiles load on real time)
+const pending = () => [...document.querySelectorAll("img")].some((i) => !i.complete) || [...document.querySelectorAll("video")].some((v) => v.seeking);
+
+async function record(i, steps, tmp) {
+  // opened on another slide and then moved to this one, so it enters the way it does on stage
+  const from = i > 0 ? i - 1 : Math.min(1, total - 1);
+  // shot at 1920 wide, for a projector
+  const size = deckSize;
+  const ctx = await browser.newContext({ viewport: { width: size.w, height: size.h }, deviceScaleFactor: 1920 / size.w });
+  await ctx.addInitScript(QUIET);
+  await ctx.clock.install({ time: Date.now() });
+  await ctx.clock.pauseAt(Date.now() + 1000);
+  const p = await ctx.newPage();
+  p.on("pageerror", (e) => errors.push(e.message));
+  await p.goto(url + "#" + (from + 1));
+  await p.waitForFunction(booted, null, { polling: 50 });
+  await p.evaluate(DRIVER, stageSel);
+  await p.evaluate(() => document.fonts.ready);
+  await p.evaluate(stageOnly, { sel: stageSel, i });
+  const notes = await p.evaluate((i) => __x.slide(i).querySelector("aside.notes")?.textContent.trim(), i);
+  await p.evaluate((i) => __x.cur() !== i && __x.show(i), i);
+
+  const segs = [], max = waitFor(i) * FPS, hold = 2 * FPS;
+  let f = 0;
+  for (let s = 0; s <= steps; s++) {
+    if (s) await p.evaluate(() => __x.next());
+    const frames = [];
+    let still = 0;
+    for (let k = 0; k < max; k++, f++) {
+      if (k || s) await p.clock.runFor(Math.round(((f + 1) * 1000) / FPS) - Math.round((f * 1000) / FPS));
+      await p.evaluate(sync);
+      for (let w = 0; w < 300 && (await p.evaluate(pending)); w++) await p.waitForTimeout(10);
+      const jpg = await p.screenshot({ type: "jpeg", quality: 92 });
+      still = frames.length && jpg.equals(frames[frames.length - 1]) ? still + 1 : 0;
+      frames.push(jpg);
+      // still for two seconds: it has settled, and the video ends where it stopped moving
+      if (still >= hold) break;
+    }
+    const loop = still < hold;
+    if (!loop) frames.length -= still;
+    const seg = { first: frames[0], loop, ms: Math.round((frames.length * 1000) / FPS) };
+    if (frames.length > 1) seg.video = await encode(frames, join(tmp, `${i + 1}-${s}.mp4`));
+    segs.push(seg);
+    process.stdout.write(seg.video ? (loop ? "∞" : "▸") : ".");
+  }
+  await ctx.close();
+  return { size, notes, segs };
+}
+
+function encode(frames, file) {
+  const ff = spawn("ffmpeg", ["-y", "-loglevel", "error", "-f", "image2pipe", "-framerate", String(FPS), "-i", "-",
+    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "20", "-preset", "medium", "-movflags", "+faststart", file], { stdio: ["pipe", "ignore", "inherit"] });
+  for (const fr of frames) ff.stdin.write(fr);
+  ff.stdin.end();
+  return new Promise((ok, no) => ff.on("close", (c) => (c ? no(new Error("ffmpeg failed")) : ok(file))));
+}
+
+// PowerPoint's timing for "start automatically" on the video shape `id`
+const autoplay = (id, ms, loop) => `<p:timing><p:tnLst><p:par><p:cTn id="1" dur="indefinite" restart="never" nodeType="tmRoot"><p:childTnLst>
+<p:par><p:cTn id="2" fill="hold"><p:stCondLst><p:cond delay="indefinite"/><p:cond evt="onBegin" delay="0"><p:tn val="2"/></p:cond></p:stCondLst><p:childTnLst>
+<p:par><p:cTn id="3" fill="hold"><p:stCondLst><p:cond delay="0"/></p:stCondLst><p:childTnLst>
+<p:par><p:cTn id="4" presetID="1" presetClass="mediacall" presetSubtype="0" fill="hold" nodeType="afterEffect"><p:stCondLst><p:cond delay="0"/></p:stCondLst><p:childTnLst>
+<p:cmd type="call" cmd="playFrom(0.0)"><p:cBhvr><p:cTn id="5" dur="${ms}" fill="hold"/><p:tgtEl><p:spTgt spid="${id}"/></p:tgtEl></p:cBhvr></p:cmd>
+</p:childTnLst></p:cTn></p:par></p:childTnLst></p:cTn></p:par></p:childTnLst></p:cTn></p:par>
+<p:video><p:cMediaNode vol="80000"><p:cTn id="6"${loop ? ' repeatCount="indefinite"' : ""} fill="hold" display="0"><p:stCondLst><p:cond delay="indefinite"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid="${id}"/></p:tgtEl></p:cMediaNode></p:video>
+</p:childTnLst></p:cTn></p:par></p:tnLst></p:timing>`;
+
 // ---------- writing ----------
 const states = [];
-const total = await (async () => { await open(0); return page.evaluate(() => __x.count()); })();
+const deckSize = await open(0);
+const total = await page.evaluate(() => __x.count());
 for (let i = 0; i < total; i++) {
   if (only && !only.includes(i + 1)) continue;
   const k = await countSteps(i);
@@ -396,6 +514,36 @@ if (pdf) {
   const shapes = doc.getPages().some((p) => { const f = p.node.Resources()?.lookup(PDFName.of("Font"));
     return f && f.entries().some(([, v]) => doc.context.lookup(v).get(PDFName.of("Subtype")) === PDFName.of("Type3")); });
   if (shapes) console.log("\n! Some text is embedded without its font's name, so apps that import the PDF will guess the font. Pass --font with a font installed as a .ttf file (not .otf, not a variable font).");
+} else if (play) {
+  const px = 1 / 96, tmp = mkdtempSync(join(tmpdir(), "slidejam-play-"));
+  const pptx = new PptxGenJS(), pages = [];
+  let size, n = 0;
+  for (let i = 0; i < total; i++) {
+    const steps = states.filter(([j]) => j === i).map(([, s]) => s);
+    if (!steps.length) continue;
+    const r = await record(i, Math.max(...steps), tmp);
+    size = r.size;
+    for (const seg of r.segs.filter((_, s) => steps.includes(s))) {
+      if (!n++) { pptx.defineLayout({ name: "DECK", width: size.w * px, height: size.h * px }); pptx.layout = "DECK"; }
+      const slide = pptx.addSlide(), full = { x: 0, y: 0, w: size.w * px, h: size.h * px };
+      slide.background = { color: "000000" };
+      const cover = "image/jpeg;base64," + seg.first.toString("base64");
+      if (seg.video) slide.addMedia({ type: "video", path: seg.video, cover: "data:" + cover, ...full });
+      else slide.addImage({ data: cover, ...full });
+      if (r.notes) slide.addNotes(r.notes);
+      pages.push(seg);
+    }
+  }
+  // pptxgenjs leaves a video to be clicked; make each one start with its page, and loops repeat
+  const zip = await JSZip.loadAsync(await pptx.write({ outputType: "nodebuffer" }));
+  for (const [k, seg] of pages.entries()) {
+    if (!seg.video) continue;
+    const name = `ppt/slides/slide${k + 1}.xml`, xml = await zip.file(name).async("string");
+    const id = xml.match(/<p:cNvPr id="(\d+)"[^>]*><a:hlinkClick[^>]*action="ppaction:\/\/media"/)[1];
+    zip.file(name, xml.replace("</p:sld>", autoplay(id, seg.ms, seg.loop) + "</p:sld>"));
+  }
+  writeFileSync(out, await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" }));
+  rmSync(tmp, { recursive: true, force: true });
 } else {
   const px = 1 / 96, pt = 0.75;
   const pptx = new PptxGenJS();
@@ -418,6 +566,8 @@ if (pdf) {
         line: it.line ? { color: it.line.hex, width: it.line.w * pt, transparency: Math.round((1 - it.line.a) * 100) } : { type: "none" },
       });
     }
+    const notes = await page.evaluate(() => __x.slide().querySelector("aside.notes")?.textContent.trim());
+    if (notes) slide.addNotes(notes);
     for (const p of await leftovers()) slide.addImage({ data: p.data.replace(/^data:/, ""), ...at(p.box) });
     for (const t of texts) {
       slide.addText(t.runs.map((r) => r.t === "\n" ? { text: "", options: { breakLine: true } } : {
