@@ -49,6 +49,8 @@ open ~/talks/my-talk/index.html
 | G 或點頁碼 | 總覽；按上方的「▶ 播放全部」，每一頁會同時動起來 |
 | P | 講者視窗：講稿、下一頁和計時器，只在你自己的螢幕上 |
 | T | 換主題：即時預覽每一套主題，⌘S 把選擇寫進檔案 |
+| ⌘P | 存成 PDF：每頁一張，停在動畫跑完的樣子 |
+| X | 匯出成 PPT、PDF 或上台備份：複製 `/slidejam export <路徑>`，貼給 Claude Code，它會列出選項 |
 | ? 或左下角的小按鈕 | 列出所有按鍵；點一列直接執行，點右邊的鍵可以換成別的鍵 |
 | 滑到最下面的進度條 | 預覽那一頁，點一下就跳過去 |
 | R | 重播這一頁 |
@@ -111,12 +113,28 @@ node tools/shoot.mjs ~/talks/my-talk/index.html --sheet     # 每一頁截一張
 node tools/shoot.mjs index.html 12 --at 0.5,2,4             # 同一頁在不同時間點各截一張
 ```
 
+## 匯出成 PowerPoint 或 PDF
+
+不用終端機的話，在瀏覽器裡按 **⌘P**，選「另存為 PDF」，每一頁存成一張、停在動畫跑完的樣子。要更多選擇，用下面的工具：
+
+```sh
+node tools/export.mjs ~/talks/my-talk/index.html --font "Noto Sans TC"         # 做出 index.pptx
+node tools/export.mjs ~/talks/my-talk/index.html --font "Noto Sans TC" --pdf   # 做出 index.pdf
+node tools/export.mjs ~/talks/my-talk/index.html --play                        # 做出 index-play.pptx
+```
+
+PowerPoint 檔裡，每張圖、每個框、每段字都是獨立的物件，在 Canva、Google 簡報、Keynote、PowerPoint 裡都能個別移動、複製、拿去別處用。PDF 的文字可以選取、搜尋。
+
+匯出的是每一頁動畫跑完的樣子：影片會變成最後一格，加上 `--steps` 則每一步各自匯出成一頁。`--font` 換成對方軟體也有的字型，文字的位置和換行才不會跑掉。
+
+`--play` 是上台用的備份：每一步錄成一段影片，進到那一頁就自動播放，按 → 換下一步，動畫、地圖、真網站都照原樣。場地沒有網路，或只能用別人的電腦時用得上。裡面的東西不能改，講稿放在備忘稿裡。
+
 ## 資料夾結構
 
 ```
 deck/        引擎：deck.css、deck.js（核心與各種模式）、fx/（每種效果一個檔，用到才載入）、themes/
 template/    新簡報的 index.html
-tools/       new-deck、capture-morph、shoot、thumbs（網站縮圖與海報）、shoot-og（og.png）
+tools/       new-deck、capture-morph、shoot、export（PowerPoint 與 PDF）、thumbs（網站縮圖與海報）、shoot-og（og.png）
 effects.html 效果圖鑑
 examples/    範例簡報（intro、civictech、taipei）和圖鑑用的素材
 skill/       跟 AI 一起做簡報用的 Claude Code skill

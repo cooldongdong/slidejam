@@ -192,6 +192,48 @@
     }
   }
 
+  // ---------- print: one page per slide, as it rests (⌘P, or 存成 PDF in the ? panel) ----------
+  // Pages are the overview's thumbnails at full size. A copied canvas is blank, so it gets
+  // what the slide has drawn, and a video (which prints as a grey box) becomes a picture of
+  // its last frame; that part waits for the video, so ⌘P is caught and goes through here too.
+  function buildPrint() {
+    $("#print")?.remove();
+    const box = el("div", { id: "print" }, document.body);
+    Deck.slides.forEach((s, i) => {
+      const t = makeThumb(i, W), from = $$("canvas", s);
+      $$("canvas", t).forEach((c, j) => { const o = from[j]; if (o?.width) { c.width = o.width; c.height = o.height; c.getContext("2d").drawImage(o, 0, 0); } });
+      box.appendChild(t);
+    });
+    return box;
+  }
+  async function printDeck() {
+    const box = buildPrint();
+    await Promise.all($$("video", box).map(async (v) => {
+      v.preload = "auto"; v.src = v.getAttribute("src").split("#")[0];
+      const wait = (ev) => new Promise((ok) => { v.addEventListener(ev, ok, { once: true }); setTimeout(ok, 4000); });
+      if (v.readyState < 1) await wait("loadedmetadata");
+      v.currentTime = v.loop || !v.duration ? Math.min(2.5, v.duration || 2.5) : v.duration - 0.05;
+      await wait("seeked");
+      if (!v.videoWidth) return;
+      const c = el("canvas", { className: v.className, width: v.videoWidth, height: v.videoHeight });
+      const st = getComputedStyle(v);
+      for (const k of ["position", "inset", "width", "height", "objectFit", "objectPosition", "borderRadius", "margin", "display", "transform"]) c.style[k] = st[k];
+      c.getContext("2d").drawImage(v, 0, 0);
+      v.replaceWith(c);
+    }));
+    await Promise.all($$("img", box).map((i) => i.decode().catch(() => {})));
+    window.print();
+  }
+  // the other exports run on the computer, not in the page: copy what to tell the AI, and the
+  // slidejam skill lists the choices
+  async function copyExport() {
+    const where = location.protocol === "file:" ? decodeURIComponent(location.pathname) : location.href.split("#")[0];
+    try { await navigator.clipboard.writeText(`/slidejam export ${where}`); toast("已複製，貼給 Claude Code，它會列出匯出的選項"); }
+    catch { toast("複製失敗：跟 AI 說「/slidejam export」，再加上這份簡報的路徑"); }
+  }
+  addEventListener("beforeprint", () => $("#print") || buildPrint());
+  addEventListener("afterprint", () => $("#print")?.remove());
+
   function setupPeek() {
     const zone = $("#hoverzone"), peek = $("#peek"), tick = $("#peek-tick"), bar = $("#bar");
     const cache = {};
@@ -615,6 +657,8 @@
     { id: "edit", key: "e", desk: true, label: "直接改字，⌘S 存回檔案", run: () => setEditing(!document.body.classList.contains("editing")) },
     { id: "annotate", key: "a", desk: true, label: "標註給 AI：點一下或拖拉框選", run: () => setAnnotating(!document.body.classList.contains("annotating")) },
     { id: "theme", key: "t", label: "換主題（預覽；⌘S 存進檔案）", run: () => toggleThemes() },
+    { id: "print", fixed: "⌘P", desk: true, label: "存成 PDF：每頁一張，停在動畫跑完的樣子", run: () => printDeck() },
+    { id: "export", key: "x", desk: true, label: "匯出成 PPT、PDF 或上台備份：複製一句話給 AI", run: () => copyExport() },
     { id: "help", key: "?", desk: true, label: "這份說明", run: () => toggleKeys() },
   ];
   const keyStore = "slidejam-keys";
@@ -682,6 +726,7 @@
     if (pendingAnno && !e.target.closest?.("#anno-input")) { cancelAnno(); if (e.key === "Escape") return; }
     const typing = e.target.isContentEditable || /INPUT|TEXTAREA/.test(e.target.tagName);
     if ((e.metaKey || e.ctrlKey) && e.key === "s") { e.preventDefault(); save(); return; }
+    if ((e.metaKey || e.ctrlKey) && e.key === "p") { e.preventDefault(); printDeck(); return; }
     if (e.key === "Escape") {
       if (typing) return e.target.blur();
       if ($("#keys").classList.contains("show")) return toggleKeys(false);

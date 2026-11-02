@@ -58,6 +58,8 @@ Claude Code and it walks you through a new deck in six steps.
 | G or click the page number | overview; its ▶ Play all button runs every slide at once |
 | P | presenter window: notes, next slide and a clock, on your screen only |
 | T | themes: preview any theme live; ⌘S writes the choice into the file |
+| ⌘P | save as PDF: a page per slide, as it looks once it settles |
+| X | export to PowerPoint, PDF or a backup for the talk: copies `/slidejam export <path>` for Claude Code, which lists the choices |
 | ? or the small button bottom-left | list the keys; click a row to run it, click a key to change it |
 | hover the progress bar | peek at a slide; click to jump |
 | R | replay this slide |
@@ -122,12 +124,34 @@ node tools/shoot.mjs ~/talks/my-talk/index.html --sheet     # every slide, plus 
 node tools/shoot.mjs index.html 12 --at 0.5,2,4             # one slide at several moments
 ```
 
+## Exporting to PowerPoint or PDF
+
+Without a terminal, press **⌘P** in the browser and save as PDF: a page per slide, as it
+looks once it settles. For more, use the tool:
+
+```sh
+node tools/export.mjs ~/talks/my-talk/index.html --font "Noto Sans TC"         # index.pptx
+node tools/export.mjs ~/talks/my-talk/index.html --font "Noto Sans TC" --pdf   # index.pdf
+node tools/export.mjs ~/talks/my-talk/index.html --play                        # index-play.pptx
+```
+
+In the .pptx, every picture, box and line of text is its own object, so it can be moved,
+copied and reused in Canva, Google Slides, Keynote or PowerPoint. The PDF has text you can
+select and search. Each slide is exported as it looks once it settles: a video becomes its
+last frame, and `--steps` adds a page for every step. `--font` names a font the other app
+has, so text keeps its place and wrapping there.
+
+`--play` makes a backup for showing the talk: every step is recorded as a video that starts
+with its page, and → moves on, so effects, maps and live sites look as they do in the browser.
+It's for a venue without a network, or a computer that isn't yours. Nothing in it can be
+edited, and the speaker notes are in the slide notes.
+
 ## Layout
 
 ```
 deck/        the engine: deck.css, deck.js (core and modes), fx/ (one file per effect, loaded on demand), themes/
 template/    the starting index.html
-tools/       new-deck, capture-morph, shoot, thumbs (site thumbnails and posters), shoot-og (og.png)
+tools/       new-deck, capture-morph, shoot, export (PowerPoint and PDF), thumbs (site thumbnails and posters), shoot-og (og.png)
 effects.html gallery of every effect
 examples/    example decks (intro, civictech, taipei) and the gallery's media
 skill/       a Claude Code skill for building decks with an AI

@@ -274,3 +274,14 @@ body.embed #themes{display:none}
   #anno-panel{top:62px;left:16px;right:16px;width:auto;max-height:40vh}
 }
 
+/* print: only the pages built by buildPrint(), one slide each, backgrounds kept; blurred shadows
+   print as grey blocks in some PDF viewers, so they go */
+#print{display:none}
+@media print{
+  @page{size:1600px 900px;margin:0}
+  html,body{background:none!important;overflow:visible!important;height:auto!important}
+  body>*:not(#print){display:none!important}
+  #print{display:block}
+  #print .thumb{width:1600px;height:900px;aspect-ratio:auto;border-radius:0;break-after:page;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #print *{box-shadow:none!important;text-shadow:none!important}
+}
