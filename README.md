@@ -59,6 +59,7 @@ Claude Code and it walks you through a new deck in six steps.
 | P | presenter window: notes, next slide and a clock, on your screen only |
 | T | themes: preview any theme live; ⌘S writes the choice into the file |
 | ⌘P | save as PDF: a page per slide, as it looks once it settles |
+| X | export to PowerPoint, PDF or a backup for the talk: copies `/slidejam export <path>` for Claude Code, which lists the choices |
 | ? or the small button bottom-left | list the keys; click a row to run it, click a key to change it |
 | hover the progress bar | peek at a slide; click to jump |
 | R | replay this slide |

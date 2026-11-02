@@ -17,6 +17,8 @@ Follow these steps in order, and tell the user which step you are on, e.g.「（
 They are the same steps as the site's 使用流程 page (`guide.html`). Keep the two in sync.
 
 ### Step 0: which deck?
+- If the arguments start with `export` (the deck's X key copies `/slidejam export <path>`),
+  skip the flow and go to **Exporting** below.
 - If the user named a folder, or pasted an annotation list (its first lines give
   the file path), that is the deck. Read its `index.html` and go to step 5.
 - Otherwise ask one question: 開一份新的，還是繼續做某個資料夾的簡報？
@@ -70,13 +72,40 @@ Run through this with the user:
   window only.
 - **Full screen:** F.
 - **Blank slides:** look for any in the G overview.
-- **Backup:** offer `node tools/export.mjs <deck>/index.html --play`, run while online. Every
-  step becomes a video that plays with its page in PowerPoint or Keynote, with the notes.
+- **Backup:** offer the 上台備份 export (see **Exporting**), run while online.
 
-When someone needs the deck as PowerPoint, PDF, or in Canva / Google Slides, run
-`node tools/export.mjs <deck>/index.html --font "Noto Sans TC"` (add `--pdf` for a PDF).
-Every picture, box and line of text becomes its own object. To check the result, open the
-.pptx in Keynote, export slide images, and compare them with `shoot.mjs` shots.
+## Exporting
+
+When the user asks to export, or runs `/slidejam export [path]`, find the deck (the path,
+or step 0), then list the choices in one message and wait for a pick. Unless they already
+said which one they want:
+
+> 要匯出成哪一種？
+> 1. **可以編輯的 PowerPoint**：每張圖、每個框、每段字都能拆開移動，給 Canva、Google 簡報、Keynote 繼續改。
+> 2. **PDF**：字可以選取、搜尋，字型修好了，給人看或印出來。
+> 3. **上台備份**：每一步錄成影片、自動播放，場地沒網路或要用別人電腦時用。字不能改。
+> 4. **每一步都要一頁**（加在 1 或 2 上）：按 → 才出現的東西各自一頁。
+>
+> 不用終端機也行：在 Chrome 打開簡報按 ⌘P，就能存成每頁一張的 PDF。
+
+Then run, from the slidejam repo:
+
+| Choice | Command | Output |
+|---|---|---|
+| 1 | `node tools/export.mjs <deck>/index.html --font "Noto Sans TC"` | `index.pptx` |
+| 2 | `node tools/export.mjs <deck>/index.html --font "Noto Sans TC" --pdf` | `index.pdf` |
+| 3 | `node tools/export.mjs <deck>/index.html --play` | `index-play.pptx` |
+| 4 | add `--steps` | |
+
+- `--font` names a font the other app has, so text keeps its place. Noto Sans TC is in
+  Canva and Google Slides; ask only if they use something else.
+- 3 needs a network while it runs (maps, live sites, web fonts) and takes several minutes for
+  a long deck. Run it in the background.
+- `--slides 3,8` for some slides only; `--wait 12:20` gives slide 12 more time to settle.
+- Check before handing over: open a .pptx in Keynote and export slide images, or look at
+  the last frame of each video for 3, and compare with `shoot.mjs` shots.
+- Hand over the file path, the page count, and anything that didn't come through (`live`
+  iframes are blank in a PDF; 3 can't be edited).
 
 ## More than one deck
 - Every deck is its own folder with its own copy of the engine. Decks never
